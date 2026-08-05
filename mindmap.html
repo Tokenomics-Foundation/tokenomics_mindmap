@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tokenomics Mind Map</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a0e17;
+      --panel: #111725;
+      --panel-2: #1a2233;
+      --panel-hover: #232c40;
+      --ink: #e8ebf2;
+      --muted: #96a0b5;
+      --line: #28324a;
+      --brand: #4f8cff;
+      --halo: #0a0e17;
+      --gen: #5b8cff;
+      --con: #b98cff;
+      --val: #ff6fa4;
+      --add: #6b7590;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg)
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 18px;
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+      background: var(--panel)
+    }
+
+    header h1 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: .2px
+    }
+
+    header .spacer {
+      flex: 1
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--ink)
+    }
+
+    .btn:hover {
+      background: var(--panel-hover)
+    }
+
+    .btn.primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.08)
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--ink);
+      cursor: pointer;
+      user-select: none
+    }
+
+    .toggle input {
+      accent-color: var(--brand)
+    }
+
+    #search {
+      font: inherit;
+      font-size: 13px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      width: 170px;
+      background: var(--panel-2);
+      color: var(--ink)
+    }
+
+    #search::placeholder {
+      color: var(--muted)
+    }
+
+    #search:focus {
+      outline: none;
+      border-color: var(--brand)
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px
+    }
+
+    #stage {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      background: var(--bg)
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab
+    }
+
+    svg:active {
+      cursor: grabbing
+    }
+
+    .link {
+      fill: none;
+      stroke-opacity: .6;
+      stroke-width: 1.5px
+    }
+
+    .node text {
+      font-size: 12.5px;
+      fill: var(--ink);
+      paint-order: stroke;
+      stroke: var(--halo);
+      stroke-width: 3.5px;
+      stroke-linejoin: round
+    }
+
+    .node.has-info text {
+      cursor: help;
+      text-decoration: underline dotted rgba(255, 255, 255, .4);
+      text-underline-offset: 3px
+    }
+
+    .node circle {
+      cursor: pointer;
+      stroke-width: 1.6px
+    }
+
+    .node.leaf circle {
+      cursor: default
+    }
+
+    .node.match text {
+      fill: #fbbf24;
+      stroke: var(--halo)
+    }
+
+    .node.match circle {
+      stroke: #fbbf24 !important
+    }
+
+    .node.add text {
+      fill: var(--add);
+      font-style: italic;
+      stroke: var(--halo);
+      cursor: pointer
+    }
+
+    .node.add circle {
+      fill: var(--bg);
+      stroke: var(--add);
+      stroke-dasharray: 2.5 2.5;
+      cursor: pointer
+    }
+
+    #tip {
+      position: absolute;
+      max-width: 340px;
+      background: var(--panel);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .5);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .12s;
+      z-index: 10
+    }
+
+    #tip.show {
+      opacity: 1;
+      pointer-events: auto
+    }
+
+    #tip h3 {
+      margin: 0 0 5px;
+      font-size: 13px;
+      color: #fff
+    }
+
+    #tip .desc {
+      color: var(--ink)
+    }
+
+    #tip .links {
+      margin-top: 8px;
+      border-top: 1px solid var(--line);
+      padding-top: 7px
+    }
+
+    #tip .links a {
+      display: block;
+      color: var(--brand);
+      text-decoration: none;
+      margin: 2px 0;
+      word-break: break-all
+    }
+
+    #tip .links a:hover {
+      text-decoration: underline
+    }
+
+    #loader {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 14, 23, .94);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20
+    }
+
+    #drop {
+      width: min(520px, 86%);
+      border: 2px dashed var(--line);
+      border-radius: 16px;
+      padding: 34px;
+      text-align: center;
+      background: var(--panel)
+    }
+
+    #drop.drag {
+      border-color: var(--brand);
+      background: var(--panel-2)
+    }
+
+    #drop h2 {
+      margin: 0 0 6px;
+      font-size: 18px
+    }
+
+    #drop p {
+      margin: 6px 0;
+      color: var(--muted);
+      font-size: 13.5px
+    }
+
+    #drop code {
+      background: var(--panel-2);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      color: var(--ink)
+    }
+
+    #err {
+      color: #ff8a8a;
+      font-size: 13px;
+      min-height: 18px;
+      margin-top: 8px
+    }
+
+    .hint {
+      position: absolute;
+      left: 14px;
+      bottom: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(17, 23, 37, .85);
+      padding: 5px 9px;
+      border-radius: 8px;
+      border: 1px solid var(--line)
+    }
+
+    .hint b {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    #toast {
+      position: absolute;
+      right: 16px;
+      bottom: 14px;
+      background: var(--brand);
+      color: #fff;
+      font-size: 13px;
+      padding: 9px 13px;
+      border-radius: 9px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .18s, transform .18s;
+      z-index: 15
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: none
+    }
+
+    #modal {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4, 6, 12, .6);
+      z-index: 30
+    }
+
+    #modal.show {
+      display: flex
+    }
+
+    #modalCard {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px 20px 16px;
+      width: min(460px, 90%);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .6)
+    }
+
+    #modalCard h2 {
+      margin: 0 0 14px;
+      font-size: 17px
+    }
+
+    #modalCard label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 4px
+    }
+
+    #modalCard .field {
+      margin-bottom: 14px
+    }
+
+    #modalCard input[type=text],
+    #modalCard textarea {
+      width: 100%;
+      font: inherit;
+      font-size: 14px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--panel-2)
+    }
+
+    #modalCard input[type=text]:focus,
+    #modalCard textarea:focus {
+      outline: none;
+      border-color: var(--brand)
+    }
+
+    #modalCard textarea {
+      resize: vertical;
+      min-height: 78px;
+      line-height: 1.45
+    }
+
+    #modalCard .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 2px
+    }
+
+    .linkrow {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px
+    }
+
+    .linkrow input {
+      flex: 1;
+      font: inherit;
+      font-size: 13px;
+      padding: 7px 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--ink)
+    }
+
+    .linkrow input:focus {
+      outline: none;
+      border-color: var(--brand)
+    }
+
+    .linkrow .rm {
+      flex: 0 0 auto;
+      width: 32px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--muted);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1
+    }
+
+    .linkrow .rm:hover {
+      color: #ff8a8a;
+      border-color: #ff8a8a
+    }
+
+    .btn.linkadd {
+      font-size: 12.5px;
+      padding: 5px 10px;
+      margin-top: 2px
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <header>
+      <h1>Tokenomics Mind Map</h1>
+      <div class="legend">
+        <span><i style="background:var(--gen)"></i>Generation</span>
+        <span><i style="background:var(--con)"></i>Consumption</span>
+        <span><i style="background:var(--val)"></i>Value</span>
+      </div>
+      <div class="spacer"></div>
+      <input id="search" type="search" placeholder="Search nodes… (Enter)" />
+      <label class="toggle"><input type="checkbox" id="editToggle" /> Edit</label>
+      <button class="btn" id="expandBtn">Expand all</button>
+      <button class="btn" id="collapseBtn">Collapse</button>
+      <button class="btn" id="fitBtn">Fit</button>
+      <button class="btn" id="loadBtn">Load</button>
+      <button class="btn primary" id="saveBtn">Save YAML</button>
+    </header>
+    <div id="stage">
+      <svg></svg>
+      <div id="tip"></div>
+      <div class="hint">Scroll to zoom · drag to pan · click node to collapse · click <b>add node</b> to add a child ·
+        double-click to rename</div>
+      <div id="toast"></div>
+      <div id="loader">
+        <div id="drop">
+          <h2>Load your mind map</h2>
+          <p>Pick <code>tokenomics_mindmap.yaml</code> from your folder, or drop it here.</p>
+          <p><button class="btn primary" id="pickBtn">Choose YAML file</button></p>
+          <p style="font-size:12px">Keep the HTML and YAML in the same folder. Serving the folder over a local server
+            also auto-loads.</p>
+          <div id="err"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <input id="file" type="file" accept=".yaml,.yml,text/yaml" style="display:none" />
+
+  <div id="modal">
+    <div id="modalCard">
+      <h2>Edit Node</h2>
+      <div class="field">
+        <label for="edName">Name</label>
+        <input id="edName" type="text" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="edDesc">Description</label>
+        <textarea id="edDesc" placeholder="Optional — shown on hover in the map"></textarea>
+      </div>
+      <div class="field">
+        <label>Links</label>
+        <div id="edLinks"></div>
+        <button type="button" class="btn linkadd" id="edAddLink">+ Add link</button>
+      </div>
+      <div class="actions">
+        <button class="btn" id="edCancel">Cancel</button>
+        <button class="btn primary" id="edSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+    const BRANCH_COLORS = { Generation: "#5b8cff", Consumption: "#b98cff", Value: "#ff6fa4" };
+    const DEFAULT_FILE = "tokenomics_mindmap.yaml";
+    const dx = 20, dy = 250, duration = 350;
+    const HOLLOW = (getComputedStyle(document.documentElement).getPropertyValue("--bg").trim()) || "#0a0e17";
+    const ADD_LINK = "#4a5570";
+
+    let svg, gLink, gNode, zoom, treeLayout;
+    let dataRoot = null, root = null, posCache = {}, editMode = false, uidC = 0, fileHandle = null;
+    const stage = document.getElementById("stage");
+    const tip = document.getElementById("tip");
+    const loader = document.getElementById("loader");
+    const errBox = document.getElementById("err");
+    const toastEl = document.getElementById("toast");
+    const uid = () => "u" + (++uidC);
+
+    /* ---------- YAML -> editable data tree ---------- */
+    function pick(obj, ...keys) { for (const k of keys) { if (obj[k] != null) return obj[k]; } return undefined; }
+    function toNode(name, val) {
+      const node = { name: String(name), children: [] };
+      if (val && typeof val === "object" && !Array.isArray(val)) {
+        const desc = pick(val, "Description", "description");
+        const links = pick(val, "Links", "links");
+        if (desc != null) node.description = String(desc);
+        if (links != null) node.links = Array.isArray(links) ? links.map(String) : [String(links)];
+        const ch = pick(val, "children", "Children");
+        if (ch && typeof ch === "object" && !Array.isArray(ch)) {
+          node.children = Object.entries(ch).map(([k, v]) => toNode(k, v));
+        }
+      }
+      return node;
+    }
+    function buildData(parsed) {
+      if (!parsed || typeof parsed !== "object") throw new Error("YAML root is not a mapping.");
+      const entries = Object.entries(parsed);
+      if (entries.length === 1) return toNode(entries[0][0], entries[0][1]);
+      return { name: "Mind Map", children: entries.map(([k, v]) => toNode(k, v)) };
+    }
+    function eachData(d, fn) { fn(d); (d.children || []).forEach(c => eachData(c, fn)); }
+
+    /* ---------- hierarchy building (rebuilt each render) ---------- */
+    function accessor(d) {
+      if (d.__add) return null;
+      if (d.collapsed) return null;
+      const kids = (d.children ? d.children.slice() : []);
+      if (editMode) kids.push({ __add: true, name: "add node" });
+      return kids.length ? kids : null;
+    }
+    function keyOf(d) { return d.data.__add ? (d.parent.data.__id + "::add") : d.data.__id; }
+    function parentKey(d) { return d.parent ? keyOf(d.parent) : null; }
+    function hasRealChildren(d) { return !!(d.data.children && d.data.children.length); }
+    function branchName(d) { let n = d; while (n.depth > 1) n = n.parent; return n.depth === 1 ? n.data.name : null; }
+    function colorOf(d) { return BRANCH_COLORS[branchName(d)] || "#9aa1ad"; }
+    function hasInfo(d) { return !d.data.__add && !!(d.data.description || (d.data.links && d.data.links.length)); }
+    function textLeft(d) { return !d.data.__add && hasRealChildren(d) && !d.data.collapsed; }
+
+    function initSvg() {
+      svg = d3.select("#stage svg");
+      svg.selectAll("*").remove();
+      const g = svg.append("g");
+      gLink = g.append("g").attr("fill", "none");
+      gNode = g.append("g");
+      zoom = d3.zoom().scaleExtent([0.15, 2.5]).on("zoom", (e) => g.attr("transform", e.transform));
+      svg.call(zoom).on("dblclick.zoom", null);
+      treeLayout = d3.tree().nodeSize([dx, dy]);
+    }
+
+    function diagonal(s, t) {
+      return `M${s.y},${s.x}C${(s.y + t.y) / 2},${s.x} ${(s.y + t.y) / 2},${t.x} ${t.y},${t.x}`;
+    }
+    function nodeClass(d) {
+      if (d.data.__add) return "node add";
+      let c = "node";
+      if (!hasRealChildren(d)) c += " leaf";
+      if (hasInfo(d)) c += " has-info";
+      return c;
+    }
+
+    function update() {
+      const prev = posCache;
+      root = d3.hierarchy(dataRoot, accessor);
+      treeLayout(root);
+      const nodes = root.descendants();
+      const links = root.links();
+      const startFor = d => prev[keyOf(d)] || prev[parentKey(d)] || { x: 0, y: 0 };
+
+      // LINKS
+      const link = gLink.selectAll("path.link").data(links, d => keyOf(d.target));
+      const linkEnter = link.enter().append("path").attr("class", "link")
+        .attr("d", d => { const p = prev[keyOf(d.target)] || prev[keyOf(d.source)] || { x: 0, y: 0 }; return diagonal(p, p); });
+      linkEnter.merge(link)
+        .attr("stroke", d => d.target.data.__add ? ADD_LINK : colorOf(d.target))
+        .attr("stroke-width", d => d.target.data.__add ? 1 : Math.max(1, 2.4 - d.target.depth * 0.35))
+        .transition().duration(duration)
+        .attr("d", d => diagonal(d.source, d.target));
+      link.exit().transition().duration(duration)
+        .attr("d", d => { const p = { x: d.source.x, y: d.source.y }; return diagonal(p, p); }).remove();
+
+      // NODES
+      const node = gNode.selectAll("g.node").data(nodes, d => keyOf(d));
+      const nodeEnter = node.enter().append("g")
+        .attr("transform", d => { const p = startFor(d); return `translate(${p.y},${p.x})`; })
+        .on("click", (e, d) => onClick(e, d))
+        .on("dblclick", (e, d) => onDbl(e, d))
+        .on("mouseenter", (e, d) => showTip(e, d))
+        .on("mousemove", (e) => moveTip(e))
+        .on("mouseleave", hideTip);
+      nodeEnter.append("circle");
+      nodeEnter.append("text").attr("dy", "0.32em");
+
+      const nodeMerge = nodeEnter.merge(node);
+      nodeMerge.attr("class", d => nodeClass(d));
+      nodeMerge.transition().duration(duration).attr("transform", d => `translate(${d.y},${d.x})`);
+      nodeMerge.select("circle")
+        .attr("r", d => d.depth === 0 ? 6 : (d.data.__add ? 3.2 : ((d.data.collapsed && hasRealChildren(d)) ? 5.5 : 4.5)))
+        .attr("fill", d => (!d.data.__add && d.data.collapsed && hasRealChildren(d)) ? colorOf(d) : HOLLOW)
+        .attr("stroke", d => d.data.__add ? "var(--add)" : colorOf(d));
+      nodeMerge.select("text")
+        .attr("x", d => textLeft(d) ? -9 : 9)
+        .attr("text-anchor", d => textLeft(d) ? "end" : "start")
+        .style("font-weight", d => (d.depth <= 1 && !d.data.__add) ? 700 : 400)
+        .text(d => d.data.__add ? ("+ " + d.data.name) : d.data.name);
+
+      node.exit().transition().duration(duration)
+        .attr("transform", d => { const p = d.parent ? { x: d.parent.x, y: d.parent.y } : { x: d.x, y: d.y }; return `translate(${p.y},${p.x})`; })
+        .remove();
+
+      posCache = {};
+      nodes.forEach(d => { posCache[keyOf(d)] = { x: d.x, y: d.y }; });
+    }
+
+    /* ---------- interactions ---------- */
+    function onClick(e, d) {
+      if (d.data.__add) { addChild(d.parent.data); return; }
+      if (hasRealChildren(d)) { d.data.collapsed = !d.data.collapsed; update(); }
+    }
+    function onDbl(e, d) {
+      if (d.data.__add) return;
+      e.preventDefault(); e.stopPropagation();
+      openEditor({ mode: "edit", node: d.data });
+    }
+    function addChild(parent) {
+      openEditor({ mode: "add", parent: parent });
+    }
+
+    /* ---------- Edit Node modal ---------- */
+    const modal = document.getElementById("modal");
+    const edName = document.getElementById("edName");
+    const edDesc = document.getElementById("edDesc");
+    const edLinks = document.getElementById("edLinks");
+    let editorState = null;
+
+    function makeLinkRow(value) {
+      const row = document.createElement("div"); row.className = "linkrow";
+      const inp = document.createElement("input"); inp.type = "text"; inp.placeholder = "https://…"; inp.value = value || "";
+      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addLinkRow(""); } });
+      const rm = document.createElement("button"); rm.type = "button"; rm.className = "rm"; rm.textContent = "×"; rm.title = "Remove link";
+      rm.addEventListener("click", () => row.remove());
+      row.appendChild(inp); row.appendChild(rm);
+      edLinks.appendChild(row); return inp;
+    }
+    function addLinkRow(v) { makeLinkRow(v).focus(); }
+    function setLinks(arr) { edLinks.innerHTML = ""; (arr || []).forEach(u => makeLinkRow(u)); }
+    function getLinks() { return Array.from(edLinks.querySelectorAll("input")).map(i => i.value.trim()).filter(Boolean); }
+
+    function openEditor(cfg) {
+      editorState = cfg;
+      const src = cfg.mode === "edit" ? cfg.node : {};
+      edName.value = src.name || "";
+      edDesc.value = src.description || "";
+      setLinks(src.links || []);
+      modal.classList.add("show");
+      setTimeout(() => { edName.focus(); edName.select(); }, 30);
+    }
+    function closeEditor() { modal.classList.remove("show"); editorState = null; }
+    function saveEditor() {
+      if (!editorState) return;
+      const name = edName.value.trim();
+      const desc = edDesc.value.trim();
+      const links = getLinks();
+      if (!name) { edName.focus(); return; }
+      if (editorState.mode === "add") {
+        const parent = editorState.parent;
+        parent.children = parent.children || [];
+        const node = { name, children: [], collapsed: false, __id: uid() };
+        if (desc) node.description = desc;
+        if (links.length) node.links = links;
+        parent.children.push(node);
+        parent.collapsed = false;
+      } else {
+        const node = editorState.node;
+        node.name = name;
+        if (desc) node.description = desc; else delete node.description;
+        if (links.length) node.links = links; else delete node.links;
+      }
+      closeEditor();
+      update();
+    }
+
+    /* ---------- tooltip ---------- */
+    function showTip(e, d) {
+      if (!hasInfo(d)) return;
+      let html = `<h3>${escapeHtml(d.data.name)}</h3>`;
+      if (d.data.description) html += `<div class="desc">${escapeHtml(d.data.description)}</div>`;
+      if (d.data.links && d.data.links.length) {
+        html += `<div class="links">` + d.data.links.map(l => {
+          const url = escapeHtml(l); return `<a href="${url}" target="_blank" rel="noopener">${url}</a>`;
+        }).join("") + `</div>`;
+      }
+      tip.innerHTML = html; tip.classList.add("show"); moveTip(e);
+    }
+    function moveTip(e) {
+      if (!tip.classList.contains("show")) return;
+      const r = stage.getBoundingClientRect();
+      let x = e.clientX - r.left + 14, y = e.clientY - r.top + 14;
+      const tw = tip.offsetWidth, th = tip.offsetHeight;
+      if (x + tw > r.width) x = e.clientX - r.left - tw - 14;
+      if (y + th > r.height) y = e.clientY - r.top - th - 14;
+      tip.style.left = Math.max(4, x) + "px"; tip.style.top = Math.max(4, y) + "px";
+    }
+    function hideTip() { tip.classList.remove("show"); }
+    function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+    /* ---------- fit / expand / collapse ---------- */
+    function fit() {
+      if (!root) return;
+      const nodes = root.descendants(); if (!nodes.length) return;
+      const xs = nodes.map(d => d.x), ys = nodes.map(d => d.y);
+      const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+      const w = stage.clientWidth, h = stage.clientHeight;
+      const bw = (y1 - y0) + 340, bh = (x1 - x0) + 80;
+      const k = Math.min(2.2, Math.max(0.15, 0.92 * Math.min(w / bw, h / bh)));
+      const tx = w / 2 - k * ((y0 + y1) / 2) + 40, ty = h / 2 - k * ((x0 + x1) / 2);
+      svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(k));
+    }
+    function expandAll() { eachData(dataRoot, d => d.collapsed = false); update(); setTimeout(fit, 60); }
+    function collapseToBranches() {
+      eachData(dataRoot, d => d.collapsed = false);
+      (dataRoot.children || []).forEach(b => b.collapsed = true);
+      update(); setTimeout(fit, 60);
+    }
+
+    /* ---------- search (filter to matches) ---------- */
+    function matchesTerm(node, term) {
+      if (node.name.toLowerCase().includes(term)) return true;
+      if (node.description && node.description.toLowerCase().includes(term)) return true;
+      return false;
+    }
+    function computeMatch(d, term) {
+      let hm = matchesTerm(d, term);
+      (d.children || []).forEach(c => { if (computeMatch(c, term)) hm = true; });
+      d.__hm = hm; return hm;
+    }
+    function applyFilter(d) {
+      const kids = d.children || [];
+      if (!kids.length) return;
+      kids.forEach(applyFilter);
+      d.collapsed = !kids.some(c => c.__hm);
+    }
+    function doSearch(term) {
+      term = term.trim().toLowerCase();
+      gNode.selectAll("g.node").classed("match", false);
+      if (!term || !dataRoot) return;
+      computeMatch(dataRoot, term);
+      if (!dataRoot.__hm) return;
+      applyFilter(dataRoot);
+      update();
+      setTimeout(() => {
+        gNode.selectAll("g.node").classed("match", d => !d.data.__add && matchesTerm(d.data, term));
+        fit();
+      }, duration + 20);
+    }
+
+    /* ---------- YAML serialize + save ---------- */
+    function keyStr(name) {
+      const risky = /[:#]/.test(name) || /^[\s\-?,\[\]{}&*!|>'"%@`]/.test(name) || name !== name.trim() || name === "";
+      return risky ? '"' + name.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"' : name;
+    }
+    function valStr(s) { return '"' + String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"'; }
+    function serialize(node, indent, out) {
+      const pad = "  ".repeat(indent);
+      out.push(pad + keyStr(node.name) + ":");
+      if (node.description) out.push(pad + "  Description: " + valStr(node.description));
+      if (node.links && node.links.length) {
+        out.push(pad + "  Links:");
+        node.links.forEach(l => out.push(pad + "    - " + valStr(l)));
+      }
+      if (node.children && node.children.length) {
+        out.push(pad + "  children:");
+        node.children.forEach(c => serialize(c, indent + 2, out));
+      }
+    }
+    function toYaml() { const out = []; serialize(dataRoot, 0, out); return out.join("\n") + "\n"; }
+
+    function toast(msg) { toastEl.textContent = msg; toastEl.classList.add("show"); setTimeout(() => toastEl.classList.remove("show"), 2200); }
+
+    async function saveYaml() {
+      if (!dataRoot) return;
+      const text = toYaml();
+      // 1) write back to the file the user opened, if we can
+      if (fileHandle && fileHandle.createWritable) {
+        try {
+          let perm = "granted";
+          if (fileHandle.requestPermission) perm = await fileHandle.requestPermission({ mode: "readwrite" });
+          if (perm === "granted") {
+            const w = await fileHandle.createWritable(); await w.write(text); await w.close();
+            toast("Saved to " + (fileHandle.name || "file")); return;
+          }
+        } catch (e) { /* fall through */ }
+      }
+      // 2) Save As via picker
+      if (window.showSaveFilePicker) {
+        try {
+          const h = await window.showSaveFilePicker({
+            suggestedName: DEFAULT_FILE,
+            types: [{ description: "YAML", accept: { "text/yaml": [".yaml", ".yml"] } }]
+          });
+          const w = await h.createWritable(); await w.write(text); await w.close();
+          fileHandle = h; toast("Saved."); return;
+        } catch (e) { if (e && e.name === "AbortError") return; }
+      }
+      // 3) fallback: download
+      const blob = new Blob([text], { type: "text/yaml" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = DEFAULT_FILE; a.click();
+      URL.revokeObjectURL(url);
+      toast("Downloaded " + DEFAULT_FILE);
+    }
+
+    /* ---------- load ---------- */
+    function loadFromText(text) {
+      try {
+        const parsed = jsyaml.load(text);
+        dataRoot = buildData(parsed);
+        eachData(dataRoot, d => { d.__id = uid(); if (d.collapsed === undefined) d.collapsed = false; if (!d.children) d.children = []; });
+        initSvg(); posCache = {}; update();
+        loader.style.display = "none";
+        setTimeout(fit, 60);
+      } catch (err) { showError("Could not parse YAML: " + err.message); }
+    }
+    function showError(msg) { errBox.textContent = msg; loader.style.display = "flex"; }
+
+    async function tryAutoLoad() {
+      try { const res = await fetch(DEFAULT_FILE, { cache: "no-store" }); if (res.ok) { loadFromText(await res.text()); return; } }
+      catch (e) { /* file:// blocks this */ }
+      loader.style.display = "flex";
+    }
+    async function pickFile() {
+      errBox.textContent = "";
+      if (window.showOpenFilePicker) {
+        try {
+          const [h] = await window.showOpenFilePicker({ types: [{ description: "YAML", accept: { "text/yaml": [".yaml", ".yml"] } }] });
+          fileHandle = h;
+          const f = await h.getFile(); loadFromText(await f.text()); return;
+        } catch (e) { if (e && e.name === "AbortError") return; }
+      }
+      document.getElementById("file").click();
+    }
+    async function reload() {
+      if (fileHandle && fileHandle.getFile) {
+        try { const f = await fileHandle.getFile(); loadFromText(await f.text()); return; } catch (e) { }
+      }
+      try { const res = await fetch(DEFAULT_FILE, { cache: "no-store" }); if (res.ok) { loadFromText(await res.text()); return; } } catch (e) { }
+      pickFile();
+    }
+
+    /* ---------- wire up ---------- */
+    document.getElementById("pickBtn").addEventListener("click", pickFile);
+    document.getElementById("loadBtn").addEventListener("click", reload);
+    document.getElementById("saveBtn").addEventListener("click", saveYaml);
+    document.getElementById("file").addEventListener("change", (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader(); r.onload = () => loadFromText(r.result); r.readAsText(f);
+    });
+    document.getElementById("expandBtn").addEventListener("click", () => { if (dataRoot) expandAll(); });
+    document.getElementById("collapseBtn").addEventListener("click", () => { if (dataRoot) collapseToBranches(); });
+    document.getElementById("fitBtn").addEventListener("click", fit);
+    document.getElementById("editToggle").addEventListener("change", (e) => { editMode = e.target.checked; if (dataRoot) update(); });
+    document.getElementById("search").addEventListener("keydown", (e) => { if (e.key === "Enter") doSearch(e.target.value); });
+
+    document.getElementById("edSave").addEventListener("click", saveEditor);
+    document.getElementById("edCancel").addEventListener("click", closeEditor);
+    document.getElementById("edAddLink").addEventListener("click", () => addLinkRow(""));
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeEditor(); });
+    edName.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); saveEditor(); } });
+    edDesc.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); saveEditor(); } });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("show")) closeEditor(); });
+
+    const drop = document.getElementById("drop");
+    ["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("drag"); }));
+    ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("drag"); }));
+    drop.addEventListener("drop", e => {
+      const f = e.dataTransfer.files[0]; if (!f) return;
+      const r = new FileReader(); r.onload = () => loadFromText(r.result); r.readAsText(f);
+    });
+    window.addEventListener("resize", () => { if (root) fit(); });
+
+    if (typeof d3 === "undefined" || typeof jsyaml === "undefined") {
+      showError("Could not load D3 / js-yaml from CDN. Connect to the internet, or host the two libraries locally.");
+    } else { tryAutoLoad(); }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,627 @@
+Tokenomics:
+  Description: "The full economics of producing and consuming LLM tokens, from hardware through pricing."
+  children:
+    Generation:
+      Description: "The supply side of tokens, covering everything required to produce them."
+      children:
+        Tokenization:
+          Description: "How raw text and media are converted into the tokens that get billed and processed."
+          children:
+            Algorithm:
+              Description: "The method used to split text into tokens."
+              children:
+                BPE (Byte-Pair Encoding):
+                  Description: "Merges frequent character pairs into subword tokens, the dominant scheme for modern LLMs."
+                WordPiece:
+                  Description: "A subword scheme used by BERT-family models that picks merges by likelihood rather than raw frequency."
+                SentencePiece / Unigram:
+                  Description: "A language-agnostic tokenizer that trains directly on raw text, common in multilingual models."
+                Byte-level tokenization:
+                  Description: "Operates on raw bytes so any input is representable without unknown tokens."
+            Implementations:
+              Description: "Concrete libraries that perform tokenization."
+              children:
+                tiktoken:
+                  Description: "OpenAI's fast byte-pair-encoding tokenizer library."
+                HuggingFace Tokenizers:
+                  Description: "A widely used Rust-backed tokenizer library with many pretrained vocabularies."
+                SentencePiece:
+                  Description: "Google's tokenizer library implementing byte-pair and Unigram models."
+            Vocabulary:
+              Description: "The fixed set of tokens a model recognizes."
+              children:
+                Vocab size:
+                  Description: "The number of distinct tokens, trading model size against how efficiently text compresses."
+                Special tokens:
+                  Description: "Reserved tokens such as end-of-sequence, padding, and chat roles that carry structural meaning."
+                Vocab / embedding tradeoff:
+                  Description: "Larger vocabularies shorten sequences but enlarge the embedding table and memory footprint."
+            Efficiency:
+              Description: "How compactly a tokenizer encodes text, which directly sets token counts and cost."
+              children:
+                Tokens-per-word ratio:
+                  Description: "How many tokens an average word consumes, a direct multiplier on cost."
+                Language disparity (non-English cost premium):
+                  Description: "Non-English text often uses more tokens per word, making it more expensive to process."
+                Code / structured text density:
+                  Description: "Code and markup tokenize inefficiently, inflating token counts for technical workloads."
+                Compression rate:
+                  Description: "The overall ratio of characters to tokens a tokenizer achieves."
+            Multimodal tokenization:
+              Description: "How non-text inputs are converted into tokens."
+              children:
+                Image patches / tiles:
+                  Description: "Images are split into patches or tiles, each costing a set number of tokens."
+                Audio tokens:
+                  Description: "Audio is discretized into tokens, typically many per second of sound."
+                Video tokens:
+                  Description: "Video is tokenized per frame or clip, the most token-intensive modality."
+        Model / Architecture:
+          Description: "The model's design, which sets the cost floor before any training or serving."
+          children:
+            Family:
+              Description: "The high-level architectural class of the model."
+              children:
+                Dense transformer:
+                  Description: "A standard transformer where every parameter is active on every token."
+                Mixture of Experts (MoE):
+                  Description: "Routes each token to a subset of expert subnetworks, cutting active compute per token."
+                State-space / hybrid (Mamba, etc.):
+                  Description: "Non-attention or hybrid architectures that scale more cheaply with sequence length."
+            Scale:
+              Description: "The size of the model, a primary driver of both quality and cost."
+              children:
+                Parameter count:
+                  Description: "The total number of weights, correlating with capability and serving cost."
+                Active vs total params (MoE):
+                  Description: "In MoE models only a fraction of parameters run per token, decoupling size from compute cost."
+                Model tiers (nano / small / frontier):
+                  Description: "Capability tiers that let teams match model cost to task difficulty."
+            Context:
+              Description: "How much input a model can attend to at once."
+              children:
+                Context window length:
+                  Description: "The maximum tokens a model can process in one request, bounding prompt and memory cost."
+                Positional encoding (RoPE, ALiBi):
+                  Description: "Methods for encoding token position that affect how far context can be extended."
+                Long-context methods:
+                  Description: "Techniques that push usable context beyond the trained window, usually at added compute cost."
+            Attention:
+              Description: "The mechanism relating tokens to each other, and a major driver of memory and compute."
+              children:
+                Multi-Head Attention:
+                  Description: "The standard attention with separate key and value heads, the most memory-hungry variant."
+                Grouped-Query / Multi-Query Attention:
+                  Description: "Shares key and value heads to shrink the KV cache and speed decoding."
+                Sliding-window / sparse attention:
+                  Description: "Limits attention to nearby or selected tokens to reduce cost on long inputs."
+                FlashAttention:
+                  Description: "A memory-efficient attention kernel that speeds training and inference without changing results."
+            Modality:
+              Description: "The kinds of input and output a model supports."
+              children:
+                Text:
+                  Description: "Text-only input and output, the baseline modality."
+                Vision / multimodal:
+                  Description: "Handles images alongside text, adding vision token costs."
+                Audio / speech:
+                  Description: "Processes or generates audio, with its own tokenization and latency profile."
+            Openness:
+              Description: "How available the model's weights and usage rights are."
+              children:
+                Open weights:
+                  Description: "Weights are downloadable, enabling self-hosting and full cost control."
+                Proprietary / API-only:
+                  Description: "Accessible only through a vendor API, trading control for convenience."
+                License terms:
+                  Description: "The legal conditions governing commercial use, redistribution, and fine-tuning."
+        Hardware:
+          Description: "The physical infrastructure that produces tokens."
+          children:
+            Capacity:
+              Description: "The pool of physical resources available for training and serving."
+              children:
+                Compute:
+                  Description: "Raw processing capability for model math."
+                  children:
+                    GPU Capacity:
+                      Description: "The number and type of GPUs available, the central constraint on throughput."
+                    Accelerator type (GPU, TPU, Trainium, Inferentia, ASIC):
+                      Description: "The class of chip used, each with distinct cost and performance tradeoffs."
+                Memory:
+                  Description: "On-device and system memory that bounds model and batch size."
+                  children:
+                    Storage:
+                      Description: "Disk capacity for weights, datasets, and checkpoints."
+                    Memory bandwidth (HBM):
+                      Description: "High-bandwidth memory speed, often the true bottleneck for inference."
+                Networking:
+                  Description: "Data movement within and between machines."
+                  children:
+                    Network Bandwidth:
+                      Description: "Throughput between nodes, critical for distributed training and serving."
+                    Interconnect (NVLink, InfiniBand):
+                      Description: "High-speed links between accelerators that enable efficient model parallelism."
+                Power:
+                  Description: "Electrical supply and heat management for the fleet."
+                  children:
+                    Energy:
+                      Description: "Electricity consumed, a growing share of total token cost."
+                    Cooling:
+                      Description: "Heat removal systems required to keep dense accelerators running."
+                    PUE (Power Usage Effectiveness):
+                      Description: "The ratio of total facility power to IT power, measuring datacenter efficiency."
+                Facilities:
+                  Description: "The physical datacenter housing the hardware."
+                  children:
+                    Space:
+                      Description: "Floor and rack space available for equipment."
+                    Rack density:
+                      Description: "How much compute is packed per rack, affecting power and cooling design."
+            Procurement:
+              Description: "How compute capacity is acquired."
+              children:
+                Sourcing model (Cloud vs on-prem vs hybrid):
+                  Description: "The basic decision of renting, owning, or mixing infrastructure."
+                Commitment (Reserved vs on-demand vs spot):
+                  Description: "The pricing commitment chosen, trading flexibility against unit cost."
+                GPU quotas / allocation:
+                  Description: "Limits vendors place on how many accelerators a customer can access."
+                Lead times:
+                  Description: "The wait between ordering and receiving scarce accelerators."
+                Capex vs Opex:
+                  Description: "Whether compute is a capital purchase or an operating expense."
+                Vendor lock-in:
+                  Description: "Dependence on one provider's hardware, software, or pricing."
+            Lifecycle (Intersections with HAM):
+              Description: "Managing hardware from acquisition through retirement, overlapping with hardware asset management."
+              children:
+                Depreciation schedules:
+                  Description: "How accelerator value is written down over its useful life."
+                Refresh cycles:
+                  Description: "The cadence of replacing hardware with newer generations."
+                Failure / RMA rates:
+                  Description: "How often units fail and must be returned, reducing effective capacity."
+                Secondary market resale:
+                  Description: "Recovering value by selling used accelerators."
+                Utilization tracking:
+                  Description: "Measuring how fully hardware is used, the key to cost efficiency."
+        Training:
+          Description: "The process of creating and refining a model."
+          children:
+            Pretraining:
+              Description: "The large-scale initial training that gives a model its base capabilities."
+              children:
+                Data curation:
+                  Description: "Selecting and cleaning the training corpus, a major quality and cost lever."
+                Data licensing:
+                  Description: "Securing legal rights to training data."
+                Synthetic data:
+                  Description: "Model-generated data used to augment or replace scarce real data."
+                Scaling laws:
+                  Description: "Empirical relationships predicting quality from model size, data, and compute."
+            Post-Training:
+              Description: "Steps after pretraining that adapt and align a model."
+              children:
+                Fine Tuning:
+                  Description: "Adapting a pretrained model to a specific task or domain."
+                  children:
+                    Full fine-tune:
+                      Description: "Updating all weights, the most capable but most expensive adaptation."
+                    PEFT / Adapters:
+                      Description: "Parameter-efficient methods that train small add-on weights instead of the full model."
+                      children:
+                        LoRA (Low-Rank Adaptation):
+                          Description: "Trains small low-rank matrices, cutting fine-tuning cost dramatically."
+                        QLoRA (Quantized Low-Rank Adaptation):
+                          Description: "Combines LoRA with a quantized base model to fine-tune on modest hardware."
+                        DoRA:
+                          Description: "A LoRA refinement that decomposes weights into magnitude and direction for better accuracy."
+                    Prompt / Prefix tuning:
+                      Description: "Learns soft prompt vectors while freezing the model, the lightest adaptation."
+                Alignment:
+                  Description: "Shaping model behavior to human preferences and safety norms."
+                  children:
+                    RLHF:
+                      Description: "Reinforcement learning from human feedback, the standard preference-alignment method."
+                    RLAIF:
+                      Description: "Uses AI-generated feedback in place of human labels to cut alignment cost."
+                    DPO:
+                      Description: "Direct preference optimization, aligning models without a separate reward model."
+                Distillation:
+                  Description: "Training a smaller model to mimic a larger one, lowering serving cost."
+            Quantization:
+              Description: "Reducing the numeric precision of weights and activations to shrink cost."
+              children:
+                Method:
+                  Description: "When quantization is applied relative to training."
+                  children:
+                    PTQ (Post-Training Quantization):
+                      Description: "Quantizes an already-trained model, fast but sometimes lossy."
+                    QAT (Quantization-Aware Training):
+                      Description: "Trains with quantization simulated, preserving more accuracy."
+                Scheme:
+                  Description: "How numeric ranges are mapped to lower precision."
+                  children:
+                    Affine quantization:
+                      Description: "Uses a scale and zero-point offset to map values, handling asymmetric ranges."
+                    Symmetric quantization:
+                      Description: "Maps values around zero without an offset, simpler and faster."
+                Algorithms:
+                  Description: "Specific quantization techniques."
+                  children:
+                    GPTQ:
+                      Description: "A one-shot post-training method that quantizes weights layer by layer with low error."
+                    AWQ:
+                      Description: "Activation-aware quantization that protects the most important weights."
+                    GGUF:
+                      Description: "A file format and quantization scheme popular for running models locally."
+                Precision formats:
+                  Description: "The numeric formats weights and activations use."
+                  children:
+                    BF16:
+                      Description: "16-bit brain floating point, the common training precision."
+                    FP8:
+                      Description: "8-bit floating point, increasingly used to speed inference and training."
+                    INT8:
+                      Description: "8-bit integer precision, a widely supported inference quantization."
+                    INT4:
+                      Description: "4-bit integer precision, maximizing memory savings at some quality cost."
+            Distributed Training:
+              Description: "Splitting training across many devices to handle large models."
+              children:
+                Data parallelism:
+                  Description: "Replicates the model across devices, each processing different data."
+                Tensor parallelism:
+                  Description: "Splits individual layers across devices to fit large models."
+                Pipeline parallelism:
+                  Description: "Splits the model by layers into stages across devices."
+                Mixture of Experts:
+                  Description: "Distributes expert subnetworks across devices, active only when routed to."
+            Operations:
+              Description: "The practical running of training jobs."
+              children:
+                Checkpointing:
+                  Description: "Periodically saving model state to survive failures and resume runs."
+                Hyperparameter tuning:
+                  Description: "Searching over training settings to improve results."
+                Training compute cost:
+                  Description: "The total accelerator spend to train a model."
+        Serving:
+          Description: "Running trained models to produce tokens for users."
+          children:
+            KV Cache:
+              Description: "Stored attention keys and values that let the model skip recomputing past tokens, the dominant inference memory cost."
+              Links:
+                - "https://arxiv.org/abs/2309.06180"
+              children:
+                Cache Management:
+                  Description: "Strategies for storing, sharing, and evicting KV cache entries."
+                  children:
+                    Persistent Caching:
+                      Description: "Keeping KV cache across requests so repeated prefixes are not recomputed."
+                    Disaggregated Caching:
+                      Description: "Storing the KV cache separately from compute nodes so it can be shared and scaled."
+                    Cross-Engine Support:
+                      Description: "Sharing cached state across different inference engines or nodes."
+                      children:
+                        Centralised Cache Server:
+                          Description: "A shared server that holds KV cache for many workers to reuse."
+                        Peer-to-Peer (P2P) Cache Transfer:
+                          Description: "Moving cache directly between workers without a central store."
+                Prefix caching:
+                  Description: "Reusing the cached computation of shared prompt prefixes across requests."
+                Eviction policies:
+                  Description: "Rules for which cache entries to drop when memory fills."
+                PagedAttention:
+                  Description: "Pages the KV cache into fixed-size blocks to cut fragmentation and raise GPU utilization."
+                  Links:
+                    - "https://blog.vllm.ai/2023/06/20/vllm.html"
+                Cache compression:
+                  Description: "Shrinking stored KV data to fit more requests in memory."
+                Quantized KV cache:
+                  Description: "Storing KV cache at lower precision to reduce its memory footprint."
+            Inference Optimization:
+              Description: "Techniques that lower the cost and latency of generating tokens."
+              children:
+                Speculative decoding:
+                  Description: "Uses a small draft model to propose tokens a large model verifies, speeding generation."
+                Prefill / Decode disaggregation:
+                  Description: "Separates the compute-heavy prefill phase from the memory-bound decode phase for efficiency."
+                Chunked prefill:
+                  Description: "Breaks long prompt processing into chunks to smooth latency and batching."
+                Parallelism (tensor / pipeline / model sharding):
+                  Description: "Splits a model across devices so it fits and serves faster."
+            Batching:
+              Description: "Grouping requests to raise GPU utilization."
+              children:
+                Static batching:
+                  Description: "Fixed batches formed before processing, simple but less efficient."
+                Continuous batching:
+                  Description: "Dynamically adds and removes requests mid-flight to maximize throughput."
+                Cold Starts:
+                  Description: "The latency and cost of loading a model before it can serve, worst after idle periods."
+            Scaling:
+              Description: "Adjusting serving capacity to match demand."
+              children:
+                Autoscaling:
+                  Description: "Automatically adding or removing serving capacity with load."
+                Load balancing:
+                  Description: "Distributing requests across workers to avoid hotspots."
+                Multi-tenancy:
+                  Description: "Serving many users or models on shared hardware to raise utilization."
+            Inference Engines:
+              Description: "Software that runs models to serve tokens."
+              children:
+                Datacenter engines:
+                  Description: "High-throughput engines for server-class GPUs."
+                  children:
+                    vLLM:
+                      Description: "A high-throughput open-source engine known for PagedAttention."
+                    TensorRT-LLM:
+                      Description: "NVIDIA's optimized inference library for its GPUs."
+                    SGLang:
+                      Description: "An engine optimized for structured generation and fast prefix reuse."
+                    TGI:
+                      Description: "Hugging Face's Text Generation Inference server."
+                    LMDeploy:
+                      Description: "A toolkit for compressing and serving LLMs efficiently."
+                    DeepSpeed-MII:
+                      Description: "Microsoft's low-latency inference engine built on DeepSpeed."
+                Local / edge runtimes:
+                  Description: "Engines for running models on personal or edge hardware."
+                  children:
+                    llama.cpp (Ollama, LM Studio):
+                      Description: "A CPU and GPU runtime for running quantized models locally."
+                    ExLlamaV2:
+                      Description: "A fast runtime for quantized models on consumer GPUs."
+                    CTranslate2:
+                      Description: "An efficient inference engine for transformer models on CPU and GPU."
+                    MLC-LLM:
+                      Description: "A compiler-based runtime that deploys models across many devices."
+                Serving orchestration:
+                  Description: "Infrastructure that manages models and traffic at scale."
+                  children:
+                    Triton Inference Server:
+                      Description: "NVIDIA's server for deploying and managing many models."
+                    Ray Serve:
+                      Description: "A scalable model-serving framework built on Ray."
+                    KServe:
+                      Description: "A Kubernetes-native platform for serving models."
+                Packaged / managed:
+                  Description: "Prebuilt or hosted serving offerings that trade cost for convenience."
+                  children:
+                    NVIDIA NIM:
+                      Description: "NVIDIA's packaged inference microservices that wrap optimized engines."
+                    Fireworks / Together / Baseten:
+                      Description: "Managed inference providers that host open models behind an API."
+                    Friendli:
+                      Description: "A managed inference service focused on high efficiency."
+            Performance:
+              Description: "The latency and throughput metrics that define serving quality and cost."
+              children:
+                TTFT (Time To First Token):
+                  Description: "How long until the first output token appears, driving perceived responsiveness."
+                TPOT / ITL (inter-token latency):
+                  Description: "The time between successive output tokens."
+                Throughput vs latency:
+                  Description: "The core serving tradeoff between total tokens per second and per-request speed."
+                SLOs:
+                  Description: "Service level objectives that set target latency and availability."
+    Consumption:
+      Description: "The demand side, covering how applications spend tokens efficiently."
+      children:
+        Prompt / Context Engineering:
+          Description: "Per-request techniques that control how many tokens a call uses."
+          children:
+            Prompt design (few-shot, system prompts):
+              Description: "Structuring prompts and examples to get good results with fewer tokens."
+            Prompt compression:
+              Description: "Shortening prompts while preserving meaning to cut input cost."
+            Context window management:
+              Description: "Deciding what to include or drop to stay within budget and window limits."
+            Output length control (max tokens, stop sequences):
+              Description: "Capping generation length to control output cost."
+            Structured outputs (JSON mode, grammars):
+              Description: "Constraining output format to reduce retries and wasted tokens."
+            Token budgeting / counting:
+              Description: "Tracking token use per call to forecast and cap spend."
+        Optimization:
+          Description: "Levers that reduce the number or price of tokens consumed."
+          children:
+            Model Selection:
+              Description: "Choosing the right model for each task to balance quality and cost."
+              children:
+                Benchmarking:
+                  Description: "Testing models on representative tasks to compare quality."
+                Capability tiers:
+                  Description: "Grouping models by strength so the cheapest adequate one can be picked."
+                Cost per task:
+                  Description: "Measuring what completing a real task costs, not just per-token price."
+                Accuracy vs price tradeoff:
+                  Description: "Weighing quality gains against the higher cost of stronger models."
+            Routing:
+              Description: "Directing each request to the most cost-effective model or path."
+              children:
+                Small vs large routing:
+                  Description: "Sending easy requests to small models and hard ones to large models."
+                Cascades / fallback:
+                  Description: "Trying a cheap model first and escalating only when needed."
+                Cost-based routing:
+                  Description: "Choosing the model that meets quality at the lowest cost."
+                Semantic routing:
+                  Description: "Routing by request meaning or category to the best-suited model."
+            Caching:
+              Description: "Reusing prior results to avoid paying for repeated work."
+              children:
+                Provider-side prompt caching:
+                  Description: "Vendor caching of repeated prompt prefixes at a discounted rate."
+                Semantic caching:
+                  Description: "Serving cached answers for semantically similar queries."
+                Response caching:
+                  Description: "Storing full responses for identical requests."
+            AI memory:
+              Description: "Giving models access to prior context and external knowledge."
+              children:
+                RAG (Retrieval-Augmented Generation):
+                  Description: "Fetching relevant documents to ground responses and cut hallucination."
+                Vector stores:
+                  Description: "Databases of embeddings that power semantic retrieval."
+                Short vs long-term memory:
+                  Description: "Distinguishing per-session context from persistent recall."
+                Context compression / summarization:
+                  Description: "Condensing history to keep context small and cheap."
+            Agentic:
+              Description: "Multi-step, tool-using workflows that can multiply token consumption."
+              children:
+                Token amplification:
+                  Description: "The way agent loops turn one task into many model calls and tokens."
+                Context accumulation:
+                  Description: "Growing context as an agent gathers state, steadily raising cost."
+                Sub-agents / orchestration:
+                  Description: "Coordinating multiple agents, each adding token overhead."
+                Tool-call overhead:
+                  Description: "The extra tokens spent describing tools and parsing their results."
+        Workloads / Use Cases:
+          Description: "The application types that consume tokens, each with a distinct cost profile."
+          children:
+            Chat / assistant:
+              Description: "Interactive conversation, typically bursty and latency-sensitive."
+            Code generation:
+              Description: "Producing and editing code, often long-output and context-heavy."
+            RAG / search:
+              Description: "Retrieval-grounded question answering over a corpus."
+            Summarization:
+              Description: "Condensing long inputs, input-heavy and output-light."
+            Extraction / classification:
+              Description: "Pulling structured data or labels from text, usually short outputs."
+            Batch / offline jobs:
+              Description: "Non-interactive bulk processing that can use discounted throughput."
+        Access & Delivery:
+          Description: "How requests are sent and results returned, which affects price."
+          children:
+            Synchronous API:
+              Description: "Standard request-response calls at full price."
+            Batch API (discounted):
+              Description: "Submitting jobs for asynchronous processing at a lower rate."
+            Streaming vs non-streaming:
+              Description: "Whether tokens stream as generated or return all at once."
+            Sync vs async:
+              Description: "Whether the caller waits or is notified when results are ready."
+            Rate limits / quotas:
+              Description: "Provider caps on request and token throughput."
+        Guardrails / Quality:
+          Description: "Controls that keep output safe and correct, some of which cost extra tokens."
+          children:
+            Output validation:
+              Description: "Checking responses against schemas or rules before use."
+            Moderation / safety:
+              Description: "Screening inputs and outputs for harmful content."
+            Hallucination control:
+              Description: "Techniques to reduce confident but wrong outputs."
+            Retries (token cost):
+              Description: "Re-running failed calls, a hidden and often overlooked cost."
+            Production evals:
+              Description: "Ongoing quality measurement of live traffic."
+    Value:
+      Description: "What tokens are worth and how that value is priced, governed, and captured."
+      children:
+        Pricing:
+          Description: "How token usage is priced by providers."
+          children:
+            Input vs output token pricing:
+              Description: "Input and output tokens are billed at different rates, usually output higher."
+            Cached token pricing:
+              Description: "Discounted rates for reused, cached prompt tokens."
+            Batch API discounts:
+              Description: "Lower prices for non-urgent asynchronous jobs."
+            Tiered / volume pricing:
+              Description: "Unit prices that fall with committed volume."
+            Reserved capacity (PTUs / provisioned throughput):
+              Description: "Prepaid dedicated throughput for predictable cost and latency."
+            Price by model tier:
+              Description: "Different prices for models of different capability."
+        Unit Economics:
+          Description: "The per-unit costs and efficiency ratios behind token spend."
+          children:
+            Cost per token / request / user / session:
+              Description: "Cost measured at the unit that matters for the business."
+            Gross & contribution margin:
+              Description: "The profit left after token and serving costs."
+            Tokens per dollar:
+              Description: "A throughput-per-cost efficiency metric and core optimization target."
+            Tokens per watt:
+              Description: "Token output per unit of energy, an efficiency and sustainability measure."
+            Tokens per GPU-hour:
+              Description: "How many tokens a GPU produces per hour, a utilization measure."
+            Cost per outcome:
+              Description: "Cost tied to a completed business result rather than raw usage."
+        Cost Governance / FinOps:
+          Description: "Practices for making token spend visible, efficient, and controlled."
+          children:
+            Inform:
+              Description: "The FinOps phase of making cost visible and attributable."
+              children:
+                Cost attribution / tagging:
+                  Description: "Labeling usage so spend can be traced to its source."
+                Allocation (team / product / feature):
+                  Description: "Assigning shared costs to the teams and features that drive them."
+                Showback / chargeback:
+                  Description: "Reporting or billing internal cost back to consuming teams."
+            Optimize:
+              Description: "The FinOps phase of reducing cost without losing value."
+              children:
+                Rate optimization (commitments, tier selection):
+                  Description: "Lowering unit price through commitments and the right tier."
+                Workload optimization (routing, caching, model choice):
+                  Description: "Cutting usage through smarter routing, caching, and model choice."
+                Optimization recommendations:
+                  Description: "Automated suggestions for where to cut cost."
+            Operate:
+              Description: "The FinOps phase of running cost management day to day."
+              children:
+                Budgets & quotas:
+                  Description: "Spending limits that prevent overruns."
+                Forecasting:
+                  Description: "Predicting future spend from usage trends."
+                Anomaly detection:
+                  Description: "Catching unexpected cost spikes early."
+                Policy & guardrails:
+                  Description: "Rules that enforce cost discipline automatically."
+        Monetization:
+          Description: "How the value of tokens is captured as revenue."
+          children:
+            Usage-based / metered:
+              Description: "Charging customers in proportion to tokens or calls used."
+            Seat-based:
+              Description: "Charging per user regardless of usage."
+            Subscription / tiers:
+              Description: "Recurring plans with bundled usage limits."
+            Credits / prepaid:
+              Description: "Selling usage credits customers draw down."
+            Markup on token cost:
+              Description: "Reselling tokens above their raw cost as the margin."
+        Business Case:
+          Description: "The justification for AI spend against its returns."
+          children:
+            ROI:
+              Description: "The return generated relative to AI investment."
+            TCO:
+              Description: "The total cost of ownership across infrastructure, licensing, and operations."
+            Build vs buy:
+              Description: "Whether to self-host or use a managed provider."
+            Payback period:
+              Description: "How long until savings or revenue cover the investment."
+            Value per token (quality, task completion):
+              Description: "The business value a token delivers, not just its cost."
+        Observability:
+          Description: "Visibility into the usage, cost, and quality of AI systems."
+          children:
+            Usage & cost dashboards:
+              Description: "Live views of token consumption and spend."
+            Utilization tracking:
+              Description: "Measuring how fully hardware is used, the key to cost efficiency."
+            Quality / latency SLIs:
+              Description: "Indicators tracking response quality and speed."
+            Cost per outcome:
+              Description: "Cost tied to a completed business result rather than raw usage."
