@@ -534,6 +534,7 @@
     const BRANCH_COLORS = { Generation: "#5b8cff", Consumption: "#b98cff", Value: "#ff6fa4" };
     const DEFAULT_FILE = "tokenomics_mindmap.yaml";
     const dx = 20, dy = 250, duration = 350;
+    const DBL_DELAY = 220;
     const HOLLOW = (getComputedStyle(document.documentElement).getPropertyValue("--bg").trim()) || "#0a0e17";
     const ADD_LINK = "#4a5570";
 
@@ -662,12 +663,30 @@
     }
 
     /* ---------- interactions ---------- */
+    // A collapse re-lays out the tree and slides the node out from under the
+    // cursor, so the second click of a double-click misses it and no dblclick
+    // ever fires. Hold the toggle for DBL_DELAY so dblclick can cancel it.
+    // Keyed by node id so clicking a different node doesn't drop a pending one.
+    const clickTimers = new Map();
+    function cancelPendingClick(d) {
+      const t = clickTimers.get(d.data.__id);
+      if (t) { clearTimeout(t); clickTimers.delete(d.data.__id); }
+    }
     function onClick(e, d) {
       if (d.data.__add) { addChild(d.parent.data); return; }
-      if (hasRealChildren(d)) { d.data.collapsed = !d.data.collapsed; update(); }
+      if (!hasRealChildren(d)) return;
+      if (e.detail > 1) return; // second click of a double-click
+      cancelPendingClick(d);
+      const id = d.data.__id;
+      clickTimers.set(id, setTimeout(() => {
+        clickTimers.delete(id);
+        d.data.collapsed = !d.data.collapsed;
+        update();
+      }, DBL_DELAY));
     }
     function onDbl(e, d) {
       if (d.data.__add) return;
+      cancelPendingClick(d);
       e.preventDefault(); e.stopPropagation();
       openEditor({ mode: "edit", node: d.data });
     }
