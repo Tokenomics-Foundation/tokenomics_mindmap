@@ -6,6 +6,10 @@ The content lives in a single YAML file ([tokenomics_mindmap.yaml](tokenomics_mi
 
 ## Quick start
 
+**[Open the live map](https://tokenomics-foundation.github.io/tokenomics_mindmap/)** — hosted on GitHub Pages, nothing to install.
+
+### Run it locally
+
 The viewer auto-loads `tokenomics_mindmap.yaml` from its own folder over HTTP, so the simplest path is a local server:
 
 ```bash
