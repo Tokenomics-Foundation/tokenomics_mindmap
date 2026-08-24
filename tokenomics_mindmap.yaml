@@ -1,8 +1,9 @@
 Tokenomics:
-  Description: "The full economics of producing and consuming LLM tokens, from hardware through pricing."
+  Description: "AI Tokenomics is the discipline of converting energy and capital into AI, then efficiently consuming AI services to enable intelligent outcomes and drive business value.
+(Draft v0.2, August 2026)"
   children:
-    Generation:
-      Description: "The supply side of tokens, covering everything required to produce them."
+    Production:
+      Description: "The supply side of AI. Energy, capital resources, and the economics of building and running AI in production. How capacity is planned, costed, and brought online."
       children:
         Tokenization:
           Description: "How raw text and media are converted into the tokens that get billed and processed."
@@ -553,7 +554,7 @@ Tokenomics:
             KV Cache:
               Description: "Stored attention keys and values that let the model skip recomputing past tokens, the dominant inference memory cost."
               Links:
-              - "https://arxiv.org/abs/2309.06180"
+                - "https://arxiv.org/abs/2309.06180"
               children:
                 Cache Management:
                   Description: "Strategies for storing, sharing, and evicting KV cache entries."
@@ -585,7 +586,7 @@ Tokenomics:
                 PagedAttention:
                   Description: "Pages the KV cache into fixed-size blocks to cut fragmentation and raise GPU utilization."
                   Links:
-                  - "https://blog.vllm.ai/2023/06/20/vllm.html"
+                    - "https://blog.vllm.ai/2023/06/20/vllm.html"
                 Cache compression:
                   Description: "Shrinking stored KV data to fit more requests in memory."
                 Quantized KV cache:
@@ -598,7 +599,7 @@ Tokenomics:
                 Speculative decoding:
                   Description: "Proposes several tokens ahead with a cheap drafter, then verifies them in a single target model pass, cutting per token latency without changing the output distribution."
                   Links:
-                  - "https://docs.vllm.ai/en/latest/features/speculative_decoding/"
+                    - "https://docs.vllm.ai/en/latest/features/speculative_decoding/"
                   children:
                     Mechanics:
                       Description: "The draft then verify loop shared by every speculative method."
@@ -632,7 +633,7 @@ Tokenomics:
                             EAGLE-3:
                               Description: "Drops the feature prediction constraint in favour of direct token prediction and fuses low, mid, and high layer features via training-time test, which lets draft quality keep improving as draft training data scales."
                               Links:
-                              - "https://arxiv.org/abs/2503.01840"
+                                - "https://arxiv.org/abs/2503.01840"
                             HASS:
                               Description: "Harmonized Speculative Sampling, an EAGLE-based drafter that aligns training with multi-step inference to raise acceptance length without changing output."
                             FR-Spec:
@@ -640,7 +641,7 @@ Tokenomics:
                         Multi-Token Prediction (MTP):
                           Description: "Extra prediction modules trained into the model itself, originally as a training objective, then reused at serving time as the drafter; DeepSeek-V3 popularised the pattern."
                           Links:
-                          - "https://arxiv.org/abs/2412.19437"
+                            - "https://arxiv.org/abs/2412.19437"
                         Retrieval and n-gram drafting:
                           Description: "Model free drafting that copies candidate spans from text already in context, cheap to run and strong on repetitive or edit heavy work."
                           children:
@@ -660,11 +661,11 @@ Tokenomics:
                         Mirror-SD:
                           Description: "Runs draft and target as two overlapping pipelines across heterogeneous accelerators, the draft proposing continuations while the target proposes correction paths, preserving the standard acceptance rule."
                           Links:
-                          - "https://arxiv.org/abs/2510.13161"
+                            - "https://arxiv.org/abs/2510.13161"
                         Speculative Speculative Decoding (SSD):
                           Description: "The drafter predicts likely verification outcomes and prepares speculations for them while verification is still running, so drafting overhead disappears when the guess is right; Saguaro is the optimised algorithm."
                           Links:
-                          - "https://arxiv.org/abs/2603.03251"
+                            - "https://arxiv.org/abs/2603.03251"
                     Tuning knobs:
                       Description: "The settings that decide whether speculation pays off in a given deployment."
                       children:
@@ -703,7 +704,7 @@ Tokenomics:
                         vLLM:
                           Description: "Exposes speculation as a configured method, covering draft models, EAGLE and EAGLE-3, MTP, MLP and parallel draft models, n-gram, and suffix decoding."
                           Links:
-                          - "https://docs.vllm.ai/en/latest/features/speculative_decoding/"
+                            - "https://docs.vllm.ai/en/latest/features/speculative_decoding/"
                         TensorRT-LLM:
                           Description: "NVIDIA's engine, with native speculative decoding support across draft model, EAGLE, and MTP style paths."
                         SGLang:
@@ -874,7 +875,7 @@ Tokenomics:
                     Friendli:
                       Description: "A managed inference service focused on high efficiency."
     Consumption:
-      Description: "The demand side, covering how applications spend tokens efficiently."
+      Description: "Owns delivering AI services: how much is consumed, where the waste lives, and how to serve efficiently without degrading outcomes."
       children:
         Prompt / Context Engineering:
           Description: "Per-request techniques that control how many tokens a call uses."
@@ -994,7 +995,7 @@ Tokenomics:
                     CAG (Cache-Augmented Generation):
                       Description: "Preloads the whole knowledge set into the context window once, caches the resulting model state, and answers every later query from that cache with no retrieval step at query time."
                       Links:
-                      - "https://arxiv.org/abs/2412.15605"
+                        - "https://arxiv.org/abs/2412.15605"
                       children:
                         Corpus fit:
                           Description: "Viable only when the knowledge set fits inside the context window, which makes context length the gating constraint rather than index size."
@@ -1284,8 +1285,10 @@ Tokenomics:
                   Description: "Finding and removing personal data before it is sent, usually an extra model or classifier call per request."
                 Data retention and training use:
                   Description: "Whether a provider stores prompts or trains on them, a contract term rather than a technical control."
+        Demand:
+          Description: "Understanding, measuring, and forecasting the drivers of AI consumption."
     Value:
-      Description: "What tokens are worth and how that value is priced, governed, and captured."
+      Description: "Owns the last part of Tokenomics, measuring the business value AI produces, so AI investment can be judged on the outcomes it delivers rather than cost alone."
       children:
         Pricing:
           Description: "How token usage is priced by providers."
