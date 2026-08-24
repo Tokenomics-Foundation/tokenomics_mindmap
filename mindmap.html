@@ -785,9 +785,11 @@
       svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(k));
     }
     function expandAll() { eachData(dataRoot, d => d.collapsed = false); update(); setTimeout(fit, 60); }
+    // Collapse every node with children, root excepted, so the top-level
+    // branches stay visible and each subsequent click reveals one level only.
     function collapseToBranches() {
-      eachData(dataRoot, d => d.collapsed = false);
-      (dataRoot.children || []).forEach(b => b.collapsed = true);
+      eachData(dataRoot, d => d.collapsed = !!(d.children && d.children.length));
+      dataRoot.collapsed = false;
       update(); setTimeout(fit, 60);
     }
 
