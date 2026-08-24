@@ -1,7 +1,7 @@
 Tokenomics:
   Description: The full economics of producing and consuming LLM tokens, from hardware through pricing.
   children:
-    Generation:
+    Production:
       Description: The supply side of tokens, covering everything required to produce them.
       children:
         Tokenization:
