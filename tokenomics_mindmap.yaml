@@ -149,15 +149,19 @@ Tokenomics:
               children:
                 Next-token prediction:
                   Description: The standard objective, predicting one token ahead, which is what makes decoding serial.
+                Parallel / diffusion decoding:
+                  Description: Refines the whole sequence over parallel denoising steps rather than one token at a time, which gives diffusion models a latency profile unlike autoregressive decoding.
                 Multi-token prediction heads:
                   Description: Extra heads trained to predict several positions ahead, useful during training and reusable as a drafter at inference.
-                LM head and tied embeddings:
-                  Description: The output projection back to vocabulary, sometimes sharing weights with the input embedding to save memory.
+                Input embeddings and LM head:
+                  Description: The input table mapping token ids to vectors and the output projection back to vocabulary, sized vocab times hidden dimension and sometimes sharing weights to save memory.
             Reasoning and test-time compute:
               Description: Spending extra tokens at inference to raise answer quality, the newest and least predictable cost driver.
               children:
                 Chain of thought:
                   Description: Prompting or training the model to write intermediate steps, which raises output token counts substantially.
+                Tree of Thoughts:
+                  Description: Explores and prunes branching reasoning paths, multiplying token spend for a chance at harder problems.
                 Reasoning tokens:
                   Description: Intermediate tokens a reasoning model produces before its answer, usually billed even when not shown to the user.
                 Reasoning effort levels:
@@ -331,6 +335,8 @@ Tokenomics:
                   Description: NVIDIA's parallel computing platform, the default target for nearly all inference software.
                 ROCm:
                   Description: AMD's equivalent stack, the main route to running the same workloads on non-NVIDIA accelerators.
+                Metal / MPS:
+                  Description: Apple's GPU stack, the Apple Silicon analog to CUDA and ROCm, and the layer MLX and llama.cpp target on Mac.
                 Triton (kernel language):
                   Description: A Python-like language for writing GPU kernels, distinct from the inference server of the same name.
                 NCCL and collective libraries:
@@ -357,12 +363,23 @@ Tokenomics:
                   Description: Total accelerator time allocated to a run, fixed early and difficult to revise once underway.
                 Data mixing and curriculum:
                   Description: The proportions and ordering of data sources, which shape capability without changing model size.
+                Optimizer:
+                  Description: Turns gradients into weight updates, with stored state that is a large share of training memory and a choice that sets convergence speed.
+                  children:
+                    AdamW:
+                      Description: The default adaptive optimizer, whose two state tensors per parameter dominate optimizer memory.
+                    Muon:
+                      Description: Momentum-orthogonalizing optimizer for 2D hidden weights, reaching target loss in fewer steps and cutting compute at scale.
+                    Second-order / Shampoo:
+                      Description: Uses curvature for faster convergence per step, at higher per-step compute and memory.
             Post-Training:
               Description: Steps after pretraining that adapt and align a model.
               children:
                 Fine Tuning:
                   Description: Adapting a pretrained model to a specific task or domain.
                   children:
+                    Supervised fine-tuning (SFT):
+                      Description: Trains a base model on curated prompt-response pairs, the supervised step before preference alignment that yields the instruction-tuned model.
                     Full fine-tune:
                       Description: Updating all weights, the most capable but most expensive adaptation.
                     PEFT / Adapters:
@@ -385,6 +402,8 @@ Tokenomics:
                       Description: Reinforcement learning from human feedback, the standard preference-alignment method.
                     RLAIF:
                       Description: Uses AI-generated feedback in place of human labels to cut alignment cost.
+                    Constitutional AI:
+                      Description: Aligns to a written set of principles via model-generated critiques and revisions, cutting human labeling and underlying much RLAIF.
                     DPO:
                       Description: Direct preference optimization, aligning models without a separate reward model.
                     PPO:
@@ -393,6 +412,11 @@ Tokenomics:
                       Description: A group-relative policy optimization variant that drops the separate value model, widely used for reasoning training.
                     Reward models:
                       Description: Models trained to score outputs, used as the objective that policy optimization maximizes.
+                      children:
+                        Outcome reward model (ORM):
+                          Description: Scores only the final answer, cheap to label but blind to where a reasoning trace failed.
+                        Process reward model (PRM):
+                          Description: Scores each reasoning step, a denser signal at much higher labeling and inference cost.
                     Reinforcement learning with verifiable rewards:
                       Description: Training against automatically checkable outcomes such as passing tests, which removes the human labelling bottleneck.
                 Distillation:
@@ -609,6 +633,10 @@ Tokenomics:
                               Description: Drops the feature prediction constraint in favour of direct token prediction and fuses low, mid, and high layer features via training-time test, which lets draft quality keep improving as draft training data scales.
                               Links:
                               - https://arxiv.org/abs/2503.01840
+                            HASS:
+                              Description: Harmonized Speculative Sampling, an EAGLE-based drafter that aligns training with multi-step inference to raise acceptance length without changing output.
+                            FR-Spec:
+                              Description: Frequency-ranked speculative sampling, limiting the drafting head to a high-frequency vocab subset to cut draft cost on large vocabularies without changing output.
                         Multi-Token Prediction (MTP):
                           Description: Extra prediction modules trained into the model itself, originally as a training objective, then reused at serving time as the drafter; DeepSeek-V3 popularised the pattern.
                           Links:
@@ -804,6 +832,8 @@ Tokenomics:
                       Description: An efficient inference engine for transformer models on CPU and GPU.
                     MLC-LLM:
                       Description: A compiler-based runtime that deploys models across many devices.
+                    MLX / mlx-lm:
+                      Description: Apple's array framework for Apple Silicon, supporting local inference and LoRA fine-tuning on Mac over unified memory with 4- and 8-bit quantization.
                 Serving orchestration:
                   Description: Infrastructure that manages models and traffic at scale.
                   children:
@@ -1075,7 +1105,7 @@ Tokenomics:
                 Beam search:
                   Description: Exploring several candidate sequences in parallel and keeping the best, which multiplies compute and is rarely used for chat.
         Workloads / Use Cases:
-          Description: The application types that consume tokens, each with a distinct cost profile.
+          Description: The application types that consume AI capacity, each with a distinct cost profile.
           children:
             Chat / assistant:
               Description: Interactive conversation, typically bursty and latency-sensitive.
@@ -1095,6 +1125,33 @@ Tokenomics:
               Description: Producing vectors rather than text, priced differently and dominated by corpus size.
             Synthetic data and evaluation:
               Description: Using models to generate training data or to grade other models, an internal workload easily larger than production traffic.
+            Vision workloads:
+              Description: Applications built on image input, billed as tiles plus output tokens.
+              children:
+                OCR / document parsing:
+                  Description: Reads text and layout from images and PDFs, billed as input tiles plus transcribed output tokens.
+                Image captioning:
+                  Description: A text description of an image, short on output with cost dominated by input tiles.
+                Visual question answering (VQA):
+                  Description: Answers questions grounded in an image, combining tile input with reasoning-length output.
+                Chart and screen reading:
+                  Description: Extracts structure from charts, screenshots, and interfaces, the reading step behind computer and browser use.
+                Object detection / grounding:
+                  Description: Locates or points to image regions, returning coordinates rather than prose.
+            Audio and speech workloads:
+              Description: Applications built on audio input or output, usually metered per second or minute rather than per token.
+              children:
+                Transcription and diarization:
+                  Description: Turns recorded speech into labelled text with speakers identified, priced by length of audio rather than by prompt size.
+                Voice agents:
+                  Description: Interactive speech to speech assistants, where continuous audio and a strict latency budget make cost per conversation minute the unit that matters.
+            Video workloads:
+              Description: Applications built on moving images, the heaviest input per minute of source content.
+              children:
+                Video understanding:
+                  Description: Summarizes or answers questions over recorded video, where frame rate and clip length drive cost more than prompt length does.
+                Live and streaming video:
+                  Description: Continuous frame ingestion under a latency budget, where cost accrues per minute of stream rather than per request.
             Batch / offline jobs:
               Description: Non-interactive bulk processing that can use discounted throughput.
             Workload characteristics:
@@ -1167,6 +1224,10 @@ Tokenomics:
               Description: Checking responses against schemas or rules before use.
             Moderation / safety:
               Description: Screening inputs and outputs for harmful content.
+            Watermarking / provenance:
+              Description: Marks or certifies output for origin tracing under schemes such as SynthID and C2PA, an emerging compliance cost that adds per-request processing.
+            Over-refusals and caveats:
+              Description: Over-refusals and appended caveats burn output tokens and trigger retries, a safety and quality tradeoff with direct token cost.
             Hallucination control:
               Description: Techniques to reduce confident but wrong outputs.
             Groundedness and citation checking:
