@@ -714,6 +714,21 @@ Tokenomics:
                   Description: Breaks long prompt processing into chunks to smooth latency and batching.
                 Parallelism (tensor / pipeline / model sharding):
                   Description: Splits a model across devices so it fits and serves faster.
+                Memory hierarchy and offloading:
+                  Description: Serving a model whose weights exceed accelerator memory by placing state across GPU, host memory, and storage.
+                  children:
+                    Weight offloading:
+                      Description: Holding part of the weights in host memory or on disk and moving them in as needed, trading interconnect bandwidth for capacity.
+                    Expert residency and caching:
+                      Description: Which MoE experts stay resident on the accelerator, with the rest fetched or computed elsewhere as routing demands them.
+                    CPU and GPU co-execution:
+                      Description: Running some experts or layers on the host processor rather than moving their weights, worthwhile when host compute is cheaper than the transfer.
+                    Interconnect bandwidth as the constraint:
+                      Description: Host link throughput setting the ceiling once weights no longer fit, the binding limit in offloaded serving.
+                    Bandwidth-adaptive scheduling:
+                      Description: Dividing work between transfer and host execution according to measured bandwidth rather than committing to one fixed strategy.
+                    Elastic memory allocation:
+                      Description: Resizing the split between weight cache and KV cache while the engine runs, which avoids a restart when available memory changes.
                 Kernels and compilation:
                   Description: The low-level code that actually executes the model, often worth more than any algorithmic change.
                   children:
@@ -834,6 +849,8 @@ Tokenomics:
                       Description: A compiler-based runtime that deploys models across many devices.
                     MLX / mlx-lm:
                       Description: Apple's array framework for Apple Silicon, supporting local inference and LoRA fine-tuning on Mac over unified memory with 4- and 8-bit quantization.
+                    FreeToken:
+                      Description: An edge-native MoE engine treating GPU, CPU, host memory, and interconnect as one pool to serve models larger than accelerator memory.
                 Serving orchestration:
                   Description: Infrastructure that manages models and traffic at scale.
                   children:
