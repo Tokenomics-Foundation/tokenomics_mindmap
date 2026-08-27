@@ -935,7 +935,7 @@ Tokenomics:
           Description: "Levers that reduce the number or price of tokens consumed."
           children:
             Model Selection:
-              Description: "Choosing the right model for each task to balance quality and cost."
+              Description: "Choosing the right model for each task to balance quality and cost, the portfolio decision made at design time; Routing applies the same criteria per request at run time."
               children:
                 Benchmarking:
                   Description: "Testing models on representative tasks to compare quality."
@@ -950,18 +950,22 @@ Tokenomics:
                 Migration cost:
                   Description: "Prompts, evals, and guardrails are tuned per model, so switching is rarely as cheap as the price difference suggests."
             Routing:
-              Description: "Directing each request to the most cost-effective model or path."
+              Description: "Directing each request to the model or serving path that meets the task's quality bar at the lowest cost, the decision layer over a mixed portfolio of hosted and open-weight models. A router answers the cost question against a quality bar set elsewhere; it does not define the bar."
               children:
                 Small vs large routing:
                   Description: "Sending easy requests to small models and hard ones to large models."
                 Cascades / fallback:
-                  Description: "Trying a cheap model first and escalating only when needed."
+                  Description: "Trying a cheap model first and escalating only when a check on the first answer fails, the pattern; confidence-based escalation and output validation are the usual triggers."
                 Cost-based routing:
-                  Description: "Choosing the model that meets quality at the lowest cost."
+                  Description: "Choosing among eligible models by current price and expected quality, the comparison that cost per task is meant to settle rather than the per-token price sheet."
                 Semantic routing:
                   Description: "Routing by request meaning or category to the best-suited model."
                 Confidence-based escalation:
-                  Description: "Using the first model's own uncertainty to decide whether a stronger model is needed."
+                  Description: "Using the first model's own uncertainty to decide whether a stronger model is needed, the signal most cascades run on."
+                Routing ownership:
+                  Description: "Who owns the router matters when the routing layer comes from a company that also sells models, since the picker can favor its own inventory. A material share of buyers build the layer in-house, which makes build versus buy read as a trust decision, not only a tooling gap. Related: aggregators and gateways under Access and Delivery."
+                Misroutes and routing quality:
+                  Description: "Requests a classifier sends to a model that cannot handle them, answered confidently and incorrectly. Damage per misroute runs many multiples of the request cost, and uninstrumented misroutes surface months later through customer harm rather than the bill, so per-tier quality monitoring and a log of which model served every request are prerequisites to trusting a cost-based router."
                 Router overhead:
                   Description: "Classification adds its own latency and tokens, which can erase the saving on short requests."
             Caching:
