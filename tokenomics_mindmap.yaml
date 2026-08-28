@@ -1324,8 +1324,8 @@ Tokenomics:
                   Description: "Identifiers that let a retried request be recognised as the same call, avoiding duplicate work and duplicate billing."
                 Backpressure:
                   Description: "Signalling upstream to slow down rather than queueing without bound, the difference between degraded and collapsed."
-        Guardrails / Quality:
-          Description: "Controls that keep output safe and correct, some of which cost extra tokens."
+        Guardrails:
+          Description: "Controls that keep output safe and correct, some of which cost extra tokens. Consumption owns enforcement and the measurement machinery; what counts as acceptable is the Quality Floor, owned by Value."
           children:
             Output validation:
               Description: "Checking responses against schemas or rules before use."
@@ -1522,7 +1522,7 @@ Tokenomics:
                 Labor Offset:
                   Description: "Human time freed by AI, framed as a before-and-after augmentation comparison rather than headcount removed, because headcount framing reads as layoffs."
                 Output Quality:
-                  Description: "Improvement in the quality of the work itself. Placement is contested: argued to be an input to the value calculation rather than a value category in its own right."
+                  Description: "Improvement in the quality of the work itself, measured only for output that clears the Quality Floor. Placement is contested: argued to be an input to the value calculation rather than a value category in its own right."
                 Speed to Market:
                   Description: "Faster delivery of changes, hard to price directly and visible mainly in competitive position."
                 Risk Reduction:
@@ -1548,6 +1548,17 @@ Tokenomics:
                   Description: "Whether the AI is a customer-facing product or an internal tool. Demoted from a top-level split: outcomes usually stand on their own and workload type does most of the categorization work."
                 Value claim components:
                   Description: "A full claim names the workload or task type, the outcome measured, the unit, the baseline, and the quality the result was judged at."
+                Quality Floor:
+                  Description: "The pass bar for acceptable output on a specific workload: quality is the gate, not a multiplier. Value only counts when output clears the floor, cheap output that misses it is waste, and full utilization of a model that misses it is waste rather than efficiency."
+                  children:
+                    Task-specific criteria:
+                      Description: "Code generation and creative summarization have different correctness criteria, so the floor is defined per workload. Leaderboard scores are a starting point for model selection, not a substitute for measuring on your own workload."
+                    Defined before optimization:
+                      Description: "Routing to cheaper models is impossible until acceptable has a definition, so the floor must exist before cost work begins."
+                    Re-baselining:
+                      Description: "A floor calibrated for one model generation goes stale for the next, so it must be re-established as models evolve."
+                    Floor versus work quality:
+                      Description: "The floor is a binary pass signal for the AI output; the Output Quality category means the quality of the work itself. Two different concepts that have repeatedly talked past each other in the WG."
             Outcome KPIs:
               Description: "The outcome-facing readouts of unit economics, where cost per unit stops describing production efficiency and starts describing business results."
               children:
