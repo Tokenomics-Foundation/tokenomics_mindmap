@@ -1511,24 +1511,28 @@ Tokenomics:
           Description: "What the AI changed and by how much, measured against a stated baseline. Anchors the Value layer: cost and utilization from the other layers only matter through the outcome they produce."
           children:
             Value Categorization:
-              Description: "A conversation-framing device, not a fixed list: the categories of value AI produces, arranged on a quantifiability gradient, easiest to measure near the delivered outcome and hardest furthest from it."
+              Description: "What the AI produces, framed for conversation rather than fixed. The fusion draft groups the ten categories by how the number is produced: direct dollar wins, labor categories estimated in hours or FTE, and reported outcomes. The groups differ in method, not worth, and no category outranks another."
               children:
                 Revenue Enablement:
-                  Description: "New revenue made possible by AI, measured against the revenue that would have existed without it."
+                  Description: "Revenue that would not exist without the AI. The number already sits in a ledger, so the argument is attribution rather than measurement."
                 Cost Avoidance:
-                  Description: "Spend that no longer happens because of AI, measured against what would have been paid."
+                  Description: "Spend that does not occur. Spend that went down is visible on an invoice, spend never incurred is a counterfactual. Spans most of the range by itself."
                 Capacity Gain:
-                  Description: "More throughput from the same people and infrastructure, measured as output per unit of staff or capacity."
-                Labor Offset:
-                  Description: "Human time freed by AI, framed as a before-and-after augmentation comparison rather than headcount removed, because headcount framing reads as layoffs."
-                Output Quality:
-                  Description: "Improvement in the quality of the work itself, measured only for output that clears the Quality Floor. Placement is contested: argued to be an input to the value calculation rather than a value category in its own right."
+                  Description: "Same people produce more. Individually nice-to-haves, in aggregate often the largest line. Freed capacity that nothing is spent on stays a tracked FTE estimate rather than a booked claim."
+                Labor Augmentation:
+                  Description: "AI does part of the task and the human stays in the loop. The gain shows up as throughput or hours per unit before it shows up as headcount, measured against the human alone."
+                Labor Automation:
+                  Description: "AI does the task end to end. Trivial to compute and hardest to defend: needs the best-of-either baseline and a cleared quality gate, and raises who owns the decision once the human is out of the loop."
+                Product Quality:
+                  Description: "Fewer defects, less rework, better product. Quality of the work the business ships, deliberately renamed from Output Quality to keep it from being confused with the Quality Floor signal. Measurable only once the workload has a defined floor and instrumentation."
                 Speed to Market:
-                  Description: "Faster delivery of changes, hard to price directly and visible mainly in competitive position."
+                  Description: "Faster delivery of changes. Cycle time is usually available, what a week of earlier delivery is worth usually is not. Resolves into revenue pulled forward or spend avoided."
                 Risk Reduction:
-                  Description: "The cost of something that did not happen, usually likelihood times impact, which is deliberately not quite dollars."
+                  Description: "Exposure, liability, or security posture materially improved. The value is a loss that did not occur, so the claim rests on an expected-loss estimate and should say so plainly."
                 New Capability:
-                  Description: "Work that could not happen at all before AI, the hardest category to quantify because a created process has no prior version to compare against."
+                  Description: "Something not previously possible, with no prior state to measure against. The claim is about viability rather than delta: name the alternative you chose not to build."
+                Job Satisfaction:
+                  Description: "Candidate tenth category: morale, developer experience, retention, recruitment appeal. Genuinely intangible, usually with no honest conversion at the end of the chain, so the defensible move is to report it rather than book it."
             Value Measurement:
               Description: "How a value claim is constructed and defended. The categories name what changed; these nodes are the how."
               children:
@@ -1536,16 +1540,26 @@ Tokenomics:
                   Description: "The comparison a value claim rests on, ideally the best available alternative rather than a stale before-AI state. Baselines go stale quickly and created processes may have none."
                 No-baseline problem:
                   Description: "Workloads where AI created the process so no counterfactual exists. The hardest measurement case, handled with bounded estimates rather than solved."
-                Two-layer claim:
-                  Description: "Layer one names the change itself, hours freed, throughput, quality, availability, which most organizations already measure. Layer two optionally converts the change into dollars. Whether that conversion is mandatory or optional is the open question in the WG."
+                Claim chain:
+                  Description: "The how-to workflow, in three parts rather than layers, since layer is reserved for the technical stack. Part one the delta, what moved, with a unit and a direction. Part two the conversion, a baseline so the delta is real and a quality gate so it counts. Part three the destination, where a booked number lands, a closed set because the financial statements are a closed set."
+                  children:
+                    Stated stopping point:
+                      Description: "The conversion is available, not mandatory: teams managing in time may stop at the delta and report hours or FTE equivalents. The chain requires the claim to name where it stopped, so a freed hour is never quietly counted as a booked dollar. Mandatory for anyone booking to a statement, optional for anyone managing in time."
+                    Destinations:
+                      Description: "The five places a booked number lands: new revenue won, revenue retained, spend removed, spend avoided, capital freed. Defensibility lives at the conversion step, not at the destination."
+                    Role ladder:
+                      Description: "Each scope from IC to C-Suite answers the value question at a different range and has its own natural unit, hours per task at the bottom, P and L lines and market position at the top. Estimates add up within a scope, not across scopes."
                 Unit of measure:
                   Description: "Dollars, hours, or FTE equivalents, chosen per audience. Dollars read to executives, hours and FTE equivalents read to operational leads, and some outcomes deliberately stay unconverted."
                 Horizontal rollout attribution:
                   Description: "Time saved by a company-wide assistant does not automatically become organizational value, the buying-coffee-with-that problem. Vertical workloads are measurably easier than horizontal ones."
                 Augmentation and automation:
-                  Description: "Labor offset is either speeding people up or taking them out of the loop. What happens to freed time afterwards, higher-value work or nothing, is the open half of the measurement."
-                Product versus internal lens:
-                  Description: "Whether the AI is a customer-facing product or an internal tool. Demoted from a top-level split: outcomes usually stand on their own and workload type does most of the categorization work."
+                  Description: "The old single Labor Offset label let teams claim augmentation and defend it with automation math. The split into two categories is the resolution: they need different baselines, human alone versus best-of-either, and saying which one you mean is most of the defense. What freed people move to afterwards stays open."
+                Product versus internal posture:
+                  Description: "Restored as the what of common AI task types: Product AI is customer-facing and judged on growth and margin, Internal AI is operational and judged on cost and efficiency. The posture picks the scoreboard but never changes the measurement math, and packaging never decides posture, consumption does."
+                  children:
+                    Internal product workload:
+                      Description: "AI-enabled features built and packaged like a product for internal users. The goal is productivity, so it is measured as Internal AI no matter how well it is packaged."
                 Value claim components:
                   Description: "A full claim names the workload or task type, the outcome measured, the unit, the baseline, and the quality the result was judged at."
                 Quality Floor:
@@ -1558,7 +1572,7 @@ Tokenomics:
                     Re-baselining:
                       Description: "A floor calibrated for one model generation goes stale for the next, so it must be re-established as models evolve."
                     Floor versus work quality:
-                      Description: "The floor is a binary pass signal for the AI output; the Output Quality category means the quality of the work itself. Two different concepts that have repeatedly talked past each other in the WG."
+                      Description: "The floor is a binary pass signal for the AI output; the Product Quality category means the quality of the work the business ships. The rename from Output Quality exists to keep the two from talking past each other."
             Outcome KPIs:
               Description: "The outcome-facing readouts of unit economics, where cost per unit stops describing production efficiency and starts describing business results."
               children:
