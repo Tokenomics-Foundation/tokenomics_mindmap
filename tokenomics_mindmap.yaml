@@ -884,7 +884,9 @@ Tokenomics:
               Description: "Structuring prompts and examples to get good results with fewer tokens."
               children:
                 System prompt:
-                  Description: "Standing instructions sent with every request, a fixed token cost paid on every call."
+                  Description: "Standing instructions sent with every request, a fixed token cost paid on every call unless a provider cache serves it at the cached read rate."
+                Prompt ordering for cacheability:
+                  Description: "Stable content first, growing content next, per-request content last, since cached reuse stops at the first token that differs from the previous request."
                 Few-shot examples:
                   Description: "Worked examples included in context, which raise quality and input token count together."
                 Zero-shot instruction:
@@ -975,25 +977,62 @@ Tokenomics:
                 Misroutes and routing quality:
                   Description: "Requests a classifier sends to a model that cannot handle them, answered confidently and incorrectly. Damage per misroute runs many multiples of the request cost, and uninstrumented misroutes surface months later through customer harm rather than the bill, so per-tier quality monitoring and a log of which model served every request are prerequisites to trusting a cost-based router."
                 Router overhead:
-                  Description: "Classification adds its own latency and tokens, which can erase the saving on short requests."
+                  Description: "Classification adds its own latency and tokens, and spreading traffic across models splits one warm cache into several cold ones, which can erase the saving on short requests."
             Caching:
-              Description: "Reusing prior results to avoid paying for repeated work."
+              Description: "Reusing prior results to avoid paying for repeated work, measured against a provider-specific break-even rather than a generic hit-rate feeling."
+              Links:
+                - "https://www.tokeneconomics.com/cache-explainer-consumption-wg-internal-draft/"
               children:
-                Provider-side prompt caching:
-                  Description: "Vendor caching of repeated prompt prefixes at a discounted rate."
+                Cache measurement:
+                  Description: "The ratios that decide whether a cache earns its keep, computed from token buckets in usage payloads and compared per workload, never blended."
                   children:
-                    Cache write vs read pricing:
-                      Description: "Writing to cache usually costs more than a normal input token while reading costs much less, so caching only pays above a reuse threshold."
+                    Reuse ratio:
+                      Description: "Tokens read from cache divided by tokens written to cache over the same window: pulls off the shelf over pulls paid to put there, the payback measure for the cache."
+                    Break-even ratio:
+                      Description: "The static target set by one price sheet: (write price multiple minus 1) over (1 minus read price multiple). At a typical 1.25x write premium and 0.1x read rate it is about 0.28, and it is zero wherever writes are free; the reuse ratio must clear it."
+                    Cache hit rate:
+                      Description: "Cache-read tokens over all input tokens (reads, writes, and uncached): coverage, driven mostly by prompt ordering, which can look healthy while the payback stays under break-even."
+                    Cache cost efficiency:
+                      Description: "The fraction of prompt spend caching actually avoided: one minus actual prompt cost over the uncached-equivalent cost, the dollar-shaped readout of the ratios above."
+                    Per-workload measurement:
+                      Description: "One high-volume cached workload will mask a dozen broken ones in a blended number, so every cache ratio is tracked per workload and re-checked when model versions or price sheets change."
+                Provider-side prompt caching:
+                  Description: "Vendor caching of repeated prompt prefixes at a discounted rate, billed through separate cache write and cache read token buckets on every response."
+                  children:
                     Prefix stability:
-                      Description: "Cached reuse requires an exact shared prefix, so anything variable must sit at the end of the prompt."
+                      Description: "Cached reuse requires an exact shared prefix starting at token zero, so anything that varies must sit at the end of the prompt and serialization must be frozen."
                     Cache lifetime:
-                      Description: "Cached prefixes expire after an idle period, which ties the benefit to traffic pattern rather than to prompt design alone."
-                    Hit rate:
-                      Description: "The share of input tokens served from cache, the single number that decides whether the feature is worth designing around."
+                      Description: "Cached prefixes expire after an idle period, and some providers age the clock from the start of the request that touches the entry, which ties the benefit to traffic cadence rather than to prompt design alone."
+                    Minimum cacheable prefix:
+                      Description: "Each model sets a minimum prefix length, from hundreds to thousands of tokens, below which caching silently does nothing instead of returning an error."
+                    Model version binding:
+                      Description: "A cache entry belongs to one exact model version, so escalating to another model or a provider shipping an update invalidates prefixes fleet-wide with no change on the consumer side."
+                    Hidden prompt content:
+                      Description: "A hosted harness inserts its own system content ahead of the user prompt, occupying the head of the prefix and often excluded from the minimum cacheable length, while reasoning and tool-output tokens cache inside earlier turns and bill as input when read back."
+                    Cache isolation:
+                      Description: "Provider caches are partitioned per organization, workspace, and region, so there is no cross-customer reuse; within a tenant, a fleet of agents on one prefix shares a warm entry, but a parallel fan-out misses together and pays its own writes."
+                    Cache write vs read pricing:
+                      Description: "Writing to cache usually costs a premium over a normal input token while reading costs a small fraction of one, so caching only pays above a reuse threshold set by the price sheet."
+                    Provider differences:
+                      Description: "Published write charges, read discounts, minimum lengths, and lifetimes differ sharply between frontier providers, and the terms can change without notice (a major provider introduced cache write charges in mid-2026), which is why shared cache metrics must stay agnostic to any vendor implementation."
+                      Links:
+                        - "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+                        - "https://developers.openai.com/api/docs/guides/prompt-caching"
+                Cache access modes:
+                  Description: "How much cache control and cache observability a consumer gets depends on the door they enter through, from fully hidden to fully exposed."
+                  children:
+                    Web UI and chat apps:
+                      Description: "The provider's own chat surface assembles the prompt entirely and reports no token buckets at all; caching is folded into plan economics and stays invisible to the user by design."
+                    First-party agent tools:
+                      Description: "The provider's own coding or coworking harness manages breakpoints automatically and exposes session-level token dashboards, but its dollar figures are computed locally at list rates, so they show shape rather than the real bill."
+                    Third-party tools:
+                      Description: "Products that rehost frontier models behind a proxy assemble the prompt themselves and bill in credits or requests, netting cache savings into a pooled price so they never appear on the customer's side of the glass."
+                    Direct API:
+                      Description: "Full control of prompt structure and breakpoint placement, with every cache bucket returned on every response and billed line by line: full visibility and full responsibility."
+                    Subscription feedback asymmetry:
+                      Description: "On flat plans cache misses surface as rate limits rather than line items, so the feedback channel is throttling without explanation and cache economics must be inferred rather than observed."
                 Semantic caching:
                   Description: "Serving cached answers for semantically similar queries."
-                Response caching:
-                  Description: "Storing full responses for identical requests."
                 Embedding caching:
                   Description: "Storing computed embeddings so unchanged documents are not re-embedded on every index run."
             AI memory:
