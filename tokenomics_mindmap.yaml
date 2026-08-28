@@ -874,6 +874,19 @@ Tokenomics:
                       Description: "Managed inference providers that host open models behind an API."
                     Friendli:
                       Description: "A managed inference service focused on high efficiency."
+        Sustainability:
+          Description: "The energy and environmental accounting of token production, increasingly a reported figure rather than an internal one."
+          children:
+            Energy per token:
+              Description: "Electricity consumed to produce a unit of output, the bridge between infrastructure efficiency and environmental reporting."
+            Carbon intensity:
+              Description: "Emissions per unit of energy, which varies by grid and therefore by region and time of day."
+            Water use:
+              Description: "Consumption associated with cooling, a growing constraint on where capacity can be sited."
+            Embodied impact:
+              Description: "The footprint of manufacturing and disposing of hardware, separate from the cost of running it."
+            Disclosure and reporting:
+              Description: "Obligations to report environmental impact, which turn an operational number into a compliance one."
     Consumption:
       Description: "Owns delivering AI services: how much is consumed, where the waste lives, and how to serve efficiently without degrading outcomes."
       children:
@@ -1372,11 +1385,8 @@ Tokenomics:
               Description: "A gap between expected and actual spend that surfaces late, often driven by rapid usage growth, agent loops, or delayed cost visibility."
             Demand elasticity:
               Description: "How consumption changes as token prices change, determining whether lower unit prices reduce total spend or stimulate more usage."
-    Value:
-      Description: "Owns the last part of Tokenomics, measuring the business value AI produces, so AI investment can be judged on the outcomes it delivers rather than cost alone."
-      children:
-        Pricing:
-          Description: "How token usage is priced by providers."
+        Purchase Options:
+          Description: "How usage is bought from providers: the rate card, its modifiers, and the commercial structures around it. Purchasing mechanics rather than value measurement."
           children:
             Price axes:
               Description: "What the meter actually counts, which differs by provider and by modality."
@@ -1445,6 +1455,108 @@ Tokenomics:
                   Description: "Money committed up front, often with expiry, which creates use-it-or-lose-it pressure."
                 Overage terms:
                   Description: "What happens past a committed volume, frequently the least examined term in the contract."
+        Observability:
+          Description: "Visibility into the usage, cost, and quality of AI systems."
+          children:
+            Telemetry sources:
+              Description: "Where the numbers come from, each with different coverage and trust."
+              children:
+                Engine metrics:
+                  Description: "Counters emitted by the inference server, the only source that knows about cache hits, queue depth, and acceptance rates."
+                Accelerator metrics:
+                  Description: "Device-level utilization, memory, power, and temperature, which reveal whether hardware is earning its cost."
+                Traces:
+                  Description: "Per-request spans across services, the only way to attribute cost inside a multi-step agent run."
+                Application and gateway logs:
+                  Description: "Request-level records including model, tokens, and user, usually the practical basis for attribution."
+                Billing and usage records:
+                  Description: "The provider's own account of what was consumed, authoritative for spend and slow to arrive."
+            Signals:
+              Description: "What is worth measuring once the data is available."
+              children:
+                Usage & cost dashboards:
+                  Description: "Live views of token consumption and spend."
+                Utilization tracking:
+                  Description: "Measuring how fully hardware is used, the key to cost efficiency."
+                Quality / latency SLIs:
+                  Description: "Indicators tracking response quality and speed."
+                Cost per outcome:
+                  Description: "Cost tied to a completed business result rather than raw usage."
+                Efficiency signals:
+                  Description: "Cache hit rate, acceptance rate, and batch occupancy, the numbers that explain why cost per token is what it is."
+                Error and retry rates:
+                  Description: "Failed and repeated work, which shows up as cost long before it shows up as a quality complaint."
+            Practices:
+              Description: "Turning telemetry into something anyone acts on."
+              children:
+                Reconciliation:
+                  Description: "Checking engine and application counts against the invoice, which is where silent measurement errors surface."
+                Tag propagation:
+                  Description: "Carrying identity from the caller through gateways to the billing record, without which attribution breaks at the first hop."
+                Alerting:
+                  Description: "Notification on threshold breaches, useful only where a named owner can act."
+                Sampling and retention cost:
+                  Description: "Observability is itself an expense, and full-fidelity tracing of a high-volume token workload is not free."
+            Standards / Open Specifications:
+              Description: "Shared schemas that make measurement portable between tools and vendors."
+              children:
+                FOCUS:
+                  Description: "The open specification for normalizing billing and usage data across providers, which makes cross-vendor comparison possible."
+                OpenTelemetry:
+                  Description: "The vendor-neutral standard for traces and metrics, including conventions for generative AI calls."
+    Value:
+      Description: "Owns the last part of Tokenomics, measuring the business value AI produces so investment is judged on outcomes rather than cost alone. Cost and utilization arrive from Production and Consumption as supporting scaffolding, not as the claim itself."
+      children:
+        Business Outcomes:
+          Description: "What the AI changed and by how much, measured against a stated baseline. Anchors the Value layer: cost and utilization from the other layers only matter through the outcome they produce."
+          children:
+            Value Categorization:
+              Description: "A conversation-framing device, not a fixed list: the categories of value AI produces, arranged on a quantifiability gradient, easiest to measure near the delivered outcome and hardest furthest from it."
+              children:
+                Revenue Enablement:
+                  Description: "New revenue made possible by AI, measured against the revenue that would have existed without it."
+                Cost Avoidance:
+                  Description: "Spend that no longer happens because of AI, measured against what would have been paid."
+                Capacity Gain:
+                  Description: "More throughput from the same people and infrastructure, measured as output per unit of staff or capacity."
+                Labor Offset:
+                  Description: "Human time freed by AI, framed as a before-and-after augmentation comparison rather than headcount removed, because headcount framing reads as layoffs."
+                Output Quality:
+                  Description: "Improvement in the quality of the work itself. Placement is contested: argued to be an input to the value calculation rather than a value category in its own right."
+                Speed to Market:
+                  Description: "Faster delivery of changes, hard to price directly and visible mainly in competitive position."
+                Risk Reduction:
+                  Description: "The cost of something that did not happen, usually likelihood times impact, which is deliberately not quite dollars."
+                New Capability:
+                  Description: "Work that could not happen at all before AI, the hardest category to quantify because a created process has no prior version to compare against."
+            Value Measurement:
+              Description: "How a value claim is constructed and defended. The categories name what changed; these nodes are the how."
+              children:
+                Baseline:
+                  Description: "The comparison a value claim rests on, ideally the best available alternative rather than a stale before-AI state. Baselines go stale quickly and created processes may have none."
+                No-baseline problem:
+                  Description: "Workloads where AI created the process so no counterfactual exists. The hardest measurement case, handled with bounded estimates rather than solved."
+                Two-layer claim:
+                  Description: "Layer one names the change itself, hours freed, throughput, quality, availability, which most organizations already measure. Layer two optionally converts the change into dollars. Whether that conversion is mandatory or optional is the open question in the WG."
+                Unit of measure:
+                  Description: "Dollars, hours, or FTE equivalents, chosen per audience. Dollars read to executives, hours and FTE equivalents read to operational leads, and some outcomes deliberately stay unconverted."
+                Horizontal rollout attribution:
+                  Description: "Time saved by a company-wide assistant does not automatically become organizational value, the buying-coffee-with-that problem. Vertical workloads are measurably easier than horizontal ones."
+                Augmentation and automation:
+                  Description: "Labor offset is either speeding people up or taking them out of the loop. What happens to freed time afterwards, higher-value work or nothing, is the open half of the measurement."
+                Product versus internal lens:
+                  Description: "Whether the AI is a customer-facing product or an internal tool. Demoted from a top-level split: outcomes usually stand on their own and workload type does most of the categorization work."
+                Value claim components:
+                  Description: "A full claim names the workload or task type, the outcome measured, the unit, the baseline, and the quality the result was judged at."
+            Outcome KPIs:
+              Description: "The outcome-facing readouts of unit economics, where cost per unit stops describing production efficiency and starts describing business results."
+              children:
+                Cost per outcome:
+                  Description: "Cost tied to a completed business result rather than raw usage, the natural bridge from unit economics into business outcomes."
+                Cost per user:
+                  Description: "Spend per active user over a period, the denominator that most directly connects usage to business metrics."
+                Cost per session:
+                  Description: "Spend across a full user interaction, the first denominator that reflects conversion rather than infrastructure."
         Unit Economics:
           Description: "The per-unit costs and efficiency ratios behind token spend."
           children:
@@ -1455,14 +1567,8 @@ Tokenomics:
                   Description: "The rawest measure, useful for comparing infrastructure and nearly useless for comparing products."
                 Cost per request:
                   Description: "Spend per API call, which hides wide variation in request size."
-                Cost per session:
-                  Description: "Spend across a full user interaction, the first denominator that reflects conversation length."
-                Cost per user:
-                  Description: "Spend per active user over a period, the figure that connects to pricing and retention."
                 Cost per agent run:
                   Description: "Spend for one complete autonomous task, the natural unit once workflows stop being single calls."
-                Cost per outcome:
-                  Description: "Cost tied to a completed business result rather than raw usage."
             Efficiency ratios:
               Description: "Production-side measures of how much output a resource yields."
               children:
@@ -1566,55 +1672,6 @@ Tokenomics:
                   Description: "Naming who is responsible for a cost line, without which reporting produces no action."
                 Planning cadence:
                   Description: "The rhythm of review and adjustment, which has to be faster for token spend than for traditional cloud."
-        Observability:
-          Description: "Visibility into the usage, cost, and quality of AI systems."
-          children:
-            Telemetry sources:
-              Description: "Where the numbers come from, each with different coverage and trust."
-              children:
-                Engine metrics:
-                  Description: "Counters emitted by the inference server, the only source that knows about cache hits, queue depth, and acceptance rates."
-                Accelerator metrics:
-                  Description: "Device-level utilization, memory, power, and temperature, which reveal whether hardware is earning its cost."
-                Traces:
-                  Description: "Per-request spans across services, the only way to attribute cost inside a multi-step agent run."
-                Application and gateway logs:
-                  Description: "Request-level records including model, tokens, and user, usually the practical basis for attribution."
-                Billing and usage records:
-                  Description: "The provider's own account of what was consumed, authoritative for spend and slow to arrive."
-            Signals:
-              Description: "What is worth measuring once the data is available."
-              children:
-                Usage & cost dashboards:
-                  Description: "Live views of token consumption and spend."
-                Utilization tracking:
-                  Description: "Measuring how fully hardware is used, the key to cost efficiency."
-                Quality / latency SLIs:
-                  Description: "Indicators tracking response quality and speed."
-                Cost per outcome:
-                  Description: "Cost tied to a completed business result rather than raw usage."
-                Efficiency signals:
-                  Description: "Cache hit rate, acceptance rate, and batch occupancy, the numbers that explain why cost per token is what it is."
-                Error and retry rates:
-                  Description: "Failed and repeated work, which shows up as cost long before it shows up as a quality complaint."
-            Practices:
-              Description: "Turning telemetry into something anyone acts on."
-              children:
-                Reconciliation:
-                  Description: "Checking engine and application counts against the invoice, which is where silent measurement errors surface."
-                Tag propagation:
-                  Description: "Carrying identity from the caller through gateways to the billing record, without which attribution breaks at the first hop."
-                Alerting:
-                  Description: "Notification on threshold breaches, useful only where a named owner can act."
-                Sampling and retention cost:
-                  Description: "Observability is itself an expense, and full-fidelity tracing of a high-volume token workload is not free."
-            Standards / Open Specifications:
-              Description: "Shared schemas that make measurement portable between tools and vendors."
-              children:
-                FOCUS:
-                  Description: "The open specification for normalizing billing and usage data across providers, which makes cross-vendor comparison possible."
-                OpenTelemetry:
-                  Description: "The vendor-neutral standard for traces and metrics, including conventions for generative AI calls."
         Monetization:
           Description: "How the value of tokens is captured as revenue."
           children:
@@ -1684,16 +1741,3 @@ Tokenomics:
               Description: "Dependence on a small number of suppliers at several layers of the stack at once."
             Infrastructure price inflation:
               Description: "Rising cost of the underlying compute and facilities, which does not always appear in per-token rates but eventually constrains them."
-        Sustainability:
-          Description: "The energy and environmental accounting of token production, increasingly a reported figure rather than an internal one."
-          children:
-            Energy per token:
-              Description: "Electricity consumed to produce a unit of output, the bridge between infrastructure efficiency and environmental reporting."
-            Carbon intensity:
-              Description: "Emissions per unit of energy, which varies by grid and therefore by region and time of day."
-            Water use:
-              Description: "Consumption associated with cooling, a growing constraint on where capacity can be sited."
-            Embodied impact:
-              Description: "The footprint of manufacturing and disposing of hardware, separate from the cost of running it."
-            Disclosure and reporting:
-              Description: "Obligations to report environmental impact, which turn an operational number into a compliance one."
