@@ -1531,8 +1531,15 @@ Tokenomics:
                   Description: "Exposure, liability, or security posture materially improved. The value is a loss that did not occur, so the claim rests on an expected-loss estimate and should say so plainly."
                 New Capability:
                   Description: "Something not previously possible, with no prior state to measure against. The claim is about viability rather than delta: name the alternative you chose not to build."
-                Job Satisfaction:
-                  Description: "Candidate tenth category: morale, developer experience, retention, recruitment appeal. Genuinely intangible, usually with no honest conversion at the end of the chain, so the defensible move is to report it rather than book it."
+                Employee Engagement:
+                  Description: "Candidate tenth category, renamed from Job Satisfaction to name the actual I-O psychology construct. An AI program changes engagement along three facets, of which the claim carries only the behavioral top line: retention rates, productivity, and counterproductive work behaviors such as withdrawal or sabotage, measured with engagement surveys and incident reports. No forced conversion: the defensible move is to report it, not book it."
+                  children:
+                    Cognitive facet:
+                      Description: "Fit and skill match: whether the job is changing toward or away from what the person is good at. Part of the construct's full decomposition, documented for the WG record rather than carried on the claim."
+                    Affective facet:
+                      Description: "Feelings toward the organization: whether AI change management was done well or people are worried about layoffs. Part of the full decomposition, not carried on the claim."
+                    Behavioral facet:
+                      Description: "What shows up in the data: retention, productivity, and counterproductive work behaviors including withdrawal and sabotage. The facet the reported claim is built on."
             Value Measurement:
               Description: "How a value claim is constructed and defended. The categories name what changed; these nodes are the how."
               children:
