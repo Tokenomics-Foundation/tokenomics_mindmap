@@ -1645,65 +1645,6 @@ Tokenomics:
                   Description: "Whether retrieval, storage, guardrails, and human review count toward the unit cost, which is a choice that must be stated to be comparable."
                 Denominator drift:
                   Description: "A unit metric improving because the unit changed rather than because anything got cheaper."
-        Cost Governance / FinOps:
-          Description: "Practices for making token spend visible, efficient, and controlled."
-          children:
-            Inform:
-              Description: "The FinOps phase of making cost visible and attributable."
-              children:
-                Cost attribution / tagging:
-                  Description: "Labeling usage so spend can be traced to its source."
-                Allocation (team / product / feature):
-                  Description: "Assigning shared costs to the teams and features that drive them."
-                Showback / chargeback:
-                  Description: "Reporting or billing internal cost back to consuming teams."
-                Shared and untaggable cost:
-                  Description: "Spend that cannot be traced to one consumer, which has to be allocated by rule rather than by measurement."
-                Billing data normalization:
-                  Description: "Reconciling differently shaped provider billing into one comparable structure, which is what FOCUS exists to do."
-                Granularity and latency of data:
-                  Description: "How finely and how quickly spend is reported, which bounds how fast anyone can react to it."
-                Cost allocation keys:
-                  Description: "The rule used to split shared spend, which has to be agreed rather than derived because no measurement produces it."
-                Blended vs effective rate:
-                  Description: "The averaged published rate against what was actually paid after discounts and commitments, which are rarely the same number."
-                Burn rate:
-                  Description: "Spend per unit of time against remaining budget or credits, the figure that turns a cost report into a deadline."
-            Optimize:
-              Description: "The FinOps phase of reducing cost without losing value."
-              children:
-                Rate optimization (commitments, tier selection):
-                  Description: "Lowering unit price through commitments and the right tier."
-                  children:
-                    Committed use discounts:
-                      Description: "Lower rates in exchange for a usage or spend commitment over a term."
-                    Reserved instances and savings plans:
-                      Description: "Cloud commitment instruments that apply to the compute underneath self-hosted inference, distinct from any model provider discount."
-                    Coverage and utilization:
-                      Description: "The share of usage a commitment covers and the share of the commitment actually used, the two numbers that decide whether it paid off."
-                Workload optimization (routing, caching, model choice):
-                  Description: "Cutting usage through smarter routing, caching, and model choice."
-                Optimization recommendations:
-                  Description: "Automated suggestions for where to cut cost."
-                Waste identification:
-                  Description: "Finding spend that produced nothing, such as failed runs, abandoned sessions, and idle reserved capacity."
-                Commitment management:
-                  Description: "Tracking coverage and utilization of reservations so they keep paying back across their term."
-            Operate:
-              Description: "The FinOps phase of running cost management day to day."
-              children:
-                Budgets & quotas:
-                  Description: "Spending limits that prevent overruns."
-                Forecasting:
-                  Description: "Predicting future spend from usage trends."
-                Anomaly detection:
-                  Description: "Catching unexpected cost spikes early."
-                Policy & guardrails:
-                  Description: "Rules that enforce cost discipline automatically."
-                Ownership and accountability:
-                  Description: "Naming who is responsible for a cost line, without which reporting produces no action."
-                Planning cadence:
-                  Description: "The rhythm of review and adjustment, which has to be faster for token spend than for traditional cloud."
         Monetization:
           Description: "How the value of tokens is captured as revenue."
           children:
