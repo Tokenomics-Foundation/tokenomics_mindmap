@@ -1129,12 +1129,28 @@ Tokenomics:
                   Description: "Growing context as an agent gathers state, steadily raising cost."
                 Sub-agents / orchestration:
                   Description: "Coordinating multiple agents, each adding token overhead."
+                  children:
+                    Coordination overhead:
+                      Description: "Tokens spent on briefing, handoffs, and duplicated context beyond the work performed by the agents themselves."
+                    Model tiering:
+                      Description: "Planning on a stronger model while delegating execution to cheaper ones, reserving the most expensive tokens for judgment."
+                    Single vs multi-agent tradeoff:
+                      Description: "Comparing one agent with many at the same total token budget separates gains from coordination from gains due simply to extra spend."
                 Tool-call overhead:
                   Description: "The extra tokens spent describing tools and parsing their results."
                 Step and turn budgets:
                   Description: "Hard caps on loop iterations, the main defence against an agent spending without bound."
                 Trajectory observability:
                   Description: "Tracing every model call inside a run, without which agent cost cannot be attributed to a cause."
+                Waste attribution:
+                  Description: "Splitting an agent run's spend into what the task inherently required and what the loop added, so optimization targets the removable part."
+                  children:
+                    Capability limit vs harness waste:
+                      Description: "Whether extra tokens buy capability the task needs or are overhead the scaffold could avoid, the line that decides what is fixable."
+                    Harness overhead:
+                      Description: "Tokens the scaffold consumes before task work begins, including system prompts, tool schemas, and coordination instructions."
+                    Compaction economics:
+                      Description: "Trimming or summarizing accumulated context cuts per-turn cost but can trigger re-read loops that spend more than they save."
                 Tool and protocol layer:
                   Description: "How an agent reaches the outside world, and the standards forming around it."
                   children:
@@ -1182,6 +1198,15 @@ Tokenomics:
               Description: "Producing and editing code, often long-output and context-heavy."
             Coding agents:
               Description: "Autonomous multi-step code work, among the most token-intensive workloads in production."
+              children:
+                Session cost variance:
+                  Description: "The spread in spend across runs of the same task, wide enough to make per-task budgeting unreliable."
+                Harness sensitivity:
+                  Description: "How the surrounding agent scaffold changes the same model's cost and success rate, making the harness a first-class cost variable."
+                Subscription vs metered access:
+                  Description: "Whether agent usage is bought as a flat plan or paid per token, which decides who absorbs usage variance."
+                Native spend controls:
+                  Description: "Usage dashboards, budgets, and limits exposed inside an agent product rather than only through the underlying billing layer."
             RAG / search:
               Description: "Retrieval-grounded question answering over a corpus."
             Summarization:
@@ -1338,6 +1363,15 @@ Tokenomics:
                   Description: "Whether a provider stores prompts or trains on them, a contract term rather than a technical control."
         Demand:
           Description: "Understanding, measuring, and forecasting the drivers of AI consumption."
+          children:
+            Adoption and spend growth:
+              Description: "How quickly pilots turn into material token budgets, which sets the pressure on every cost control downstream."
+            Spend predictability:
+              Description: "How reliably future token spend can be forecast from past usage, workload plans, and changes in agent behaviour."
+            Bill shock:
+              Description: "A gap between expected and actual spend that surfaces late, often driven by rapid usage growth, agent loops, or delayed cost visibility."
+            Demand elasticity:
+              Description: "How consumption changes as token prices change, determining whether lower unit prices reduce total spend or stimulate more usage."
     Value:
       Description: "Owns the last part of Tokenomics, measuring the business value AI produces, so AI investment can be judged on the outcomes it delivers rather than cost alone."
       children:
