@@ -874,6 +874,19 @@ Tokenomics:
                       Description: "Managed inference providers that host open models behind an API."
                     Friendli:
                       Description: "A managed inference service focused on high efficiency."
+        Sustainability:
+          Description: "The energy and environmental accounting of token production, increasingly a reported figure rather than an internal one."
+          children:
+            Energy per token:
+              Description: "Electricity consumed to produce a unit of output, the bridge between infrastructure efficiency and environmental reporting."
+            Carbon intensity:
+              Description: "Emissions per unit of energy, which varies by grid and therefore by region and time of day."
+            Water use:
+              Description: "Consumption associated with cooling, a growing constraint on where capacity can be sited."
+            Embodied impact:
+              Description: "The footprint of manufacturing and disposing of hardware, separate from the cost of running it."
+            Disclosure and reporting:
+              Description: "Obligations to report environmental impact, which turn an operational number into a compliance one."
     Consumption:
       Description: "Owns delivering AI services: how much is consumed, where the waste lives, and how to serve efficiently without degrading outcomes."
       children:
@@ -1311,8 +1324,8 @@ Tokenomics:
                   Description: "Identifiers that let a retried request be recognised as the same call, avoiding duplicate work and duplicate billing."
                 Backpressure:
                   Description: "Signalling upstream to slow down rather than queueing without bound, the difference between degraded and collapsed."
-        Guardrails / Quality:
-          Description: "Controls that keep output safe and correct, some of which cost extra tokens."
+        Guardrails:
+          Description: "Controls that keep output safe and correct, some of which cost extra tokens. Consumption owns enforcement and the measurement machinery; what counts as acceptable is the Quality Floor, owned by Value."
           children:
             Output validation:
               Description: "Checking responses against schemas or rules before use."
@@ -1372,11 +1385,8 @@ Tokenomics:
               Description: "A gap between expected and actual spend that surfaces late, often driven by rapid usage growth, agent loops, or delayed cost visibility."
             Demand elasticity:
               Description: "How consumption changes as token prices change, determining whether lower unit prices reduce total spend or stimulate more usage."
-    Value:
-      Description: "Owns the last part of Tokenomics, measuring the business value AI produces, so AI investment can be judged on the outcomes it delivers rather than cost alone."
-      children:
-        Pricing:
-          Description: "How token usage is priced by providers."
+        Purchase Options:
+          Description: "How usage is bought from providers: the rate card, its modifiers, and the commercial structures around it. Purchasing mechanics rather than value measurement."
           children:
             Price axes:
               Description: "What the meter actually counts, which differs by provider and by modality."
@@ -1445,127 +1455,6 @@ Tokenomics:
                   Description: "Money committed up front, often with expiry, which creates use-it-or-lose-it pressure."
                 Overage terms:
                   Description: "What happens past a committed volume, frequently the least examined term in the contract."
-        Unit Economics:
-          Description: "The per-unit costs and efficiency ratios behind token spend."
-          children:
-            Cost denominators:
-              Description: "What the spend is divided by, which is the choice that determines what the metric can tell you."
-              children:
-                Cost per token:
-                  Description: "The rawest measure, useful for comparing infrastructure and nearly useless for comparing products."
-                Cost per request:
-                  Description: "Spend per API call, which hides wide variation in request size."
-                Cost per session:
-                  Description: "Spend across a full user interaction, the first denominator that reflects conversation length."
-                Cost per user:
-                  Description: "Spend per active user over a period, the figure that connects to pricing and retention."
-                Cost per agent run:
-                  Description: "Spend for one complete autonomous task, the natural unit once workflows stop being single calls."
-                Cost per outcome:
-                  Description: "Cost tied to a completed business result rather than raw usage."
-            Efficiency ratios:
-              Description: "Production-side measures of how much output a resource yields."
-              children:
-                Tokens per dollar:
-                  Description: "A throughput-per-cost efficiency metric and core optimization target."
-                Tokens per watt:
-                  Description: "Token output per unit of energy, an efficiency and sustainability measure."
-                Tokens per GPU-hour:
-                  Description: "How many tokens a GPU produces per hour, a utilization measure."
-                Tokens per second per accelerator:
-                  Description: "Instantaneous production rate, which combined with hourly cost yields cost per token directly."
-            Margin:
-              Description: "What is left after the cost of producing the tokens."
-              children:
-                Gross & contribution margin:
-                  Description: "The profit left after token and serving costs."
-                COGS composition:
-                  Description: "How much of the cost is model calls, retrieval, storage, and human review, which shows where optimization would actually land."
-                Blended cost:
-                  Description: "A weighted average across the model mix, which is what finance sees and what hides the outliers."
-            Cost drivers:
-              Description: "The operational variables that move the unit number."
-              children:
-                Utilization:
-                  Description: "The share of paid capacity doing useful work, the dominant driver for self-hosted serving."
-                Cache hit rate:
-                  Description: "The share of input served from cache, the dominant driver for prompt-heavy API workloads."
-                Model mix:
-                  Description: "The distribution of traffic across price tiers, usually more movable than any single price."
-                Retry and failure rate:
-                  Description: "Work paid for twice, which links quality engineering directly to unit cost."
-                Input to output ratio:
-                  Description: "Which side of the meter dominates, which determines whether prompt or generation is worth optimizing."
-            Measurement pitfalls:
-              Description: "Ways a unit economics figure can be technically correct and still mislead."
-              children:
-                Idle and reserved cost:
-                  Description: "Capacity paid for but unused has to land somewhere, and burying it inflates the apparent cost of active work."
-                Fixed cost amortization:
-                  Description: "Training, evaluation, and platform cost spread over volume, which makes early unit costs look worse than the steady state."
-                Attribution boundary:
-                  Description: "Whether retrieval, storage, guardrails, and human review count toward the unit cost, which is a choice that must be stated to be comparable."
-                Denominator drift:
-                  Description: "A unit metric improving because the unit changed rather than because anything got cheaper."
-        Cost Governance / FinOps:
-          Description: "Practices for making token spend visible, efficient, and controlled."
-          children:
-            Inform:
-              Description: "The FinOps phase of making cost visible and attributable."
-              children:
-                Cost attribution / tagging:
-                  Description: "Labeling usage so spend can be traced to its source."
-                Allocation (team / product / feature):
-                  Description: "Assigning shared costs to the teams and features that drive them."
-                Showback / chargeback:
-                  Description: "Reporting or billing internal cost back to consuming teams."
-                Shared and untaggable cost:
-                  Description: "Spend that cannot be traced to one consumer, which has to be allocated by rule rather than by measurement."
-                Billing data normalization:
-                  Description: "Reconciling differently shaped provider billing into one comparable structure, which is what FOCUS exists to do."
-                Granularity and latency of data:
-                  Description: "How finely and how quickly spend is reported, which bounds how fast anyone can react to it."
-                Cost allocation keys:
-                  Description: "The rule used to split shared spend, which has to be agreed rather than derived because no measurement produces it."
-                Blended vs effective rate:
-                  Description: "The averaged published rate against what was actually paid after discounts and commitments, which are rarely the same number."
-                Burn rate:
-                  Description: "Spend per unit of time against remaining budget or credits, the figure that turns a cost report into a deadline."
-            Optimize:
-              Description: "The FinOps phase of reducing cost without losing value."
-              children:
-                Rate optimization (commitments, tier selection):
-                  Description: "Lowering unit price through commitments and the right tier."
-                  children:
-                    Committed use discounts:
-                      Description: "Lower rates in exchange for a usage or spend commitment over a term."
-                    Reserved instances and savings plans:
-                      Description: "Cloud commitment instruments that apply to the compute underneath self-hosted inference, distinct from any model provider discount."
-                    Coverage and utilization:
-                      Description: "The share of usage a commitment covers and the share of the commitment actually used, the two numbers that decide whether it paid off."
-                Workload optimization (routing, caching, model choice):
-                  Description: "Cutting usage through smarter routing, caching, and model choice."
-                Optimization recommendations:
-                  Description: "Automated suggestions for where to cut cost."
-                Waste identification:
-                  Description: "Finding spend that produced nothing, such as failed runs, abandoned sessions, and idle reserved capacity."
-                Commitment management:
-                  Description: "Tracking coverage and utilization of reservations so they keep paying back across their term."
-            Operate:
-              Description: "The FinOps phase of running cost management day to day."
-              children:
-                Budgets & quotas:
-                  Description: "Spending limits that prevent overruns."
-                Forecasting:
-                  Description: "Predicting future spend from usage trends."
-                Anomaly detection:
-                  Description: "Catching unexpected cost spikes early."
-                Policy & guardrails:
-                  Description: "Rules that enforce cost discipline automatically."
-                Ownership and accountability:
-                  Description: "Naming who is responsible for a cost line, without which reporting produces no action."
-                Planning cadence:
-                  Description: "The rhythm of review and adjustment, which has to be faster for token spend than for traditional cloud."
         Observability:
           Description: "Visibility into the usage, cost, and quality of AI systems."
           children:
@@ -1615,6 +1504,147 @@ Tokenomics:
                   Description: "The open specification for normalizing billing and usage data across providers, which makes cross-vendor comparison possible."
                 OpenTelemetry:
                   Description: "The vendor-neutral standard for traces and metrics, including conventions for generative AI calls."
+    Value:
+      Description: "Owns the last part of Tokenomics, measuring the business value AI produces so investment is judged on outcomes rather than cost alone. Cost and utilization arrive from Production and Consumption as supporting scaffolding, not as the claim itself."
+      children:
+        Business Outcomes:
+          Description: "What the AI changed and by how much, measured against a stated baseline. Anchors the Value layer: cost and utilization from the other layers only matter through the outcome they produce."
+          children:
+            Value Categorization:
+              Description: "What the AI produces, framed for conversation rather than fixed. The fusion draft groups the ten categories by how the number is produced: direct dollar wins, labor categories estimated in hours or FTE, and reported outcomes. The groups differ in method, not worth, and no category outranks another."
+              children:
+                Revenue Enablement:
+                  Description: "Revenue that would not exist without the AI. The number already sits in a ledger, so the argument is attribution rather than measurement."
+                Cost Avoidance:
+                  Description: "Spend that does not occur. Spend that went down is visible on an invoice, spend never incurred is a counterfactual. Spans most of the range by itself."
+                Capacity Gain:
+                  Description: "Same people produce more. Individually nice-to-haves, in aggregate often the largest line. Freed capacity that nothing is spent on stays a tracked FTE estimate rather than a booked claim."
+                Labor Augmentation:
+                  Description: "AI does part of the task and the human stays in the loop. The gain shows up as throughput or hours per unit before it shows up as headcount, measured against the human alone."
+                Labor Automation:
+                  Description: "AI does the task end to end. Trivial to compute and hardest to defend: needs the best-of-either baseline and a cleared quality gate, and raises who owns the decision once the human is out of the loop."
+                Product Quality:
+                  Description: "Fewer defects, less rework, better product. Quality of the work the business ships, deliberately renamed from Output Quality to keep it from being confused with the Quality Floor signal. Measurable only once the workload has a defined floor and instrumentation."
+                Speed to Market:
+                  Description: "Faster delivery of changes. Cycle time is usually available, what a week of earlier delivery is worth usually is not. Resolves into revenue pulled forward or spend avoided."
+                Risk Reduction:
+                  Description: "Exposure, liability, or security posture materially improved. The value is a loss that did not occur, so the claim rests on an expected-loss estimate and should say so plainly."
+                New Capability:
+                  Description: "Something not previously possible, with no prior state to measure against. The claim is about viability rather than delta: name the alternative you chose not to build."
+                Employee Engagement:
+                  Description: "Candidate tenth category, renamed from Job Satisfaction to name the actual I-O psychology construct. An AI program changes engagement along three facets, of which the claim carries only the behavioral top line: retention rates, productivity, and counterproductive work behaviors such as withdrawal or sabotage, measured with engagement surveys and incident reports. No forced conversion: the defensible move is to report it, not book it."
+                  children:
+                    Cognitive facet:
+                      Description: "Fit and skill match: whether the job is changing toward or away from what the person is good at. Part of the construct's full decomposition, documented for the WG record rather than carried on the claim."
+                    Affective facet:
+                      Description: "Feelings toward the organization: whether AI change management was done well or people are worried about layoffs. Part of the full decomposition, not carried on the claim."
+                    Behavioral facet:
+                      Description: "What shows up in the data: retention, productivity, and counterproductive work behaviors including withdrawal and sabotage. The facet the reported claim is built on."
+            Value Measurement:
+              Description: "How a value claim is constructed and defended. The categories name what changed; these nodes are the how."
+              children:
+                Baseline:
+                  Description: "The comparison a value claim rests on, ideally the best available alternative rather than a stale before-AI state. Baselines go stale quickly and created processes may have none."
+                No-baseline problem:
+                  Description: "Workloads where AI created the process so no counterfactual exists. The hardest measurement case, handled with bounded estimates rather than solved."
+                Claim chain:
+                  Description: "The how-to workflow, in three parts rather than layers, since layer is reserved for the technical stack. Part one the delta, what moved, with a unit and a direction. Part two the conversion, a baseline so the delta is real and a quality gate so it counts. Part three the destination, where a booked number lands, a closed set because the financial statements are a closed set."
+                  children:
+                    Stated stopping point:
+                      Description: "The conversion is available, not mandatory: teams managing in time may stop at the delta and report hours or FTE equivalents. The chain requires the claim to name where it stopped, so a freed hour is never quietly counted as a booked dollar. Mandatory for anyone booking to a statement, optional for anyone managing in time."
+                    Destinations:
+                      Description: "The five places a booked number lands: new revenue won, revenue retained, spend removed, spend avoided, capital freed. Defensibility lives at the conversion step, not at the destination."
+                    Role ladder:
+                      Description: "Each scope from IC to C-Suite answers the value question at a different range and has its own natural unit, hours per task at the bottom, P and L lines and market position at the top. Estimates add up within a scope, not across scopes."
+                Unit of measure:
+                  Description: "Dollars, hours, or FTE equivalents, chosen per audience. Dollars read to executives, hours and FTE equivalents read to operational leads, and some outcomes deliberately stay unconverted."
+                Horizontal rollout attribution:
+                  Description: "Time saved by a company-wide assistant does not automatically become organizational value, the buying-coffee-with-that problem. Vertical workloads are measurably easier than horizontal ones."
+                Augmentation and automation:
+                  Description: "The old single Labor Offset label let teams claim augmentation and defend it with automation math. The split into two categories is the resolution: they need different baselines, human alone versus best-of-either, and saying which one you mean is most of the defense. What freed people move to afterwards stays open."
+                Product versus internal posture:
+                  Description: "Restored as the what of common AI task types: Product AI is customer-facing and judged on growth and margin, Internal AI is operational and judged on cost and efficiency. The posture picks the scoreboard but never changes the measurement math, and packaging never decides posture, consumption does."
+                  children:
+                    Internal product workload:
+                      Description: "AI-enabled features built and packaged like a product for internal users. The goal is productivity, so it is measured as Internal AI no matter how well it is packaged."
+                Value claim components:
+                  Description: "A full claim names the workload or task type, the outcome measured, the unit, the baseline, and the quality the result was judged at."
+                Quality Floor:
+                  Description: "The pass bar for acceptable output on a specific workload: quality is the gate, not a multiplier. Value only counts when output clears the floor, cheap output that misses it is waste, and full utilization of a model that misses it is waste rather than efficiency."
+                  children:
+                    Task-specific criteria:
+                      Description: "Code generation and creative summarization have different correctness criteria, so the floor is defined per workload. Leaderboard scores are a starting point for model selection, not a substitute for measuring on your own workload."
+                    Defined before optimization:
+                      Description: "Routing to cheaper models is impossible until acceptable has a definition, so the floor must exist before cost work begins."
+                    Re-baselining:
+                      Description: "A floor calibrated for one model generation goes stale for the next, so it must be re-established as models evolve."
+                    Floor versus work quality:
+                      Description: "The floor is a binary pass signal for the AI output; the Product Quality category means the quality of the work the business ships. The rename from Output Quality exists to keep the two from talking past each other."
+            Outcome KPIs:
+              Description: "The outcome-facing readouts of unit economics, where cost per unit stops describing production efficiency and starts describing business results."
+              children:
+                Cost per outcome:
+                  Description: "Cost tied to a completed business result rather than raw usage, the natural bridge from unit economics into business outcomes."
+                Cost per user:
+                  Description: "Spend per active user over a period, the denominator that most directly connects usage to business metrics."
+                Cost per session:
+                  Description: "Spend across a full user interaction, the first denominator that reflects conversion rather than infrastructure."
+        Unit Economics:
+          Description: "The per-unit costs and efficiency ratios behind token spend."
+          children:
+            Cost denominators:
+              Description: "What the spend is divided by, which is the choice that determines what the metric can tell you."
+              children:
+                Cost per token:
+                  Description: "The rawest measure, useful for comparing infrastructure and nearly useless for comparing products."
+                Cost per request:
+                  Description: "Spend per API call, which hides wide variation in request size."
+                Cost per agent run:
+                  Description: "Spend for one complete autonomous task, the natural unit once workflows stop being single calls."
+            Efficiency ratios:
+              Description: "Production-side measures of how much output a resource yields."
+              children:
+                Tokens per dollar:
+                  Description: "A throughput-per-cost efficiency metric and core optimization target."
+                Tokens per watt:
+                  Description: "Token output per unit of energy, an efficiency and sustainability measure."
+                Tokens per GPU-hour:
+                  Description: "How many tokens a GPU produces per hour, a utilization measure."
+                Tokens per second per accelerator:
+                  Description: "Instantaneous production rate, which combined with hourly cost yields cost per token directly."
+            Margin:
+              Description: "What is left after the cost of producing the tokens."
+              children:
+                Gross & contribution margin:
+                  Description: "The profit left after token and serving costs."
+                COGS composition:
+                  Description: "How much of the cost is model calls, retrieval, storage, and human review, which shows where optimization would actually land."
+                Blended cost:
+                  Description: "A weighted average across the model mix, which is what finance sees and what hides the outliers."
+            Cost drivers:
+              Description: "The operational variables that move the unit number."
+              children:
+                Utilization:
+                  Description: "The share of paid capacity doing useful work, the dominant driver for self-hosted serving."
+                Cache hit rate:
+                  Description: "The share of input served from cache, the dominant driver for prompt-heavy API workloads."
+                Model mix:
+                  Description: "The distribution of traffic across price tiers, usually more movable than any single price."
+                Retry and failure rate:
+                  Description: "Work paid for twice, which links quality engineering directly to unit cost."
+                Input to output ratio:
+                  Description: "Which side of the meter dominates, which determines whether prompt or generation is worth optimizing."
+            Measurement pitfalls:
+              Description: "Ways a unit economics figure can be technically correct and still mislead."
+              children:
+                Idle and reserved cost:
+                  Description: "Capacity paid for but unused has to land somewhere, and burying it inflates the apparent cost of active work."
+                Fixed cost amortization:
+                  Description: "Training, evaluation, and platform cost spread over volume, which makes early unit costs look worse than the steady state."
+                Attribution boundary:
+                  Description: "Whether retrieval, storage, guardrails, and human review count toward the unit cost, which is a choice that must be stated to be comparable."
+                Denominator drift:
+                  Description: "A unit metric improving because the unit changed rather than because anything got cheaper."
         Monetization:
           Description: "How the value of tokens is captured as revenue."
           children:
@@ -1684,16 +1714,3 @@ Tokenomics:
               Description: "Dependence on a small number of suppliers at several layers of the stack at once."
             Infrastructure price inflation:
               Description: "Rising cost of the underlying compute and facilities, which does not always appear in per-token rates but eventually constrains them."
-        Sustainability:
-          Description: "The energy and environmental accounting of token production, increasingly a reported figure rather than an internal one."
-          children:
-            Energy per token:
-              Description: "Electricity consumed to produce a unit of output, the bridge between infrastructure efficiency and environmental reporting."
-            Carbon intensity:
-              Description: "Emissions per unit of energy, which varies by grid and therefore by region and time of day."
-            Water use:
-              Description: "Consumption associated with cooling, a growing constraint on where capacity can be sited."
-            Embodied impact:
-              Description: "The footprint of manufacturing and disposing of hardware, separate from the cost of running it."
-            Disclosure and reporting:
-              Description: "Obligations to report environmental impact, which turn an operational number into a compliance one."
