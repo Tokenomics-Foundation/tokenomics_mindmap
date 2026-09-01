@@ -34,6 +34,19 @@ Opening `mindmap.html` directly from disk also works. Browsers block `fetch` on 
 | Find a node | Type in search, press Enter |
 | Read a description | Hover a node |
 
+The map opens with one level of detail under Production, Consumption, and Value. Click any node to reveal deeper levels.
+
+### Showing what changed (diff mode)
+
+Click **Compare…** and pick either:
+
+- an **earlier YAML snapshot** of the map (the state at your last WG call), or
+- a **git patch/diff** (`git diff last-tag-or-commit..HEAD -- tokenomics_mindmap.yaml > changes.patch`)
+
+The map recolors: **green = added**, **red = removed** (shown as ghost nodes with strikethrough), **yellow = revised or moved**, gray = unchanged. Lines match their child node. Hovering a revised node shows the old description alongside the new one. A banner counts the changes; **Changed only** hides untouched subtrees, and **Exit diff** (or Escape) returns to the normal color-coded view.
+
+When you feed in a patch, the viewer applies it to the loaded YAML (forward, or reversed if your diff runs the other way) before coloring. If a patch fails to apply cleanly, compare against the earlier YAML snapshot instead.
+
 Turn on the **Edit** checkbox to modify the map:
 
 - Double-click a node to rename it, edit its description, or attach links
@@ -44,7 +57,7 @@ Turn on the **Edit** checkbox to modify the map:
 
 Three top-level branches, color-coded in the viewer:
 
-- **Generation** (blue): the supply side. Tokenization, Model / Architecture, Hardware, Training, Serving.
+- **Production** (blue): the supply side. Tokenization, Model / Architecture, Hardware, Training, Serving.
 - **Consumption** (purple): the demand side. Prompt / Context Engineering, Optimization, Workloads / Use Cases, Access & Delivery, Guardrails / Quality.
 - **Value** (pink): the money. Pricing, Unit Economics, Cost Governance / FinOps, Monetization, Business Case, Observability.
 
@@ -56,7 +69,7 @@ Every node is a mapping key. `Description` and `Links` are optional; `children` 
 Tokenomics:
   Description: "The full economics of producing and consuming LLM tokens."
   children:
-    Generation:
+    Production:
       Description: "The supply side of tokens."
       children:
         PagedAttention:
