@@ -1699,6 +1699,8 @@ Tokenomics:
               Description: "What the same capacity, capital, or team could have produced elsewhere."
             Risk adjustment:
               Description: "Discounting expected return for model, vendor, and regulatory uncertainty."
+            AI Economics Architect (proposed persona):
+              Description: "Designs the enterprise AI economic model connecting strategy, technology, total cost, governed action, measurable outcomes, and learning across Production, Consumption, and Value."
         Market Structure:
           Description: "The supply landscape that sets what any buyer can actually get and at what price."
           children:
