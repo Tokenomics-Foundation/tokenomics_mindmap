@@ -1,6 +1,5 @@
 Tokenomics:
-  Description: "AI Tokenomics is the discipline of converting energy and capital into AI, then efficiently consuming AI services to enable intelligent outcomes and drive business value.
-(Draft v0.2, August 2026)"
+  Description: "AI Tokenomics (i.e., \"AI Economics\") is the discipline of converting energy and capital into AI capabilities and efficiently consuming that intelligence across the organization, to realize measurable business value. (Draft v0.5.2, September 2026)"
   children:
     Production:
       Description: "The supply side of AI. Energy, capital resources, and the economics of building and running AI in production. How capacity is planned, costed, and brought online."
@@ -1685,8 +1684,8 @@ Tokenomics:
           children:
             ROI:
               Description: "The return generated relative to AI investment."
-            TCO:
-              Description: "The total cost of ownership across infrastructure, licensing, and operations."
+            TCA:
+              Description: "The Total Cost of AI across tokens, hardware, power, licensing, and the labor to build and operate the AI platform."
             Build vs buy:
               Description: "Whether to self-host or use a managed provider."
             Payback period:
