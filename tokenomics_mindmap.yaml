@@ -1557,8 +1557,6 @@ Tokenomics:
                       Description: "Each scope from IC to C-Suite answers the value question at a different range and has its own natural unit, hours per task at the bottom, P and L lines and market position at the top. Estimates add up within a scope, not across scopes."
                 Unit of measure:
                   Description: "Dollars, hours, or FTE equivalents, chosen per audience. Dollars read to executives, hours and FTE equivalents read to operational leads, and some outcomes deliberately stay unconverted."
-                Horizontal rollout attribution:
-                  Description: "Time saved by a company-wide assistant does not automatically become organizational value, the buying-coffee-with-that problem. Vertical workloads are measurably easier than horizontal ones."
                 Augmentation and automation:
                   Description: "The old single Labor Offset label let teams claim augmentation and defend it with automation math. The split into two categories is the resolution: they need different baselines, human alone versus best-of-either, and saying which one you mean is most of the defense. What freed people move to afterwards stays open."
                 Product versus internal posture:
