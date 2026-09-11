@@ -1547,12 +1547,27 @@ Tokenomics:
                 No-baseline problem:
                   Description: "Workloads where AI created the process so no counterfactual exists. The hardest measurement case, handled with bounded estimates rather than solved."
                 Claim chain:
-                  Description: "The how-to workflow, in three parts rather than layers, since layer is reserved for the technical stack. Part one the delta, what moved, with a unit and a direction. Part two the conversion, a baseline so the delta is real and a quality gate so it counts. Part three the destination, where a booked number lands, a closed set because the financial statements are a closed set."
+                  Description: "The how-to workflow, in four parts rather than layers, since layer is reserved for the technical stack. Observe gathers the inputs, all in one unit. Net turns them into one number in that unit. Convert carries the net number into another unit and can repeat. Book names where a dollar-denominated result lands. Many claims stop after Net, and a claim that stops there is complete."
                   children:
-                    Stated stopping point:
-                      Description: "The conversion is available, not mandatory: teams managing in time may stop at the delta and report hours or FTE equivalents. The chain requires the claim to name where it stopped, so a freed hour is never quietly counted as a booked dollar. Mandatory for anyone booking to a statement, optional for anyone managing in time."
-                    Destinations:
-                      Description: "The five places a booked number lands: new revenue won, revenue retained, spend removed, spend avoided, capital freed. Defensibility lives at the conversion step, not at the destination."
+                    Observe:
+                      Description: "The inputs, each denominated in the baseline's unit: scope, baseline, observed state, Quality Floor, cost created, and provenance. Cost created is the review, triage, rework, supervision, and escalation the AI adds inside the workload, expressed in the baseline's unit."
+                    Net:
+                      Description: "Gross delta times volume, less outputs that missed the floor, less cost created, less harm from misses, equals net benefit. One number, in one unit, over one period, with one confidence mark that carries the weakest provenance among the inputs."
+                      children:
+                        Harm from misses:
+                          Description: "The Quality Floor makes bad output not count; it does not make bad output cost nothing. An incorrect resolution or a compliance miss is net negative, not merely zero, and the damage is subtracted here in the baseline's unit. Most claims carry zero on this line; risk-bearing workloads do not."
+                        Redeployment:
+                          Description: "Freed capacity that was not redeployed nets to zero realized benefit. It is tracked as an FTE estimate, not claimed, until the capacity is spent on work that produces an outcome. This applies to every labor category, not only capacity gain."
+                    Convert:
+                      Description: "The optional, repeatable hop from a net observation into hours, headcount, or money. Conversion operates on the net and never on the gross; each hop carries its own confidence and confidence compounds downward; the claim names its hop count, and a claim beyond the hop threshold the organization sets is reported, not booked. Defensibility lives here, not at the destination."
+                      children:
+                        Stated stopping point:
+                          Description: "The conversion is available, not mandatory: teams managing in time may stop at the delta and report hours or FTE equivalents. The chain requires the claim to name where it stopped, so a freed hour is never quietly counted as a booked dollar. Whether conversion to dollars is optional or mandatory is still open in the working group."
+                    Book:
+                      Description: "Only a dollar-denominated result can reach a destination; a claim that stops at Net or converts into a non-dollar unit is reported and has no destination. Evidence marks say what kind of argument a claim requires: a ledger line, a counterfactual, an expected loss, or attribution."
+                      children:
+                        Destinations:
+                          Description: "The five places a booked number lands: new revenue won, revenue retained, spend removed, spend avoided, capital freed. The financial statements are a closed list, so the set is closed; one win is booked once, in one destination, by one team."
                     Role ladder:
                       Description: "Each scope from IC to C-Suite answers the value question at a different range and has its own natural unit, hours per task at the bottom, P and L lines and market position at the top. Estimates add up within a scope, not across scopes."
                 Unit of measure:
