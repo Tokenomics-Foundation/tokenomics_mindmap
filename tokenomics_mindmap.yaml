@@ -1581,6 +1581,11 @@ Tokenomics:
                       Description: "AI-enabled features built and packaged like a product for internal users. The goal is productivity, so it is measured as Internal AI no matter how well it is packaged."
                 Value claim components:
                   Description: "A full claim names the workload or task type, the outcome measured, the unit, the baseline, and the quality the result was judged at."
+                Cost boundary:
+                  Description: "A value claim nets the costs the AI creates inside the workload: review, triage, rework, supervision, escalation. It does not net the costs the AI consumes, which are TCA under the Business Case and compose later. The test is the baseline's own unit: if the baseline was 45 minutes of human review, triage time is human review time and nets before conversion; the GPU bill is not, so it belongs to TCA."
+                  children:
+                    Attribution grain:
+                      Description: "For a claim and a cost to compose into a return, TCA has to land on the same workload boundary as the outcome. The value side defines the grain; the requirement is stated here and the solution is being built separately."
                 Quality Floor:
                   Description: "The pass bar for acceptable output on a specific workload: quality is the gate, not a multiplier. Value only counts when output clears the floor, cheap output that misses it is waste, and full utilization of a model that misses it is waste rather than efficiency."
                   children:
