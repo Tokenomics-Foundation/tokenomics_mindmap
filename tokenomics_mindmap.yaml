@@ -1572,6 +1572,8 @@ Tokenomics:
                       Description: "Each scope from IC to C-Suite answers the value question at a different range and has its own natural unit, hours per task at the bottom, P and L lines and market position at the top. Estimates add up within a scope, not across scopes."
                 Unit of measure:
                   Description: "Dollars, hours, or FTE equivalents, chosen per audience. Dollars read to executives, hours and FTE equivalents read to operational leads, and some outcomes deliberately stay unconverted."
+                Maturity staging:
+                  Description: "What a claim looks like at each stage of running the chain. Crawl: a net delta in native units with a stated baseline and floor, stopping at Net. Walk: adds the conversion chain and a named destination, running through Book. Run: composes the claim against TCA for a return, which needs cost at the same attribution grain."
                 Augmentation and automation:
                   Description: "The old single Labor Offset label let teams claim augmentation and defend it with automation math. The split into two categories is the resolution: they need different baselines, human alone versus best-of-either, and saying which one you mean is most of the defense. What freed people move to afterwards stays open."
                 Product versus internal posture:
@@ -1700,10 +1702,17 @@ Tokenomics:
         Business Case:
           Description: "The justification for AI spend against its returns."
           children:
+            Workloads / Use Cases:
+              Description: "The unit at which value is attributed: a named workload with an owner, best framed as a workflow or business process rather than a single-shot, single-user task. The same unit anchors the cost side under Consumption; here it is the boundary the outcome is measured at, and a use case is its business-facing view."
+              children:
+                Workflow grain:
+                  Description: "Value compounds across a whole workflow: the model, the retrieved data, the infrastructure, the engineer who designed the workflow, and the employee who used it. No measurement isolates the share belonging to the AI alone, so claims scope to the workflow outcome, not to individual calls."
+            Value case gate:
+              Description: "A measurable value case before a new workload goes live: what the process costs today in money or time, which specific financial outcome the AI improves, and how that outcome will be measured in dollars. A business case that cannot express its expected value in financial terms before launch is an experiment, and should be funded with explicit scope limits and a defined point at which it produces evidence or stops."
             ROI:
               Description: "The return generated relative to AI investment."
             TCA:
-              Description: "The Total Cost of AI across tokens, hardware, power, licensing, and the labor to build and operate the AI platform."
+              Description: "The Total Cost of AI across tokens, hardware, power, licensing, and the labor to build and operate the AI platform. A value claim does not net these; see Cost boundary under Value Measurement for the boundary and the grain at which a claim and a cost compose into a return."
             Build vs buy:
               Description: "Whether to self-host or use a managed provider."
             Payback period:
