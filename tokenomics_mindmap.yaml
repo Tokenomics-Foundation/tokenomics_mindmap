@@ -1100,45 +1100,127 @@ Tokenomics:
                       Description: "An agent plans and refines its own retrieval over several rounds, which raises answer quality and multiplies both retrieval calls and generation cost."
                     Self-correcting retrieval:
                       Description: "The model judges whether retrieved passages are adequate and retrieves again or falls back to another source, trading extra calls for fewer wrong answers."
-                Vector stores:
-                  Description: "Databases of embeddings that power semantic retrieval."
                 Short vs long-term memory:
                   Description: "Distinguishing per-session context from persistent recall."
                 Context compression / summarization:
                   Description: "Condensing history to keep context small and cheap."
-                Chunking and embedding cost:
-                  Description: "Indexing is its own token workload, paid up front and again on every re-index."
-                Reranking:
-                  Description: "A second scoring pass over retrieved candidates, which raises precision and lets fewer documents be sent to the model."
-                Retrieval quality and wasted context:
-                  Description: "Irrelevant retrieved passages are billed as input tokens and can actively degrade the answer."
                 Retrieval mechanics:
-                  Description: "How candidate passages are found and ordered, the layer beneath any retrieval pattern."
+                  Description: "The retrieval pipeline beneath any knowledge injection pattern, ordered by stage: what is built at index time, how the query is prepared, how candidates are found, how lists are merged and reordered, and what it costs when the result is wrong."
                   children:
+                    Indexing:
+                      Description: "Work done once over the corpus and repeated on every rebuild, paid in full before a single query arrives."
+                      children:
+                        Chunking and embedding cost:
+                          Description: "Indexing is its own token workload, paid up front and again on every re-index."
+                        Contextual retrieval:
+                          Description: "Prepending a short generated summary of surrounding context to each chunk before indexing, which improves recall and adds a one-off generation cost per chunk."
+                        Late chunking:
+                          Description: "Embedding the full document first and pooling per chunk afterwards, so chunk vectors retain document context."
+                        Hierarchical summarization indexes (RAPTOR):
+                          Description: "Recursively clustering and summarizing the corpus into a tree, so queries can be answered at the right level of abstraction."
+                    Query preparation:
+                      Description: "Work done on the question before any search runs, cheap per query and often more effective than tuning the index."
+                      children:
+                        Query rewriting and expansion:
+                          Description: "Reformulating the user question before search, which costs a small generation and often beats tuning the index. Generating several reformulations instead of one turns this into multi-query fan-out, covered under Result fusion."
+                        HyDE:
+                          Description: "Generating a hypothetical answer and retrieving against its embedding, so the search vector matches document style rather than question style."
+                    Sparse retrieval:
+                      Description: "Scoring on term overlap, also called keyword or lexical search, which handles names, codes, identifiers, and rare terms that embeddings blur. It runs on an inverted index with no model call at query time, so marginal cost per query is near zero once the index is built."
+                      children:
+                        TF-IDF:
+                          Description: "Weights a term by how often it appears in a document against how rare it is across the corpus. The original lexical weighting scheme, superseded in practice by BM25 but still the mental model most people carry for keyword search."
+                        BM25:
+                          Description: "A probabilistic refinement of TF-IDF that saturates term frequency and normalizes for document length, so a term appearing twenty times does not score ten times higher than one appearing twice. The default lexical scorer across search engines and hybrid stacks, and a baseline dense retrievers do not uniformly beat out of domain."
+                          Links:
+                            - "https://arxiv.org/abs/2104.08663"
+                        BM25 parameters (k1 and b):
+                          Description: "Two constants controlling term frequency saturation and document length normalization. They are corpus-specific and almost always left at their defaults, which makes them a quiet and recoverable source of retrieval quality loss."
+                        Inverted index:
+                          Description: "The term-to-document map sparse retrieval runs on. Cheap to build and update relative to a vector index, and it stores no floating-point vectors, so its footprint over the same corpus is a fraction of a dense index."
+                        Learned sparse retrieval (SPLADE):
+                          Description: "Uses a language model to predict term weights across the whole vocabulary, expanding documents with terms they do not literally contain while still indexing and searching as sparse vectors. It buys semantic matching without abandoning the inverted index, and pays for it with a model pass over every document at index time."
+                          Links:
+                            - "https://arxiv.org/abs/2107.05720"
                     Dense retrieval:
-                      Description: "Matching by embedding similarity, which captures meaning and misses exact identifiers."
-                    Sparse retrieval (BM25):
-                      Description: "Classic lexical scoring on term overlap, which handles names, codes, and rare terms that embeddings blur."
+                      Description: "Matching by embedding similarity, commonly called vector or semantic search, which captures meaning and misses exact identifiers. Every query costs an embedding call, and every document costs one at index time and again on every re-index."
+                      children:
+                        Bi-encoder architecture:
+                          Description: "Query and document are embedded independently, so document vectors are precomputed and the query costs one short embedding call. This is what makes dense retrieval cheap at query time and what caps its accuracy below a cross-encoder that reads both together."
+                        Similarity metric:
+                          Description: "Cosine, dot product, or Euclidean distance. The correct choice is set by how the embedding model was trained rather than by preference, and using the wrong one degrades retrieval silently rather than failing."
+                        Embedding dimensions:
+                          Description: "Vector width, which sets storage and search cost across the whole corpus and is fixed at index time."
+                        Matryoshka embeddings:
+                          Description: "Embeddings trained so a truncated prefix stays usable, letting dimensions be cut later to reclaim storage and speed."
+                        Multi-vector retrieval (ColBERT):
+                          Description: "Storing per-token vectors and scoring by late interaction, which raises accuracy and sharply raises index size."
+                        Out-of-domain degradation:
+                          Description: "Embedding models trained on general web text lose accuracy on specialist corpora, the failure that hybrid search exists to cover. The BEIR benchmark is the standard evidence."
+                          Links:
+                            - "https://arxiv.org/abs/2104.08663"
+                        Embedding model versioning:
+                          Description: "Changing the embedding model invalidates every vector in the index, so an upgrade means re-embedding the whole corpus. That re-indexing bill is the switching cost of dense retrieval and it is rarely priced in at selection time."
                     Hybrid search:
-                      Description: "Combining dense and sparse scores, usually the strongest default because their failure modes differ."
-                    ANN indexes (HNSW, IVF):
-                      Description: "Approximate nearest neighbour structures that make vector search fast, trading a little recall for large speed gains."
-                    Embedding dimensions:
-                      Description: "Vector width, which sets storage and search cost across the whole corpus and is fixed at index time."
-                    Matryoshka embeddings:
-                      Description: "Embeddings trained so a truncated prefix stays usable, letting dimensions be cut later to reclaim storage and speed."
-                    Multi-vector retrieval (ColBERT):
-                      Description: "Storing per-token vectors and scoring by late interaction, which raises accuracy and sharply raises index size."
-                    Query rewriting and expansion:
-                      Description: "Reformulating the user question before search, which costs a small generation and often beats tuning the index."
-                    HyDE:
-                      Description: "Generating a hypothetical answer and retrieving against its embedding, so the search vector matches document style rather than question style."
-                    Contextual retrieval:
-                      Description: "Prepending a short generated summary of surrounding context to each chunk before indexing, which improves recall and adds a one-off generation cost per chunk."
-                    Late chunking:
-                      Description: "Embedding the full document first and pooling per chunk afterwards, so chunk vectors retain document context."
-                    Hierarchical summarization indexes (RAPTOR):
-                      Description: "Recursively clustering and summarizing the corpus into a tree, so queries can be answered at the right level of abstraction."
+                      Description: "Running dense and sparse retrieval over the same query and merging the two result lists, usually the strongest default because their failure modes differ. The merge itself is a separate choice, covered under Result fusion."
+                    Result fusion:
+                      Description: "How several ranked result lists become one ordering, the step that actually implements hybrid search and multi-query retrieval. Fusion only reorders the union of what the retrievers returned, so a document none of them found cannot appear at all, and the method chosen changes ranking quality without changing token cost."
+                      children:
+                        Rank-based fusion:
+                          Description: "Merges by position only, discarding the underlying scores. It needs no calibration between retrievers, so it works across scoring schemes that are not comparable, and it costs nothing beyond a sort."
+                          children:
+                            Reciprocal Rank Fusion (RRF):
+                              Description: "Sums 1/(k + rank) across every list a document appears in. It combines positions rather than scores, needs no training and no model call, and ships in Elasticsearch, Qdrant, and Weaviate, where it is Qdrant's default. It is the baseline any reranker model, which bills per candidate, has to beat."
+                              Links:
+                                - "https://cormack.uwaterloo.ca/cormacksigir09-rrf.pdf"
+                                - "https://dl.acm.org/doi/10.1145/1571941.1572114"
+                            Rank constant k:
+                              Description: "The constant added to the rank before inversion, fixed at 60 in the original pilot and reused as the conventional default since, exposed by Elasticsearch as rank_constant. A larger k flattens the gap between top and lower ranks, a smaller one sharpens it."
+                            Weighted RRF:
+                              Description: "Multiplying each list's reciprocal-rank contribution by a weight before summing, which lets one retriever count for more without reintroducing score comparison. Qdrant accepts a weight pair alongside k on its RRF query."
+                            Condorcet Fuse:
+                              Description: "An earlier rank-based method that orders documents by pairwise majority vote across the input rankings. RRF was introduced as a simpler alternative and beat it across the original evaluation, which leaves this mostly of historical interest."
+                        Score-based fusion:
+                          Description: "Keeps the magnitude of each retriever's scores and combines the numbers directly. It preserves the information that one result beat the next by a wide margin rather than a hair, at the cost of depending on score distributions that shift per query, per corpus, and per model version."
+                          children:
+                            Score normalization:
+                              Description: "Rescaling each retriever's scores onto a shared range before they are combined, the prerequisite for any score-based method. Dense similarity is bounded while BM25 is not, so raw scores are not comparable and a fixed weight over them is dominated by whichever retriever has the larger magnitude on that query."
+                            Relative Score Fusion:
+                              Description: "Min-max normalizes each list so its top score becomes 1 and its bottom becomes 0, keeping the spacing in between, then adds the weighted results. Weaviate's default since v1.24, where alpha sets the split between the vector and keyword contributions."
+                              Links:
+                                - "https://docs.weaviate.io/weaviate/concepts/search/hybrid-search"
+                            Distribution-Based Score Fusion (DBSF):
+                              Description: "Normalizes each list against its own mean and score spread rather than its endpoints, then sums the rescaled scores, so the size of a lead survives into the final ranking. Qdrant's alternative to RRF, with no tuning parameters of its own."
+                              Links:
+                                - "https://qdrant.tech/documentation/search/hybrid-queries/"
+                            Weighted score combination:
+                              Description: "Multiplying each normalized list by a weight and summing, the general form that relative score fusion and Weaviate's alpha are instances of. Elasticsearch implements it as the linear retriever, with a per-retriever weight and normalizer. The weights are workload-specific, which makes this the branch carrying ongoing tuning cost."
+                              Links:
+                                - "https://www.elastic.co/docs/reference/elasticsearch/rest-apis/retrievers/linear-retriever"
+                            CombSUM and CombMNZ:
+                              Description: "The original score-combination family from the early TREC evaluations, where CombSUM adds normalized scores and CombMNZ multiplies that sum by the number of lists a document appeared in, rewarding agreement across retrievers. Named here because today's fusion parameters are rediscoveries of these rather than new inventions."
+                        Candidate depth:
+                          Description: "How many results each retriever hands into the fusion step, set as rank_window_size in Elasticsearch and the prefetch limit in Qdrant. This is the real cost lever in the branch: retrieval work scales with depth times the number of retrievers, and the fused list sets how many candidates a downstream reranker bills for. Depth set too low caps quality regardless of which fusion method is chosen."
+                        Fusion across query variants:
+                          Description: "Applying the same merge machinery to lists from several rewritten versions of one question rather than from several retrievers. It raises recall on short or ambiguous queries and turns one user question into several searches plus a generation, which makes it a token amplifier rather than a saving."
+                          children:
+                            Multi-query fan-out:
+                              Description: "Generating N reformulations of the query and retrieving for each. Cost scales linearly with N across search and embedding, and the generation producing the variants is paid on every query, so fan-out width is a direct multiplier on per-query cost."
+                            RAG-Fusion:
+                              Description: "The published name for multi-query fan-out merged with RRF. Reported to give more comprehensive answers because the variants approach the question from several angles, and to drift off topic when the generated variants stray from the original intent."
+                              Links:
+                                - "https://arxiv.org/abs/2402.03367"
+                        Fusion choice and evaluation:
+                          Description: "Which method wins is a property of the corpus and the query mix rather than a general fact, so the choice can only be settled against a set of queries with known-good answers. Building and maintaining that labeled set is the actual cost here, paid once in human time rather than per query in tokens."
+                    Reranking:
+                      Description: "A second scoring pass over retrieved candidates using a model that reads query and document together, which raises precision and lets fewer documents be sent to the model. Distinct from result fusion, which reorders existing lists arithmetically with no model call and no per-candidate cost."
+                    Vector store:
+                      Description: "The database that holds embeddings and serves the index, distinct from the search algorithm running inside it. Cost is driven by whether the index stays resident in memory, how metadata filtering interacts with the search, and whether it is hosted or embedded."
+                      children:
+                        ANN indexes (HNSW, IVF):
+                          Description: "Approximate nearest neighbour structures that make vector search fast, trading a little recall for large speed gains."
+                    Retrieval quality and wasted context:
+                      Description: "Irrelevant retrieved passages are billed as input tokens and can actively degrade the answer."
             Agentic:
               Description: "Multi-step, tool-using workflows that can multiply token consumption."
               children:
