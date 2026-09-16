@@ -572,8 +572,25 @@ Tokenomics:
                           Description: "Moving cache directly between workers without a central store."
                     Offloading to host or storage:
                       Description: "Moving cold cache off the accelerator to slower tiers, trading transfer time for capacity."
-                    LMCache:
-                      Description: "An external KV cache layer that stores and reuses cache across engine instances and storage tiers."
+                    KV cache storage tier:
+                      Description: "A shared, persistent storage layer that holds KV cache beyond device and host memory so any node can retrieve precomputed state instead of re-running prefill, turning cache from a per-node optimization into a fleet-wide stored asset with its own capacity, retention, and breakeven economics."
+                      children:
+                        LMCache:
+                          Description: "An external KV cache layer that stores and reuses cache across engine instances and storage tiers."
+                          Links:
+                            - "https://docs.lmcache.ai/"
+                        Mooncake Store:
+                          Description: "The distributed KV cache store inside Mooncake, the serving platform behind Kimi, which pools spare CPU, DRAM, and SSD capacity across prefill and decode clusters."
+                          Links:
+                            - "https://github.com/kvcache-ai/Mooncake"
+                        Dynamo KV Block Manager (KVBM):
+                          Description: "NVIDIA Dynamo's memory manager for KV cache, which separates block management from the inference runtime and tiers blocks across GPU memory, host memory, local SSD, and remote storage over NIXL."
+                          Links:
+                            - "https://docs.nvidia.com/dynamo/latest/architecture/kvbm_architecture.html"
+                        WEKA Augmented Memory Grid:
+                          Description: "A storage vendor's persistent KV cache tier on NVMe, served at near-memory latency and marketed as a token warehouse."
+                          Links:
+                            - "https://www.weka.io/article/wekas-augmented-memory-grid-pioneering-a-token-warehouse-for-the-future"
                     NIXL:
                       Description: "A transfer library for moving KV cache between nodes, the plumbing that makes disaggregated serving practical."
                 Prefix caching:
