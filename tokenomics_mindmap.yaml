@@ -284,6 +284,8 @@ Tokenomics:
                       Description: "Renting space versus building it, which sets the capex and commitment profile."
                     Siting and latency:
                       Description: "Where capacity physically sits, which decides achievable response times and which data residency rules apply."
+                    AI factory:
+                      Description: "A facility designed end to end to produce AI rather than house servers: power, cooling, accelerators, and networking engineered as one system whose output is intelligence."
             Performance characterization:
               Description: "How to tell whether hardware is actually being used, and what is limiting it."
               children:
@@ -549,7 +551,7 @@ Tokenomics:
                 Model obsolescence:
                   Description: "A trained model depreciates as better base models arrive, shortening the window to recover its cost."
         Serving:
-          Description: "Running trained models to produce tokens for users."
+          Description: "Running trained models to produce tokens for users. Also called inference, and the two words are used interchangeably: model building is training, everything after it that answers users is serving."
           children:
             KV Cache:
               Description: "Stored attention keys and values that let the model skip recomputing past tokens, the dominant inference memory cost."
@@ -1518,7 +1520,7 @@ Tokenomics:
                 Cost Avoidance:
                   Description: "Spend that does not occur. Spend that went down is visible on an invoice, spend never incurred is a counterfactual. Spans most of the range by itself."
                 Capacity Gain:
-                  Description: "Same people produce more. Individually nice-to-haves, in aggregate often the largest line. Freed capacity that nothing is spent on stays a tracked FTE estimate rather than a booked claim."
+                  Description: "Same people produce more. Individually nice-to-haves, in aggregate often the largest line. For a non-profit or mission-driven organization this is usually where the gain lands: the same staff deliver more of the mission, measured in the organization's own output unit, such as cases handled or grants processed. Whether freed capacity counts as realized benefit is decided at the Net part of the claim chain, not here."
                 Labor Augmentation:
                   Description: "AI does part of the task and the human stays in the loop. The gain shows up as throughput or hours per unit before it shows up as headcount, measured against the human alone."
                 Labor Automation:
@@ -1540,6 +1542,8 @@ Tokenomics:
                       Description: "Feelings toward the organization: whether AI change management was done well or people are worried about layoffs. Part of the full decomposition, not carried on the claim."
                     Behavioral facet:
                       Description: "What shows up in the data: retention, productivity, and counterproductive work behaviors including withdrawal and sabotage. The facet the reported claim is built on."
+            Intangible Outcomes:
+              Description: "Candidate eleventh category alongside the ten: real effects that resist any defensible number, such as learning, option value, and better decisions. The category exists so these can be named and reported rather than dropped or inflated. Same rule as Employee Engagement: report them, do not book them, and never let an uncounted line turn into an uncounted budget."
             Value Measurement:
               Description: "How a value claim is constructed and defended. The categories name what changed; these nodes are the how."
               children:
