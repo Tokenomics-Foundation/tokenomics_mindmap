@@ -1,6 +1,5 @@
 Tokenomics:
-  Description: "AI Tokenomics is the discipline of converting energy and capital into AI, then efficiently consuming AI services to enable intelligent outcomes and drive business value.
-(Draft v0.2, August 2026)"
+  Description: "AI Tokenomics (i.e., \"AI Economics\") is the discipline of converting energy and capital into AI capabilities and efficiently consuming that intelligence across the organization, to realize measurable business value. (Draft v0.5.2, September 2026)"
   children:
     Production:
       Description: "The supply side of AI. Energy, capital resources, and the economics of building and running AI in production. How capacity is planned, costed, and brought online."
@@ -1647,18 +1646,33 @@ Tokenomics:
                 No-baseline problem:
                   Description: "Workloads where AI created the process so no counterfactual exists. The hardest measurement case, handled with bounded estimates rather than solved."
                 Claim chain:
-                  Description: "The how-to workflow, in three parts rather than layers, since layer is reserved for the technical stack. Part one the delta, what moved, with a unit and a direction. Part two the conversion, a baseline so the delta is real and a quality gate so it counts. Part three the destination, where a booked number lands, a closed set because the financial statements are a closed set."
+                  Description: "The how-to workflow, in four parts rather than layers, since layer is reserved for the technical stack. Observe gathers the inputs, all in one unit. Net turns them into one number in that unit. Convert carries the net number into another unit and can repeat. Book names where a dollar-denominated result lands. Many claims stop after Net, and a claim that stops there is complete."
                   children:
-                    Stated stopping point:
-                      Description: "The conversion is available, not mandatory: teams managing in time may stop at the delta and report hours or FTE equivalents. The chain requires the claim to name where it stopped, so a freed hour is never quietly counted as a booked dollar. Mandatory for anyone booking to a statement, optional for anyone managing in time."
-                    Destinations:
-                      Description: "The five places a booked number lands: new revenue won, revenue retained, spend removed, spend avoided, capital freed. Defensibility lives at the conversion step, not at the destination."
+                    Observe:
+                      Description: "The inputs, each denominated in the baseline's unit: scope, baseline, observed state, Quality Floor, cost created, and provenance. Cost created is the review, triage, rework, supervision, and escalation the AI adds inside the workload, expressed in the baseline's unit."
+                    Net:
+                      Description: "Gross delta times volume, less outputs that missed the floor, less cost created, less harm from misses, equals net benefit. One number, in one unit, over one period, with one confidence mark that carries the weakest provenance among the inputs."
+                      children:
+                        Harm from misses:
+                          Description: "The Quality Floor makes bad output not count; it does not make bad output cost nothing. An incorrect resolution or a compliance miss is net negative, not merely zero, and the damage is subtracted here in the baseline's unit. Most claims carry zero on this line; risk-bearing workloads do not."
+                        Redeployment:
+                          Description: "Freed capacity that was not redeployed nets to zero realized benefit. It is tracked as an FTE estimate, not claimed, until the capacity is spent on work that produces an outcome. This applies to every labor category, not only capacity gain."
+                    Convert:
+                      Description: "The optional, repeatable hop from a net observation into hours, headcount, or money. Conversion operates on the net and never on the gross; each hop carries its own confidence and confidence compounds downward; the claim names its hop count, and a claim beyond the hop threshold the organization sets is reported, not booked. Defensibility lives here, not at the destination."
+                      children:
+                        Stated stopping point:
+                          Description: "The conversion is available, not mandatory: teams managing in time may stop at the delta and report hours or FTE equivalents. The chain requires the claim to name where it stopped, so a freed hour is never quietly counted as a booked dollar. Whether conversion to dollars is optional or mandatory is still open in the working group."
+                    Book:
+                      Description: "Only a dollar-denominated result can reach a destination; a claim that stops at Net or converts into a non-dollar unit is reported and has no destination. Evidence marks say what kind of argument a claim requires: a ledger line, a counterfactual, an expected loss, or attribution."
+                      children:
+                        Destinations:
+                          Description: "The five places a booked number lands: new revenue won, revenue retained, spend removed, spend avoided, capital freed. The financial statements are a closed list, so the set is closed; one win is booked once, in one destination, by one team."
                     Role ladder:
                       Description: "Each scope from IC to C-Suite answers the value question at a different range and has its own natural unit, hours per task at the bottom, P and L lines and market position at the top. Estimates add up within a scope, not across scopes."
                 Unit of measure:
                   Description: "Dollars, hours, or FTE equivalents, chosen per audience. Dollars read to executives, hours and FTE equivalents read to operational leads, and some outcomes deliberately stay unconverted."
-                Horizontal rollout attribution:
-                  Description: "Time saved by a company-wide assistant does not automatically become organizational value, the buying-coffee-with-that problem. Vertical workloads are measurably easier than horizontal ones."
+                Maturity staging:
+                  Description: "What a claim looks like at each stage of running the chain. Crawl: a net delta in native units with a stated baseline and floor, stopping at Net. Walk: adds the conversion chain and a named destination, running through Book. Run: composes the claim against TCA for a return, which needs cost at the same attribution grain."
                 Augmentation and automation:
                   Description: "The old single Labor Offset label let teams claim augmentation and defend it with automation math. The split into two categories is the resolution: they need different baselines, human alone versus best-of-either, and saying which one you mean is most of the defense. What freed people move to afterwards stays open."
                 Product versus internal posture:
@@ -1668,6 +1682,11 @@ Tokenomics:
                       Description: "AI-enabled features built and packaged like a product for internal users. The goal is productivity, so it is measured as Internal AI no matter how well it is packaged."
                 Value claim components:
                   Description: "A full claim names the workload or task type, the outcome measured, the unit, the baseline, and the quality the result was judged at."
+                Cost boundary:
+                  Description: "A value claim nets the costs the AI creates inside the workload: review, triage, rework, supervision, escalation. It does not net the costs the AI consumes, which are TCA under the Business Case and compose later. The test is the baseline's own unit: if the baseline was 45 minutes of human review, triage time is human review time and nets before conversion; the GPU bill is not, so it belongs to TCA."
+                  children:
+                    Attribution grain:
+                      Description: "For a claim and a cost to compose into a return, TCA has to land on the same workload boundary as the outcome. The value side defines the grain; the requirement is stated here and the solution is being built separately."
                 Quality Floor:
                   Description: "The pass bar for acceptable output on a specific workload: quality is the gate, not a multiplier. Value only counts when output clears the floor, cheap output that misses it is waste, and full utilization of a model that misses it is waste rather than efficiency."
                   children:
@@ -1782,10 +1801,17 @@ Tokenomics:
         Business Case:
           Description: "The justification for AI spend against its returns."
           children:
+            Workloads / Use Cases:
+              Description: "The unit at which value is attributed: a named workload with an owner, best framed as a workflow or business process rather than a single-shot, single-user task. The same unit anchors the cost side under Consumption; here it is the boundary the outcome is measured at, and a use case is its business-facing view."
+              children:
+                Workflow grain:
+                  Description: "Value compounds across a whole workflow: the model, the retrieved data, the infrastructure, the engineer who designed the workflow, and the employee who used it. No measurement isolates the share belonging to the AI alone, so claims scope to the workflow outcome, not to individual calls."
+            Value case gate:
+              Description: "A measurable value case before a new workload goes live: what the process costs today in money or time, which specific financial outcome the AI improves, and how that outcome will be measured in dollars. A business case that cannot express its expected value in financial terms before launch is an experiment, and should be funded with explicit scope limits and a defined point at which it produces evidence or stops."
             ROI:
               Description: "The return generated relative to AI investment."
-            TCO:
-              Description: "The total cost of ownership across infrastructure, licensing, and operations."
+            TCA:
+              Description: "The Total Cost of AI across tokens, hardware, power, licensing, and the labor to build and operate the AI platform. A value claim does not net these; see Cost boundary under Value Measurement for the boundary and the grain at which a claim and a cost compose into a return."
             Build vs buy:
               Description: "Whether to self-host or use a managed provider."
             Payback period:
