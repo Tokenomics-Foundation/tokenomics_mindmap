@@ -569,29 +569,56 @@ Tokenomics:
                           Description: "A shared server that holds KV cache for many workers to reuse."
                         Peer-to-Peer (P2P) Cache Transfer:
                           Description: "Moving cache directly between workers without a central store."
-                    Offloading to host or storage:
-                      Description: "Moving cold cache off the accelerator to slower tiers, trading transfer time for capacity."
-                    KV cache storage tier:
-                      Description: "A shared, persistent storage layer that holds KV cache beyond device and host memory so any node can retrieve precomputed state instead of re-running prefill, turning cache from a per-node optimization into a fleet-wide stored asset with its own capacity, retention, and breakeven economics."
+                    Hierarchical KV cache:
+                      Description: "Placing KV cache across tiers, typically GPU memory, host memory, and shared storage, so cache survives beyond what fits on the accelerator. The trade is storage and network bandwidth against recomputed prefill, which makes the fetch-or-recompute decision the economic core of the branch. Distinct from weight offloading under Memory hierarchy and offloading, which moves model weights rather than cache."
+                      Links:
+                        - "https://arxiv.org/abs/2407.00079"
                       children:
-                        LMCache:
-                          Description: "An external KV cache layer that stores and reuses cache across engine instances and storage tiers."
-                          Links:
-                            - "https://docs.lmcache.ai/"
-                        Mooncake Store:
-                          Description: "The distributed KV cache store inside Mooncake, the serving platform behind Kimi, which pools spare CPU, DRAM, and SSD capacity across prefill and decode clusters."
-                          Links:
-                            - "https://github.com/kvcache-ai/Mooncake"
-                        Dynamo KV Block Manager (KVBM):
-                          Description: "NVIDIA Dynamo's memory manager for KV cache, which separates block management from the inference runtime and tiers blocks across GPU memory, host memory, local SSD, and remote storage over NIXL."
-                          Links:
-                            - "https://docs.nvidia.com/dynamo/latest/architecture/kvbm_architecture.html"
-                        WEKA Augmented Memory Grid:
-                          Description: "A storage vendor's persistent KV cache tier on NVMe, served at near-memory latency and marketed as a token warehouse."
-                          Links:
-                            - "https://www.weka.io/article/wekas-augmented-memory-grid-pioneering-a-token-warehouse-for-the-future"
-                    NIXL:
-                      Description: "A transfer library for moving KV cache between nodes, the plumbing that makes disaggregated serving practical."
+                        Cache tiers:
+                          Description: "GPU memory as the fast tier, host memory as the middle tier, and shared storage as the tier any node can reach. Only the shared tier is reusable across instances, and only when every instance points at the same namespace."
+                        Write policy:
+                          Description: "Whether cache entries are written down to slower tiers as they are created or only on eviction, which sets how much bandwidth is spent on entries that are never read back."
+                        Prefetch policy:
+                          Description: "Pulling cache up from a slower tier before it is needed, which hides transfer latency and wastes bandwidth when the prediction is wrong."
+                        Tier-aware routing:
+                          Description: "A router that knows which tier a prefix lives on, so a worker holding the prefix in host memory or shared storage is not scored as cold. Without it, a fetchable cache hit is treated as a full recomputation. Related: cache-aware routing under Routing."
+                        Hierarchical cache managers:
+                          Description: "The layer that decides which tier a block lives on and moves it between them. Distinct from the storage tier itself: a manager is chosen with the engine, a store is chosen with the infrastructure."
+                          children:
+                            HiCache:
+                              Description: "SGLang's hierarchical cache, extending RadixAttention across GPU, host, and an optional external storage tier, with the external tier exposed through one pluggable interface."
+                              Links:
+                                - "https://www.lmsys.org/blog/2025-09-10-sglang-hicache/"
+                            LMCache:
+                              Description: "An external KV cache layer that stores and reuses cache across engine instances and storage tiers."
+                              Links:
+                                - "https://docs.lmcache.ai/"
+                            Dynamo KV Block Manager (KVBM):
+                              Description: "NVIDIA Dynamo's memory manager for KV cache, which separates block management from the inference runtime and tiers blocks across GPU memory, host memory, local SSD, and remote storage over NIXL."
+                              Links:
+                                - "https://docs.nvidia.com/dynamo/latest/architecture/kvbm_architecture.html"
+                        KV cache storage tier:
+                          Description: "A shared, persistent storage layer that holds KV cache beyond device and host memory so any node can retrieve precomputed state instead of re-running prefill, turning cache from a per-node optimization into a fleet-wide stored asset with its own capacity, retention, and breakeven economics."
+                          children:
+                            Mooncake Store:
+                              Description: "The distributed KV cache store inside Mooncake, the serving platform behind Kimi, which pools spare CPU, DRAM, and SSD capacity across prefill and decode clusters."
+                              Links:
+                                - "https://github.com/kvcache-ai/Mooncake"
+                                - "https://arxiv.org/abs/2407.00079"
+                            WEKA Augmented Memory Grid:
+                              Description: "A storage vendor's persistent KV cache tier on NVMe, served at near-memory latency and marketed as a token warehouse."
+                              Links:
+                                - "https://www.weka.io/article/wekas-augmented-memory-grid-pioneering-a-token-warehouse-for-the-future"
+                            3FS (Fire-Flyer File System):
+                              Description: "DeepSeek's open-source distributed file system for AI training and inference, built around SSDs and RDMA, used as a KV cache store as well as a training data store."
+                              Links:
+                                - "https://github.com/deepseek-ai/3FS"
+                            AIBrix KVCache:
+                              Description: "A KV cache offloading framework providing memory tiering and cross-engine reuse, with pluggable eviction policies and backend stores."
+                              Links:
+                                - "https://aibrix.readthedocs.io/latest/designs/aibrix-kvcache-offloading-framework.html"
+                            NIXL:
+                              Description: "A transfer library with a unified API over memory and storage tiers, covering plugins such as 3FS, GPUDirect Storage, and S3-compatible object storage. The access layer the stores are reached through rather than a store in its own right."
                 Prefix caching:
                   Description: "Reusing the cached computation of shared prompt prefixes across requests."
                   children:
@@ -726,7 +753,7 @@ Tokenomics:
                         SGLang:
                           Description: "Ships EAGLE family speculative decoding alongside its structured generation and prefix reuse features."
                 Prefill / Decode disaggregation:
-                  Description: "Separates the compute-heavy prefill phase from the memory-bound decode phase for efficiency."
+                  Description: "Separates the compute-heavy prefill phase from the memory-bound decode phase for efficiency. The compute-side half of a KVCache-centric architecture; the cache-side half is Hierarchical KV cache under KV Cache."
                 Chunked prefill:
                   Description: "Breaks long prompt processing into chunks to smooth latency and batching."
                 Parallelism (tensor / pipeline / model sharding):
