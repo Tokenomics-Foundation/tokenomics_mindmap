@@ -551,7 +551,7 @@ Tokenomics:
           Description: "Running trained models to produce tokens for users."
           children:
             KV Cache:
-              Description: "Stored attention keys and values that let the model skip recomputing past tokens, the dominant inference memory cost."
+              Description: "Stored attention keys and values that let the model skip recomputing past tokens, the dominant inference memory cost. Per-request by default: extending that state across requests is prefix caching."
               Links:
                 - "https://arxiv.org/abs/2309.06180"
               children:
@@ -593,7 +593,7 @@ Tokenomics:
                     NIXL:
                       Description: "A transfer library for moving KV cache between nodes, the plumbing that makes disaggregated serving practical."
                 Prefix caching:
-                  Description: "Reusing the cached computation of shared prompt prefixes across requests."
+                  Description: "Reusing the cached computation of shared prompt prefixes across requests, the extension of the per-request KV cache. Sold through provider APIs as prompt caching."
                   children:
                     RadixAttention:
                       Description: "Automatic reuse of shared prefixes via a radix tree over cached sequences, so prefix sharing needs no explicit cache management."
@@ -1026,7 +1026,7 @@ Tokenomics:
                     Per-workload measurement:
                       Description: "One high-volume cached workload will mask a dozen broken ones in a blended number, so every cache ratio is tracked per workload and re-checked when model versions or price sheets change."
                 Provider-side prompt caching:
-                  Description: "Vendor caching of repeated prompt prefixes at a discounted rate, billed through separate cache write and cache read token buckets on every response."
+                  Description: "Prefix caching sold through an API: the provider keeps the details, pricing, minimum prefix lengths, and idle timeout included, and the consumer controls prompt ordering. Billed through separate cache write and cache read token buckets on every response."
                   children:
                     Prefix stability:
                       Description: "Cached reuse requires an exact shared prefix starting at token zero, so anything that varies must sit at the end of the prompt and serialization must be frozen."
