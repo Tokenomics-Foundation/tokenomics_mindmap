@@ -1002,7 +1002,9 @@ Tokenomics:
                 Capability tiers:
                   Description: "Grouping models by strength so the cheapest adequate one can be picked."
                 Cost per task:
-                  Description: "Measuring what completing a real task costs, not just per-token price."
+                  Description: "Average spend to complete one task from a defined, repeatable task set, built up from the input, cached, and output tokens actually consumed, including reasoning tokens, rather than from the price list. Models with identical per-token prices can differ widely here, because the number of tokens each spends per task is the variable, so a lower figure only counts at a held quality level."
+                  Links:
+                    - "https://artificialanalysis.ai/methodology"
                 Accuracy vs price tradeoff:
                   Description: "Weighing quality gains against the higher cost of stronger models."
                 Open vs proprietary:
@@ -1607,8 +1609,6 @@ Tokenomics:
                   Description: "Measuring how fully hardware is used, the key to cost efficiency."
                 Quality / latency SLIs:
                   Description: "Indicators tracking response quality and speed."
-                Cost per outcome:
-                  Description: "Cost tied to a completed business result rather than raw usage."
                 Efficiency signals:
                   Description: "Cache hit rate, acceptance rate, and batch occupancy, the numbers that explain why cost per token is what it is."
                 Error and retry rates:
@@ -1733,7 +1733,7 @@ Tokenomics:
               Description: "The outcome-facing readouts of unit economics, where cost per unit stops describing production efficiency and starts describing business results."
               children:
                 Cost per outcome:
-                  Description: "Cost tied to a completed business result rather than raw usage, the natural bridge from unit economics into business outcomes."
+                  Description: "Total spend, including failed attempts, retries, and human review, divided by the number of tasks that reached an accepted business result. Cost per task averages over every attempt; cost per outcome divides by successes only, so an unreliable workflow shows its true price here and the figure connects unit economics to business results."
                 Cost per user:
                   Description: "Spend per active user over a period, the denominator that most directly connects usage to business metrics."
                 Cost per session:
@@ -1749,7 +1749,7 @@ Tokenomics:
                 Cost per request:
                   Description: "Spend per API call, which hides wide variation in request size."
                 Cost per agent run:
-                  Description: "Spend for one complete autonomous task, the natural unit once workflows stop being single calls."
+                  Description: "Spend for one complete autonomous run, including every model call, tool call, and retry along the way; the unit to use when a task is no longer a single request."
             Efficiency ratios:
               Description: "Production-side measures of how much output a resource yields."
               children:
