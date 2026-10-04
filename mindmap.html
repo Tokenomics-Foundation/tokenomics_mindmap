@@ -22,6 +22,8 @@
       --con: #b98cff;
       --val: #ff6fa4;
       --add: #6b7590;
+      --kpi-color: #f97316;
+      --concept-color: #22c55e;
     }
 
     * {
@@ -112,7 +114,7 @@
       padding: 6px 10px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      width: 170px;
+      width: 150px;
       background: var(--panel-2);
       color: var(--ink)
     }
@@ -164,12 +166,17 @@
     .link {
       fill: none;
       stroke-opacity: .6;
-      stroke-width: 1.5px
+      stroke-width: 1.5px;
+      transition: opacity .2s;
+    }
+
+    .node {
+      transition: opacity .2s;
     }
 
     .node text {
       font-size: 12.5px;
-      fill: var(--ink);
+      fill: #fff;
       paint-order: stroke;
       stroke: var(--halo);
       stroke-width: 3.5px;
@@ -182,13 +189,29 @@
       text-underline-offset: 3px
     }
 
-    .node circle {
+    .node path.shape {
       cursor: pointer;
       stroke-width: 1.6px
     }
 
-    .node.leaf circle {
+    .node.leaf path.shape {
       cursor: default
+    }
+
+    .node.type-kpi path.shape {
+      stroke: var(--kpi-color) !important;
+    }
+
+    .node.type-concept path.shape {
+      stroke: var(--concept-color) !important;
+    }
+
+    .node.dimmed {
+      opacity: 0.2;
+    }
+
+    .link.dimmed {
+      opacity: 0.1;
     }
 
     .node.match text {
@@ -196,7 +219,7 @@
       stroke: var(--halo)
     }
 
-    .node.match circle {
+    .node.match path.shape {
       stroke: #fbbf24 !important
     }
 
@@ -207,14 +230,14 @@
       cursor: pointer
     }
 
-    .node.add circle {
+    .node.add path.shape {
       fill: var(--bg);
       stroke: var(--add);
       stroke-dasharray: 2.5 2.5;
       cursor: pointer
     }
 
-    /* diff status colors (added = green, removed = red, revised/moved = yellow) */
+    /* diff status colors */
     :root {
       --st-add: #3ddc84;
       --st-rem: #ff5a5a;
@@ -222,60 +245,19 @@
       --st-neutral: #8b93a7
     }
 
-    .node.st-added text {
-      fill: var(--st-add)
-    }
+    .node.st-added text { fill: var(--st-add) }
+    .node.st-added path.shape { fill: var(--st-add); stroke: var(--st-add) }
+    .node.st-removed text { fill: var(--st-rem); text-decoration: line-through }
+    .node.st-removed path.shape { fill: var(--st-rem); stroke: var(--st-rem) }
+    .node.st-revised text, .node.st-moved text { fill: var(--st-rev) }
+    .node.st-revised path.shape, .node.st-moved path.shape { fill: var(--st-rev); stroke: var(--st-rev) }
+    .node.st-unchanged text { fill: var(--st-neutral) }
+    .node.st-unchanged path.shape { stroke: var(--st-neutral) }
 
-    .node.st-added circle {
-      fill: var(--st-add);
-      stroke: var(--st-add)
-    }
-
-    .node.st-removed text {
-      fill: var(--st-rem);
-      text-decoration: line-through
-    }
-
-    .node.st-removed circle {
-      fill: var(--st-rem);
-      stroke: var(--st-rem)
-    }
-
-    .node.st-revised text,
-    .node.st-moved text {
-      fill: var(--st-rev)
-    }
-
-    .node.st-revised circle,
-    .node.st-moved circle {
-      fill: var(--st-rev);
-      stroke: var(--st-rev)
-    }
-
-    .node.st-unchanged text {
-      fill: var(--st-neutral)
-    }
-
-    .node.st-unchanged circle {
-      stroke: var(--st-neutral)
-    }
-
-    .link.st-added {
-      stroke: var(--st-add)
-    }
-
-    .link.st-removed {
-      stroke: var(--st-rem)
-    }
-
-    .link.st-revised,
-    .link.st-moved {
-      stroke: var(--st-rev)
-    }
-
-    .link.st-unchanged {
-      stroke: var(--st-neutral)
-    }
+    .link.st-added { stroke: var(--st-add) }
+    .link.st-removed { stroke: var(--st-rem) }
+    .link.st-revised, .link.st-moved { stroke: var(--st-rev) }
+    .link.st-unchanged { stroke: var(--st-neutral) }
 
     #diffBanner {
       display: none;
@@ -293,9 +275,7 @@
       z-index: 5
     }
 
-    #diffBanner.show {
-      display: flex
-    }
+    #diffBanner.show { display: flex }
 
     #diffBanner .dot {
       display: inline-block;
@@ -306,21 +286,12 @@
       vertical-align: 0
     }
 
-    #diffBanner .dot:first-of-type {
-      margin-left: 0
-    }
+    #diffBanner .dot:first-of-type { margin-left: 0 }
 
-    #diffLegend {
-      display: none
-    }
+    #diffLegend { display: none }
+    #diffLegend.show { display: flex }
 
-    #diffLegend.show {
-      display: flex
-    }
-
-    .legend .st-neutral i {
-      background: var(--st-neutral)
-    }
+    .legend .st-neutral i { background: var(--st-neutral) }
 
     #tip {
       position: absolute;
@@ -339,21 +310,24 @@
       z-index: 10
     }
 
-    #tip.show {
-      opacity: 1;
-      pointer-events: auto
+    #tip.show { opacity: 1; pointer-events: auto }
+    #tip h3 { margin: 0 0 5px; font-size: 13px; color: #fff }
+
+    #tip .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    #tip h3 {
-      margin: 0 0 5px;
-      font-size: 13px;
-      color: #fff
-    }
-
-    #tip .desc {
-      color: var(--ink)
-    }
-
+    #tip .badge.kpi { background: var(--kpi-color); color: #fff; }
+    #tip .badge.concept { background: var(--concept-color); color: #fff; }
+    #tip .desc { color: var(--ink) }
+    
     #tip .links {
       margin-top: 8px;
       border-top: 1px solid var(--line);
@@ -368,9 +342,7 @@
       word-break: break-all
     }
 
-    #tip .links a:hover {
-      text-decoration: underline
-    }
+    #tip .links a:hover { text-decoration: underline }
 
     #loader {
       position: absolute;
@@ -391,36 +363,12 @@
       background: var(--panel)
     }
 
-    #drop.drag {
-      border-color: var(--brand);
-      background: var(--panel-2)
-    }
+    #drop.drag { border-color: var(--brand); background: var(--panel-2) }
+    #drop h2 { margin: 0 0 6px; font-size: 18px }
+    #drop p { margin: 6px 0; color: var(--muted); font-size: 13.5px }
+    #drop code { background: var(--panel-2); padding: 2px 6px; border-radius: 6px; font-size: 12.5px; color: var(--ink) }
 
-    #drop h2 {
-      margin: 0 0 6px;
-      font-size: 18px
-    }
-
-    #drop p {
-      margin: 6px 0;
-      color: var(--muted);
-      font-size: 13.5px
-    }
-
-    #drop code {
-      background: var(--panel-2);
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-size: 12.5px;
-      color: var(--ink)
-    }
-
-    #err {
-      color: #ff8a8a;
-      font-size: 13px;
-      min-height: 18px;
-      margin-top: 8px
-    }
+    #err { color: #ff8a8a; font-size: 13px; min-height: 18px; margin-top: 8px }
 
     .hint {
       position: absolute;
@@ -434,10 +382,7 @@
       border: 1px solid var(--line)
     }
 
-    .hint b {
-      color: var(--ink);
-      font-weight: 600
-    }
+    .hint b { color: var(--ink); font-weight: 600 }
 
     #toast {
       position: absolute;
@@ -454,10 +399,7 @@
       z-index: 15
     }
 
-    #toast.show {
-      opacity: 1;
-      transform: none
-    }
+    #toast.show { opacity: 1; transform: none }
 
     #modal {
       position: absolute;
@@ -469,9 +411,7 @@
       z-index: 30
     }
 
-    #modal.show {
-      display: flex
-    }
+    #modal.show { display: flex }
 
     #modalCard {
       background: var(--panel);
@@ -482,23 +422,12 @@
       box-shadow: 0 24px 70px rgba(0, 0, 0, .6)
     }
 
-    #modalCard h2 {
-      margin: 0 0 14px;
-      font-size: 17px
-    }
-
-    #modalCard label {
-      display: block;
-      font-size: 12px;
-      color: var(--muted);
-      margin: 0 0 4px
-    }
-
-    #modalCard .field {
-      margin-bottom: 14px
-    }
-
+    #modalCard h2 { margin: 0 0 14px; font-size: 17px }
+    #modalCard label { display: block; font-size: 12px; color: var(--muted); margin: 0 0 4px }
+    #modalCard .field { margin-bottom: 14px }
+    
     #modalCard input[type=text],
+    #modalCard select,
     #modalCard textarea {
       width: 100%;
       font: inherit;
@@ -511,30 +440,13 @@
     }
 
     #modalCard input[type=text]:focus,
-    #modalCard textarea:focus {
-      outline: none;
-      border-color: var(--brand)
-    }
+    #modalCard select:focus,
+    #modalCard textarea:focus { outline: none; border-color: var(--brand) }
+    #modalCard textarea { resize: vertical; min-height: 78px; line-height: 1.45 }
+    #modalCard .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px }
 
-    #modalCard textarea {
-      resize: vertical;
-      min-height: 78px;
-      line-height: 1.45
-    }
-
-    #modalCard .actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 2px
-    }
-
-    .linkrow {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 6px
-    }
-
+    .linkrow { display: flex; gap: 6px; margin-bottom: 6px }
+    
     .linkrow input {
       flex: 1;
       font: inherit;
@@ -546,10 +458,7 @@
       color: var(--ink)
     }
 
-    .linkrow input:focus {
-      outline: none;
-      border-color: var(--brand)
-    }
+    .linkrow input:focus { outline: none; border-color: var(--brand) }
 
     .linkrow .rm {
       flex: 0 0 auto;
@@ -563,16 +472,8 @@
       line-height: 1
     }
 
-    .linkrow .rm:hover {
-      color: #ff8a8a;
-      border-color: #ff8a8a
-    }
-
-    .btn.linkadd {
-      font-size: 12.5px;
-      padding: 5px 10px;
-      margin-top: 2px
-    }
+    .linkrow .rm:hover { color: #ff8a8a; border-color: #ff8a8a }
+    .btn.linkadd { font-size: 12.5px; padding: 5px 10px; margin-top: 2px }
   </style>
 </head>
 
@@ -584,6 +485,8 @@
         <span><i style="background:var(--gen)"></i>Production</span>
         <span><i style="background:var(--con)"></i>Consumption</span>
         <span><i style="background:var(--val)"></i>Value</span>
+        <span><i style="background:var(--concept-color)"></i>Concept</span>
+        <span><i style="background:var(--kpi-color)"></i>KPI</span>
       </div>
       <div class="legend" id="diffLegend">
         <span class="st-neutral"><i></i>No change</span>
@@ -592,6 +495,11 @@
         <span><i style="background:var(--st-rem)"></i>Removed</span>
       </div>
       <div class="spacer"></div>
+      <select id="typeFilter" class="btn">
+        <option value="all">All Types</option>
+        <option value="KPI">KPIs Only</option>
+        <option value="Concept">Concepts Only</option>
+      </select>
       <input id="search" type="search" placeholder="Search nodes… (Enter)" />
       <label class="toggle"><input type="checkbox" id="editToggle" /> Edit</label>
       <button class="btn" id="expandBtn">Expand all</button>
@@ -604,8 +512,7 @@
     <div id="stage">
       <svg></svg>
       <div id="tip"></div>
-      <div class="hint">Scroll to zoom · drag to pan · click node to collapse · click <b>add node</b> to add a child ·
-        double-click to rename</div>
+      <div class="hint">Scroll to zoom · drag to pan · click node to collapse · click <b>add node</b> to add a child · double-click to rename</div>
       <div id="diffBanner">
         <span id="diffBannerText"></span>
         <label class="toggle" style="margin-left:6px"><input type="checkbox" id="changedOnlyToggle" /> Changed only</label>
@@ -617,8 +524,7 @@
           <h2>Load your mind map</h2>
           <p>Pick <code>tokenomics_mindmap.yaml</code> from your folder, or drop it here.</p>
           <p><button class="btn primary" id="pickBtn">Choose YAML file</button></p>
-          <p style="font-size:12px">Keep the HTML and YAML in the same folder. Serving the folder over a local server
-            also auto-loads.</p>
+          <p style="font-size:12px">Keep the HTML and YAML in the same folder. Serving the folder over a local server also auto-loads.</p>
           <div id="err"></div>
         </div>
       </div>
@@ -632,6 +538,14 @@
       <div class="field">
         <label for="edName">Name</label>
         <input id="edName" type="text" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="edType">Type</label>
+        <select id="edType">
+          <option value="">(None)</option>
+          <option value="Concept">Concept</option>
+          <option value="KPI">KPI</option>
+        </select>
       </div>
       <div class="field">
         <label for="edDesc">Description</label>
@@ -657,12 +571,13 @@
     const DBL_DELAY = 220;
     const HOLLOW = (getComputedStyle(document.documentElement).getPropertyValue("--bg").trim()) || "#0a0e17";
     const ADD_LINK = "#4a5570";
-    // diff status colors: added=green, removed=red, revised/moved=yellow, unchanged=neutral gray
     const ST = { added: "#3ddc84", removed: "#ff5a5a", revised: "#fbbf24", moved: "#fbbf24", unchanged: "#8b93a7" };
 
     let svg, gLink, gNode, zoom, treeLayout;
     let dataRoot = null, root = null, posCache = {}, editMode = false, uidC = 0, fileHandle = null;
     let currentYamlText = "", diffMode = false, changedOnly = false, diffBase = null, diffPending = null;
+    let selectedTypeFilter = "all";
+
     const stage = document.getElementById("stage");
     const tip = document.getElementById("tip");
     const loader = document.getElementById("loader");
@@ -670,15 +585,16 @@
     const toastEl = document.getElementById("toast");
     const uid = () => "u" + (++uidC);
 
-    /* ---------- YAML -> editable data tree ---------- */
     function pick(obj, ...keys) { for (const k of keys) { if (obj[k] != null) return obj[k]; } return undefined; }
     function toNode(name, val) {
       const node = { name: String(name), children: [] };
       if (val && typeof val === "object" && !Array.isArray(val)) {
         const desc = pick(val, "Description", "description");
         const links = pick(val, "Links", "links");
+        const type = pick(val, "Type", "type");
         if (desc != null) node.description = String(desc);
         if (links != null) node.links = Array.isArray(links) ? links.map(String) : [String(links)];
+        if (type != null) node.type = String(type);
         const ch = pick(val, "children", "Children");
         if (ch && typeof ch === "object" && !Array.isArray(ch)) {
           node.children = Object.entries(ch).map(([k, v]) => toNode(k, v));
@@ -686,15 +602,24 @@
       }
       return node;
     }
+    
     function buildData(parsed) {
       if (!parsed || typeof parsed !== "object") throw new Error("YAML root is not a mapping.");
       const entries = Object.entries(parsed);
       if (entries.length === 1) return toNode(entries[0][0], entries[0][1]);
       return { name: "Mind Map", children: entries.map(([k, v]) => toNode(k, v)) };
     }
+    
     function eachData(d, fn) { fn(d); (d.children || []).forEach(c => eachData(c, fn)); }
 
-    /* ---------- hierarchy building (rebuilt each render) ---------- */
+    function nodeOrDescendantMatchesType(node, targetType) {
+      if (node.type && node.type.toLowerCase() === targetType.toLowerCase()) return true;
+      if (node.children && node.children.length) {
+        return node.children.some(c => nodeOrDescendantMatchesType(c, targetType));
+      }
+      return false;
+    }
+
     function accessor(d) {
       if (d.__add) return null;
       if (diffMode && changedOnly && !d.__changedSubtree) return null;
@@ -708,7 +633,7 @@
     function hasRealChildren(d) { return !!(d.data.children && d.data.children.length); }
     function branchName(d) { let n = d; while (n.depth > 1) n = n.parent; return n.depth === 1 ? n.data.name : null; }
     function colorOf(d) { return BRANCH_COLORS[branchName(d)] || "#9aa1ad"; }
-    function hasInfo(d) { return !d.data.__add && !!(d.data.description || (d.data.links && d.data.links.length)); }
+    function hasInfo(d) { return !d.data.__add && !!(d.data.description || d.data.type || (d.data.links && d.data.links.length)); }
     function textLeft(d) { return !d.data.__add && hasRealChildren(d) && !d.data.collapsed; }
 
     function initSvg() {
@@ -725,17 +650,27 @@
     function diagonal(s, t) {
       return `M${s.y},${s.x}C${(s.y + t.y) / 2},${s.x} ${(s.y + t.y) / 2},${t.x} ${t.y},${t.x}`;
     }
+
     function nodeClass(d) {
       if (d.data.__add) return "node add";
       let c = "node";
-      if (!hasRealChildren(d)) c += " leaf";
+      if (!hasRealChildren(d)) {
+        c += " leaf";
+        if (d.data.type && d.data.type.toUpperCase() === "KPI") c += " type-kpi";
+        if (d.data.type && d.data.type.toUpperCase() === "CONCEPT") c += " type-concept";
+      }
       if (hasInfo(d)) c += " has-info";
       if (diffMode && !d.data.__removed) c += " st-" + (d.data.__status || "unchanged");
       if (d.data.__removed) c += " st-removed";
       return c;
     }
+
     function strokeFor(targetD) {
       if (targetD.data.__add) return ADD_LINK;
+      if (!hasRealChildren(targetD)) {
+        if (targetD.data.type && targetD.data.type.toUpperCase() === "KPI") return "var(--kpi-color)";
+        if (targetD.data.type && targetD.data.type.toUpperCase() === "CONCEPT") return "var(--concept-color)";
+      }
       if (targetD.data.__removed) return ST.removed;
       if (diffMode) return ST[targetD.data.__status] || ST.unchanged;
       return colorOf(targetD);
@@ -749,21 +684,27 @@
       const links = root.links();
       const startFor = d => prev[keyOf(d)] || prev[parentKey(d)] || { x: 0, y: 0 };
 
-      // LINKS
       const link = gLink.selectAll("path.link").data(links, d => keyOf(d.target));
       const linkEnter = link.enter().append("path").attr("class", "link")
         .attr("d", d => { const p = prev[keyOf(d.target)] || prev[keyOf(d.source)] || { x: 0, y: 0 }; return diagonal(p, p); });
+      
       linkEnter.merge(link)
-        .attr("class", d => "link" + (diffMode ? " st-" + (d.target.data.__removed ? "removed" : (d.target.data.__status || "unchanged")) : ""))
+        .attr("class", d => {
+          let c = "link" + (diffMode ? " st-" + (d.target.data.__removed ? "removed" : (d.target.data.__status || "unchanged")) : "");
+          if (selectedTypeFilter !== "all" && !d.target.data.__add && !nodeOrDescendantMatchesType(d.target.data, selectedTypeFilter)) {
+            c += " dimmed";
+          }
+          return c;
+        })
         .attr("stroke", d => strokeFor(d.target))
         .attr("stroke-width", d => d.target.data.__add ? 1 : Math.max(1, 2.4 - d.target.depth * 0.35))
         .attr("stroke-dasharray", d => d.target.data.__removed ? "4 3" : null)
         .transition().duration(duration)
         .attr("d", d => diagonal(d.source, d.target));
+      
       link.exit().transition().duration(duration)
         .attr("d", d => { const p = { x: d.source.x, y: d.source.y }; return diagonal(p, p); }).remove();
 
-      // NODES
       const node = gNode.selectAll("g.node").data(nodes, d => keyOf(d));
       const nodeEnter = node.enter().append("g")
         .attr("transform", d => { const p = startFor(d); return `translate(${p.y},${p.x})`; })
@@ -772,23 +713,52 @@
         .on("mouseenter", (e, d) => showTip(e, d))
         .on("mousemove", (e) => moveTip(e))
         .on("mouseleave", hideTip);
-      nodeEnter.append("circle");
+      nodeEnter.append("path").attr("class", "shape");
       nodeEnter.append("text").attr("dy", "0.32em");
 
       const nodeMerge = nodeEnter.merge(node);
-      nodeMerge.attr("class", d => nodeClass(d));
+      nodeMerge.attr("class", d => {
+        let c = nodeClass(d);
+        if (selectedTypeFilter !== "all" && !d.data.__add && !nodeOrDescendantMatchesType(d.data, selectedTypeFilter)) {
+          c += " dimmed";
+        }
+        return c;
+      });
+      
       nodeMerge.transition().duration(duration).attr("transform", d => `translate(${d.y},${d.x})`);
-      nodeMerge.select("circle")
-        .attr("r", d => d.depth === 0 ? 6 : (d.data.__add ? 3.2 : ((d.data.collapsed && hasRealChildren(d)) ? 5.5 : 4.5)))
+      
+      nodeMerge.select("path.shape")
+        .attr("d", d => {
+          const r = d.depth === 0 ? 6 : (d.data.__add ? 3.2 : ((d.data.collapsed && hasRealChildren(d)) ? 5.5 : 4.5));
+          if (!hasRealChildren(d) && !d.data.__add) {
+            const s = r * 1.35;
+            return `M 0,-${s} L${s},0 L 0,${s} L -${s},0 Z`;
+          }
+          return `M 0,-${r} A ${r},${r} 0 1,1 0,${r} A${r},${r} 0 1,1 0,-${r}`;
+        })
         .attr("fill", d => {
           if (d.data.__removed) return ST.removed;
+          if (!hasRealChildren(d)) {
+            if (d.data.type && d.data.type.toUpperCase() === "KPI") return "var(--kpi-color)";
+            if (d.data.type && d.data.type.toUpperCase() === "CONCEPT") return "var(--concept-color)";
+          }
           if (diffMode) return (d.data.__status && d.data.__status !== "unchanged") ? ST[d.data.__status]
             : ((d.data.collapsed && hasRealChildren(d)) ? ST.unchanged : HOLLOW);
           return (!d.data.__add && d.data.collapsed && hasRealChildren(d)) ? colorOf(d) : HOLLOW;
         })
-        .attr("stroke", d => d.data.__add ? "var(--add)" : (d.data.__removed ? ST.removed : (diffMode ? (ST[d.data.__status] || ST.unchanged) : colorOf(d))))
+        .attr("stroke", d => {
+           if (d.data.__add) return "var(--add)";
+           if (!hasRealChildren(d)) {
+             if (d.data.type && d.data.type.toUpperCase() === "KPI") return "var(--kpi-color)";
+             if (d.data.type && d.data.type.toUpperCase() === "CONCEPT") return "var(--concept-color)";
+           }
+           if (d.data.__removed) return ST.removed;
+           if (diffMode) return ST[d.data.__status] || ST.unchanged;
+           return colorOf(d);
+        })
         .attr("stroke-dasharray", d => d.data.__removed ? "2.5 2.5" : null)
         .style("opacity", d => diffMode && !d.data.__removed && d.data.__status === "unchanged" && !hasRealChildren(d) ? 0.75 : null);
+      
       nodeMerge.select("text")
         .attr("x", d => textLeft(d) ? -9 : 9)
         .attr("text-anchor", d => textLeft(d) ? "end" : "start")
@@ -804,11 +774,6 @@
       nodes.forEach(d => { posCache[keyOf(d)] = { x: d.x, y: d.y }; });
     }
 
-    /* ---------- interactions ---------- */
-    // A collapse re-lays out the tree and slides the node out from under the
-    // cursor, so the second click of a double-click misses it and no dblclick
-    // ever fires. Hold the toggle for DBL_DELAY so dblclick can cancel it.
-    // Keyed by node id so clicking a different node doesn't drop a pending one.
     const clickTimers = new Map();
     function cancelPendingClick(d) {
       const t = clickTimers.get(d.data.__id);
@@ -817,7 +782,7 @@
     function onClick(e, d) {
       if (d.data.__add) { addChild(d.parent.data); return; }
       if (!hasRealChildren(d)) return;
-      if (e.detail > 1) return; // second click of a double-click
+      if (e.detail > 1) return;
       cancelPendingClick(d);
       const id = d.data.__id;
       clickTimers.set(id, setTimeout(() => {
@@ -836,9 +801,9 @@
       openEditor({ mode: "add", parent: parent });
     }
 
-    /* ---------- Edit Node modal ---------- */
     const modal = document.getElementById("modal");
     const edName = document.getElementById("edName");
+    const edType = document.getElementById("edType");
     const edDesc = document.getElementById("edDesc");
     const edLinks = document.getElementById("edLinks");
     let editorState = null;
@@ -860,6 +825,7 @@
       editorState = cfg;
       const src = cfg.mode === "edit" ? cfg.node : {};
       edName.value = src.name || "";
+      edType.value = src.type || "";
       edDesc.value = src.description || "";
       setLinks(src.links || []);
       modal.classList.add("show");
@@ -869,6 +835,7 @@
     function saveEditor() {
       if (!editorState) return;
       const name = edName.value.trim();
+      const type = edType.value.trim();
       const desc = edDesc.value.trim();
       const links = getLinks();
       if (!name) { edName.focus(); return; }
@@ -876,6 +843,7 @@
         const parent = editorState.parent;
         parent.children = parent.children || [];
         const node = { name, children: [], collapsed: false, __id: uid() };
+        if (type) node.type = type;
         if (desc) node.description = desc;
         if (links.length) node.links = links;
         parent.children.push(node);
@@ -883,6 +851,7 @@
       } else {
         const node = editorState.node;
         node.name = name;
+        if (type) node.type = type; else delete node.type;
         if (desc) node.description = desc; else delete node.description;
         if (links.length) node.links = links; else delete node.links;
       }
@@ -890,15 +859,17 @@
       update();
     }
 
-    /* ---------- tooltip ---------- */
     const STATUS_LABEL = { added: "Added", removed: "Removed", revised: "Revised", moved: "Moved", unchanged: "No change" };
     function showTip(e, d) {
       if (d.data.__add) return;
       const statusNote = diffMode ? STATUS_LABEL[d.data.__removed ? "removed" : d.data.__status] : null;
       if (!hasInfo(d) && !statusNote) return;
       let html = `<h3>${escapeHtml(d.data.name)}</h3>`;
-      if (statusNote) html += `<div style="color:${ST[d.data.__removed ? "removed" : d.data.__status] || ST.unchanged};font-weight:600;margin-bottom:5px">${statusNote}</div>`;
-      if (d.data.description) html += `<div class="desc">${escapeHtml(d.data.description)}</div>`;
+      if (d.data.type) {
+        const badgeClass = d.data.type.toUpperCase() === "KPI" ? "kpi" : "concept";
+        html += `<div class="badge ${badgeClass}">${escapeHtml(d.data.type)}</div>`;
+      }
+      if (statusNote) html += `<div style="color:${ST[d.data.__removed ? "removed" : d.data.__status] || ST.unchanged};font-weight:600;margin-bottom:5px">${statusNote}</div>`;      if (d.data.description) html += `<div class="desc">${escapeHtml(d.data.description)}</div>`;
       if (diffMode && d.data.__status === "revised" && d.data.__oldDescription) {
         html += `<div class="desc" style="color:var(--muted);margin-top:5px"><i>was: ${escapeHtml(d.data.__oldDescription)}</i></div>`;
       }
@@ -921,7 +892,6 @@
     function hideTip() { tip.classList.remove("show"); }
     function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
-    /* ---------- fit / expand / collapse ---------- */
     function fit() {
       if (!root) return;
       const nodes = root.descendants(); if (!nodes.length) return;
@@ -934,23 +904,18 @@
       svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(k));
     }
     function expandAll() { eachData(dataRoot, d => d.collapsed = false); update(); setTimeout(fit, 60); }
-    // Collapse every node with children, root excepted, so the top-level
-    // branches stay visible and each subsequent click reveals one level only.
     function collapseToBranches() {
       eachData(dataRoot, d => d.collapsed = !!(d.children && d.children.length));
       dataRoot.collapsed = false;
       update(); setTimeout(fit, 60);
     }
-    // Default load view: root + Production/Consumption/Value + their first
-    // level of children visible; everything deeper collapsed.
     function collapseToFirstLevel(d, depth) {
       if (d.children && d.children.length) d.collapsed = depth >= 2;
       (d.children || []).forEach(c => collapseToFirstLevel(c, depth + 1));
     }
 
-    /* ---------- diff mode ---------- */
     function nodeContent(n) {
-      return JSON.stringify([n.description || "", (n.links || []).slice().sort()]);
+      return JSON.stringify([n.type || "", n.description || "", (n.links || []).slice().sort()]);
     }
     function indexTree(tree) {
       const byPath = new Map(), byName = new Map();
@@ -964,12 +929,10 @@
       })(tree, []);
       return { byPath, byName };
     }
-    // Mark every node in the NEW tree with __status by comparing against BASE.
-    // Then attach ghost nodes for old nodes that vanished (shown in red).
     function markDiff(newRoot, baseRoot) {
       const base = indexTree(baseRoot);
-      const claimed = new Map();   // old node -> new node (path or name match)
-      const newNames = new Map();  // name -> count, in new tree
+      const claimed = new Map();
+      const newNames = new Map();
       eachData(newRoot, n => { newNames.set(n.name, (newNames.get(n.name) || 0) + 1); });
 
       (function walk(n, path, underMoved) {
@@ -992,9 +955,6 @@
         (n.children || []).forEach(c => walk(c, path.concat(n.name), nextUnderMoved));
       })(newRoot, [], false);
 
-      // Removed: base nodes nobody claimed. Ghost each maximal removed
-      // subtree at its root, under the closest surviving anchor; descendants
-      // ride along inside the clone so nesting is preserved.
       const ghostsByAnchor = new Map();
       (function walkOld(n, path, parentOld) {
         if (!n.__claimed && (!parentOld || parentOld.__claimed)) {
@@ -1007,11 +967,10 @@
         (n.children || []).forEach(c => { c.__parent = n; walkOld(c, path.concat(n.name), n); });
       })(baseRoot, [], null);
 
-      // Clone an unclaimed old subtree; children that were claimed elsewhere
-      // (moved) already render in the new tree, so skip them here.
       const cloneGhost = n => {
         const g = {
           name: n.name, children: [], collapsed: false, __id: uid(), __removed: true,
+          ...(n.type ? { type: n.type } : {}),
           ...(n.description ? { description: n.description } : {}),
           ...(n.links && n.links.length ? { links: n.links.slice() } : {})
         };
@@ -1074,7 +1033,6 @@
     function isPatchText(text) {
       return /(^|\n)diff --git /.test(text) || /(^|\n)--- [^\s].*\n\+\+\+ /.test(text) || /(^|\n)@@+ -\d+/.test(text);
     }
-    // Minimal unified-diff applier (single file). dir: 1 = forward, -1 = reverse.
     function applyUnifiedDiff(text, patchText, dir) {
       const src = text.split("\n");
       const hunks = []; let h = null;
@@ -1093,7 +1051,6 @@
         const t = hh.startA; hh.startA = hh.startB; hh.startB = t;
       });
       const out = src.slice();
-      // reverse hunk order keeps earlier hunks' positions valid
       for (let i = hunks.length - 1; i >= 0; i--) {
         const hh = hunks[i];
         const want = hh.ops.filter(o => o[0] !== "+").map(o => o[1]);
@@ -1129,7 +1086,7 @@
           if (dir === 1) enterDiffMode(newText, currentYamlText, file.name + " (applied)");
           else enterDiffMode(currentYamlText, newText, file.name + " (reversed)");
         } else {
-          jsyaml.load(text); // validate
+          jsyaml.load(text);
           if (!currentYamlText) throw new Error("No current map loaded to compare against.");
           enterDiffMode(currentYamlText, text, file.name);
         }
@@ -1137,9 +1094,9 @@
       } catch (err) { toast("Compare failed: " + err.message); }
     }
 
-    /* ---------- search (filter to matches) ---------- */
     function matchesTerm(node, term) {
       if (node.name.toLowerCase().includes(term)) return true;
+      if (node.type && node.type.toLowerCase().includes(term)) return true;
       if (node.description && node.description.toLowerCase().includes(term)) return true;
       return false;
     }
@@ -1168,7 +1125,6 @@
       }, duration + 20);
     }
 
-    /* ---------- YAML serialize + save ---------- */
     function keyStr(name) {
       const risky = /[:#]/.test(name) || /^[\s\-?,\[\]{}&*!|>'"%@`]/.test(name) || name !== name.trim() || name === "";
       return risky ? '"' + name.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"' : name;
@@ -1177,6 +1133,7 @@
     function serialize(node, indent, out) {
       const pad = "  ".repeat(indent);
       out.push(pad + keyStr(node.name) + ":");
+      if (node.type) out.push(pad + "  Type: " + valStr(node.type));
       if (node.description) out.push(pad + "  Description: " + valStr(node.description));
       if (node.links && node.links.length) {
         out.push(pad + "  Links:");
@@ -1195,7 +1152,6 @@
       if (!dataRoot) return;
       if (diffMode) { toast("Exit diff mode before saving (Save writes the live map, not the diff view)."); return; }
       const text = toYaml();
-      // 1) write back to the file the user opened, if we can
       if (fileHandle && fileHandle.createWritable) {
         try {
           let perm = "granted";
@@ -1204,9 +1160,8 @@
             const w = await fileHandle.createWritable(); await w.write(text); await w.close();
             toast("Saved to " + (fileHandle.name || "file")); return;
           }
-        } catch (e) { /* fall through */ }
+        } catch (e) { }
       }
-      // 2) Save As via picker
       if (window.showSaveFilePicker) {
         try {
           const h = await window.showSaveFilePicker({
@@ -1217,7 +1172,6 @@
           fileHandle = h; toast("Saved."); return;
         } catch (e) { if (e && e.name === "AbortError") return; }
       }
-      // 3) fallback: download
       const blob = new Blob([text], { type: "text/yaml" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a"); a.href = url; a.download = DEFAULT_FILE; a.click();
@@ -1225,31 +1179,33 @@
       toast("Downloaded " + DEFAULT_FILE);
     }
 
-    /* ---------- load ---------- */
     function prepareTree(parsed) {
       const tree = buildData(parsed);
       eachData(tree, d => { d.__id = uid(); if (d.collapsed === undefined) d.collapsed = false; if (!d.children) d.children = []; });
       return tree;
     }
+    
     function loadFromText(text, opts) {
       try {
         const parsed = jsyaml.load(text);
         if (diffMode) exitDiffMode();
         dataRoot = prepareTree(parsed);
         currentYamlText = text;
-        collapseToFirstLevel(dataRoot, 0);   // start: branches + one level under each
+        collapseToFirstLevel(dataRoot, 0);
         initSvg(); posCache = {}; update();
         loader.style.display = "none";
         if (!opts || !opts.keepView) setTimeout(fit, 60);
       } catch (err) { showError("Could not parse YAML: " + err.message); }
     }
+    
     function showError(msg) { errBox.textContent = msg; loader.style.display = "flex"; }
 
     async function tryAutoLoad() {
       try { const res = await fetch(DEFAULT_FILE, { cache: "no-store" }); if (res.ok) { loadFromText(await res.text()); return; } }
-      catch (e) { /* file:// blocks this */ }
+      catch (e) { }
       loader.style.display = "flex";
     }
+    
     async function pickFile() {
       errBox.textContent = "";
       if (window.showOpenFilePicker) {
@@ -1261,6 +1217,7 @@
       }
       document.getElementById("file").click();
     }
+    
     async function reload() {
       if (fileHandle && fileHandle.getFile) {
         try { const f = await fileHandle.getFile(); loadFromText(await f.text()); return; } catch (e) { }
@@ -1269,7 +1226,6 @@
       pickFile();
     }
 
-    /* ---------- wire up ---------- */
     document.getElementById("pickBtn").addEventListener("click", pickFile);
     document.getElementById("loadBtn").addEventListener("click", reload);
     document.getElementById("saveBtn").addEventListener("click", saveYaml);
@@ -1280,6 +1236,10 @@
     document.getElementById("expandBtn").addEventListener("click", () => { if (dataRoot) expandAll(); });
     document.getElementById("collapseBtn").addEventListener("click", () => { if (dataRoot) collapseToBranches(); });
     document.getElementById("fitBtn").addEventListener("click", fit);
+    document.getElementById("typeFilter").addEventListener("change", (e) => {
+      selectedTypeFilter = e.target.value;
+      if (dataRoot) update();
+    });
     document.getElementById("editToggle").addEventListener("change", (e) => {
       if (diffMode) { e.target.checked = false; toast("Exit diff mode before editing."); return; }
       editMode = e.target.checked; if (dataRoot) update();
