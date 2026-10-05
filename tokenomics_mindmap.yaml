@@ -11,69 +11,94 @@ Tokenomics:
               Description: "The method used to split text into tokens."
               children:
                 BPE (Byte-Pair Encoding):
+                  Type: Concept
                   Description: "Merges frequent character pairs into subword tokens, the dominant scheme for modern LLMs."
                 WordPiece:
+                  Type: Concept
                   Description: "A subword scheme used by BERT-family models that picks merges by likelihood rather than raw frequency."
                 SentencePiece / Unigram:
+                  Type: Concept
                   Description: "A language-agnostic tokenizer that trains directly on raw text, common in multilingual models."
                 Byte-level tokenization:
+                  Type: Concept
                   Description: "Operates on raw bytes so any input is representable without unknown tokens."
                 Pre-tokenization rules:
+                  Type: Concept
                   Description: "The regex or splitting pass applied before merging, which decides how whitespace, digits, and punctuation group together."
                 Tokenizer-free approaches:
+                  Type: Concept
                   Description: "Research directions that learn dynamic byte groupings instead of a fixed vocabulary, removing the tokenizer as a cost variable."
             Implementations:
               Description: "Concrete libraries that perform tokenization."
               children:
                 tiktoken:
+                  Type: Concept
                   Description: "OpenAI's fast byte-pair-encoding tokenizer library."
                 HuggingFace Tokenizers:
+                  Type: Concept
                   Description: "A widely used Rust-backed tokenizer library with many pretrained vocabularies."
                 SentencePiece:
+                  Type: Concept
                   Description: "Google's tokenizer library implementing byte-pair and Unigram models."
             Vocabulary:
               Description: "The fixed set of tokens a model recognizes."
               children:
                 Vocab size:
+                  Type: KPI
                   Description: "The number of distinct tokens, trading model size against how efficiently text compresses."
                 Special tokens:
+                  Type: Concept
                   Description: "Reserved tokens such as end-of-sequence, padding, and chat roles that carry structural meaning."
                 Vocab / embedding tradeoff:
+                  Type: Concept
                   Description: "Larger vocabularies shorten sequences but enlarge the embedding table and memory footprint."
                 Chat templates:
+                  Type: Concept
                   Description: "The role and turn markup a model was trained to expect, which adds billable tokens to every message."
                 Reserved and unused slots:
+                  Type: Concept
                   Description: "Vocabulary entries held back for later use, often repurposed for control tokens or tool syntax."
             Efficiency:
               Description: "How compactly a tokenizer encodes text, which directly sets token counts and cost."
               children:
                 Tokens-per-word ratio:
+                  Type: KPI
                   Description: "How many tokens an average word consumes, a direct multiplier on cost."
                 Language disparity (non-English cost premium):
+                  Type: Concept
                   Description: "Non-English text often uses more tokens per word, making it more expensive to process."
                 Code / structured text density:
+                  Type: Concept
                   Description: "Code and markup tokenize inefficiently, inflating token counts for technical workloads."
                 Compression rate:
+                  Type: KPI
                   Description: "The overall ratio of characters to tokens a tokenizer achieves."
                 Tokenizer parity across providers:
+                  Type: Concept
                   Description: "The same text costs different token counts on different models, so quoted prices per token are not directly comparable."
             Multimodal tokenization:
               Description: "How non-text inputs are converted into tokens."
               children:
                 Image patches / tiles:
+                  Type: Concept
                   Description: "Images are split into patches or tiles, each costing a set number of tokens."
                 Audio tokens:
+                  Type: Concept
                   Description: "Audio is discretized into tokens, typically many per second of sound."
                 Video tokens:
+                  Type: Concept
                   Description: "Video is tokenized per frame or clip, the most token-intensive modality."
                 Resolution and detail settings:
+                  Type: Concept
                   Description: "Requested image detail changes how many tiles are produced, making resolution a direct cost control."
             Detokenization and streaming:
               Description: "Turning generated token ids back into text as output is produced."
               children:
                 Partial token handling:
+                  Type: Concept
                   Description: "A single character can span several tokens, so streamed output must buffer until a boundary is safe to emit."
                 Stop sequence matching:
+                  Type: Concept
                   Description: "Stop strings are matched on text rather than tokens, so generation can overshoot slightly before halting."
         Model / Architecture:
           Description: "The model's design, which sets the cost floor before any training or serving."
@@ -82,137 +107,187 @@ Tokenomics:
               Description: "The high-level architectural class of the model."
               children:
                 Dense transformer:
+                  Type: Concept
                   Description: "A standard transformer where every parameter is active on every token."
                 Mixture of Experts (MoE):
                   Description: "Routes each token to a subset of expert subnetworks, cutting active compute per token."
                   children:
                     Router / gating:
+                      Type: Concept
                       Description: "The learned function that picks which experts see each token."
                     Top-k routing:
+                      Type: Concept
                       Description: "How many experts each token is sent to, setting active compute per token."
                     Shared experts:
+                      Type: Concept
                       Description: "Experts every token passes through, used to hold general capability outside the routed pool."
                     Load balancing:
+                      Type: Concept
                       Description: "Auxiliary objectives or bias terms that stop a few experts absorbing most traffic and stranding the rest."
                     Expert parallelism:
+                      Type: Concept
                       Description: "Spreading experts across devices, which turns routing into network traffic and makes interconnect a cost factor."
                 State-space / hybrid (Mamba, etc.):
+                  Type: Concept
                   Description: "Non-attention or hybrid architectures that scale more cheaply with sequence length."
                 Diffusion language models:
+                  Type: Concept
                   Description: "Models that refine a whole sequence in parallel steps rather than emitting one token at a time, with a different latency and cost profile."
             Scale:
               Description: "The size of the model, a primary driver of both quality and cost."
               children:
                 Parameter count:
+                  Type: KPI
                   Description: "The total number of weights, correlating with capability and serving cost."
                 Active vs total params (MoE):
+                  Type: KPI
                   Description: "In MoE models only a fraction of parameters run per token, decoupling size from compute cost."
                 Model tiers (nano / small / frontier):
+                  Type: Concept
                   Description: "Capability tiers that let teams match model cost to task difficulty."
                 Depth, width, and heads:
+                  Type: Concept
                   Description: "Layer count, hidden size, and head count, which together set memory footprint and how the model shards across devices."
             Context:
               Description: "How much input a model can attend to at once."
               children:
                 Context window length:
+                  Type: KPI
                   Description: "The maximum tokens a model can process in one request, bounding prompt and memory cost."
                 Positional encoding (RoPE, ALiBi):
+                  Type: Concept
                   Description: "Methods for encoding token position that affect how far context can be extended."
                 Long-context methods:
                   Description: "Techniques that push usable context beyond the trained window, usually at added compute cost."
                   children:
                     RoPE scaling and YaRN:
+                      Type: Concept
                       Description: "Rescaling rotary position frequencies so a model handles sequences longer than it was trained on."
                     Attention sinks:
+                      Type: Concept
                       Description: "Keeping the earliest tokens permanently in cache so quality does not collapse when older context is evicted."
                 Effective vs advertised context:
+                  Type: Concept
                   Description: "Models often degrade well before their stated limit, so the usable window is an empirical question rather than a spec."
                 Quadratic cost of attention:
+                  Type: Concept
                   Description: "Prefill compute grows with the square of input length, which is why long prompts cost more than their token count suggests."
             Attention:
               Description: "The mechanism relating tokens to each other, and a major driver of memory and compute."
               children:
                 Multi-Head Attention:
+                  Type: Concept
                   Description: "The standard attention with separate key and value heads, the most memory-hungry variant."
                 Grouped-Query / Multi-Query Attention:
+                  Type: Concept
                   Description: "Shares key and value heads to shrink the KV cache and speed decoding."
                 Multi-head Latent Attention (MLA):
+                  Type: Concept
                   Description: "Compresses keys and values into a low-rank latent space, cutting KV cache size sharply at some added compute."
                 Sliding-window / sparse attention:
+                  Type: Concept
                   Description: "Limits attention to nearby or selected tokens to reduce cost on long inputs."
                 Linear and sub-quadratic attention:
+                  Type: Concept
                   Description: "Reformulations that avoid the full pairwise comparison, trading exactness for cheaper scaling with length."
                 FlashAttention:
+                  Type: Concept
                   Description: "A memory-efficient attention kernel that speeds training and inference without changing results."
             Heads and objectives:
               Description: "What the model is trained to predict, which determines what can be reused at serving time."
               children:
                 Next-token prediction:
+                  Type: Concept
                   Description: "The standard objective, predicting one token ahead, which is what makes decoding serial."
                 Parallel / diffusion decoding:
+                  Type: Concept
                   Description: "Refines the whole sequence over parallel denoising steps rather than one token at a time, which gives diffusion models a latency profile unlike autoregressive decoding."
                 Multi-token prediction heads:
+                  Type: Concept
                   Description: "Extra heads trained to predict several positions ahead, useful during training and reusable as a drafter at inference."
                 Input embeddings and LM head:
+                  Type: Concept
                   Description: "The input table mapping token ids to vectors and the output projection back to vocabulary, sized vocab times hidden dimension and sometimes sharing weights to save memory."
             Reasoning and test-time compute:
               Description: "Spending extra tokens at inference to raise answer quality, the newest and least predictable cost driver."
               children:
                 Chain of thought:
+                  Type: Concept
                   Description: "Prompting or training the model to write intermediate steps, which raises output token counts substantially."
                 Tree of Thoughts:
+                  Type: Concept
                   Description: "Explores and prunes branching reasoning paths, multiplying token spend for a chance at harder problems."
                 Reasoning tokens:
+                  Type: Concept
                   Description: "Intermediate tokens a reasoning model produces before its answer, usually billed even when not shown to the user."
                 Reasoning effort levels:
+                  Type: Concept
                   Description: "Provider controls that trade answer quality against how many reasoning tokens are spent."
                 Test-time scaling:
+                  Type: Concept
                   Description: "Improving results by spending more inference compute rather than training a larger model, moving cost from capex to per-request spend."
             Modality:
               Description: "The kinds of input and output a model supports."
               children:
                 Text:
+                  Type: Concept
                   Description: "Text-only input and output, the baseline modality."
                 Vision / multimodal:
+                  Type: Concept
                   Description: "Handles images alongside text, adding vision token costs."
                 Audio / speech:
                   Description: "Processes or generates audio, with its own tokenization and latency profile."
                   children:
                     Speech to text (ASR):
+                      Type: Concept
                       Description: "Automatic speech recognition, usually priced per second or minute of audio rather than per token."
                     Text to speech (TTS):
+                      Type: Concept
                       Description: "Speech synthesis, priced per character or per second of generated audio."
                 Video:
+                  Type: Concept
                   Description: "Handles moving images, the most token-intensive input a model can accept."
                 Any-to-any / omni models:
+                  Type: Concept
                   Description: "Single models accepting and producing several modalities, which complicates per-unit pricing."
             Openness:
               Description: "How available the model's weights and usage rights are."
               children:
                 Open weights:
+                  Type: Concept
                   Description: "Weights are downloadable, enabling self-hosting and full cost control."
                 Open source:
+                  Type: Concept
                   Description: "Weights plus training code and often data recipe, a stricter standard than open weights alone."
                 Proprietary / API-only:
+                  Type: Concept
                   Description: "Accessible only through a vendor API, trading control for convenience."
                 License terms:
+                  Type: Concept
                   Description: "The legal conditions governing commercial use, redistribution, and fine-tuning."
                 Model card:
+                  Type: Concept
                   Description: "Published documentation of a model's intended use, training approach, and limitations."
                 System card:
+                  Type: Concept
                   Description: "A fuller disclosure covering evaluations and safety testing for a released system, increasingly the reference for procurement review."
             Model variants:
               Description: "The distinct kinds of model a stack uses, which are priced and evaluated separately."
               children:
                 Base model:
+                  Type: Concept
                   Description: "A pretrained model with no instruction tuning, which completes text rather than following instructions."
                 Instruction-tuned model:
+                  Type: Concept
                   Description: "A base model post-trained to follow instructions and hold a conversation, the default for application use."
                 Embedding model:
+                  Type: Concept
                   Description: "Produces vectors rather than text, priced per input token with no output cost, and the workhorse of retrieval."
                 Reranker model:
+                  Type: Concept
                   Description: "Scores query and document pairs directly, more accurate than vector similarity and more expensive per candidate."
                 Guardrail and classifier models:
+                  Type: Concept
                   Description: "Small models that screen input or output, adding a fixed per-request cost to every call they protect."
         Hardware:
           Description: "The physical infrastructure that produces tokens."
@@ -224,126 +299,175 @@ Tokenomics:
                   Description: "Raw processing capability for model math."
                   children:
                     GPU Capacity:
+                      Type: Concept
                       Description: "The number and type of GPUs available, the central constraint on throughput."
                     Accelerator type (GPU, TPU, Trainium, Inferentia, ASIC):
+                      Type: Concept
                       Description: "The class of chip used, each with distinct cost and performance tradeoffs."
                     Precision throughput:
+                      Type: Concept
                       Description: "Rated performance differs sharply by numeric format, so quoted peak figures only apply at a stated precision."
                     Generational uplift:
+                      Type: Concept
                       Description: "Each accelerator generation changes performance per dollar and per watt, which resets cost models on a hardware cycle."
                     TFLOPS:
+                      Type: KPI
                       Description: "Rated floating point operations per second, quoted per precision format and only reachable under ideal conditions."
                     Thermal design power (TDP):
+                      Type: KPI
                       Description: "The power draw a device is designed to sustain, which sets the facility requirement per accelerator."
                     GPU sharing (MIG, time-slicing):
+                      Type: Concept
                       Description: "Partitioning one accelerator across workloads, either as isolated instances or by interleaving, to raise utilization on small models."
                 Memory:
                   Description: "On-device and system memory that bounds model and batch size."
                   children:
                     Storage:
+                      Type: Concept
                       Description: "Disk capacity for weights, datasets, and checkpoints."
                     Memory bandwidth (HBM):
+                      Type: KPI
                       Description: "High-bandwidth memory speed, often the true bottleneck for inference."
                     Device memory capacity:
+                      Type: KPI
                       Description: "How much fits on one accelerator, which decides whether a model needs sharding at all."
                     Unified and shared memory:
+                      Type: Concept
                       Description: "Architectures where host and accelerator share an address space, changing what fits on smaller systems."
                 Networking:
                   Description: "Data movement within and between machines."
                   children:
                     Network Bandwidth:
+                      Type: KPI
                       Description: "Throughput between nodes, critical for distributed training and serving."
                     Interconnect (NVLink, InfiniBand):
+                      Type: Concept
                       Description: "High-speed links between accelerators that enable efficient model parallelism."
                     Scale-up vs scale-out:
+                      Type: Concept
                       Description: "Whether capacity grows by making one node bigger or by adding nodes, which changes the cost of parallelism."
                     Collective communication:
+                      Type: Concept
                       Description: "All-reduce and all-to-all operations that dominate distributed cost when models are split across devices."
                 Power:
                   Description: "Electrical supply and heat management for the fleet."
                   children:
                     Energy:
+                      Type: Concept
                       Description: "Electricity consumed, a growing share of total token cost."
                     Cooling:
+                      Type: Concept
                       Description: "Heat removal systems required to keep dense accelerators running."
                     PUE (Power Usage Effectiveness):
+                      Type: KPI
                       Description: "The ratio of total facility power to IT power, measuring datacenter efficiency."
                     Rack power density:
+                      Type: KPI
                       Description: "Kilowatts per rack, which decides whether existing facilities can host current accelerators at all."
                     Grid and interconnection constraints:
+                      Type: Concept
                       Description: "Time to secure power at a site, often the true lead time behind apparent chip scarcity."
                 Facilities:
                   Description: "The physical datacenter housing the hardware."
                   children:
                     Space:
+                      Type: Concept
                       Description: "Floor and rack space available for equipment."
                     Rack density:
+                      Type: KPI
                       Description: "How much compute is packed per rack, affecting power and cooling design."
                     Colocation vs owned:
+                      Type: Concept
                       Description: "Renting space versus building it, which sets the capex and commitment profile."
                     Siting and latency:
+                      Type: Concept
                       Description: "Where capacity physically sits, which decides achievable response times and which data residency rules apply."
                     AI factory:
+                      Type: Concept
                       Description: "A facility designed end to end to produce AI rather than house servers: power, cooling, accelerators, and networking engineered as one system whose output is intelligence."
             Performance characterization:
               Description: "How to tell whether hardware is actually being used, and what is limiting it."
               children:
                 Compute-bound vs memory-bound:
+                  Type: Concept
                   Description: "Prefill is usually limited by arithmetic and decode by memory bandwidth, which is why the two phases behave differently."
                 Arithmetic intensity:
+                  Type: KPI
                   Description: "Operations performed per byte moved, the number that decides which limit a workload hits."
                 Roofline analysis:
+                  Type: Concept
                   Description: "Plotting achieved performance against arithmetic intensity to see how much headroom a kernel has."
                 MFU (Model FLOPs Utilization):
+                  Type: KPI
                   Description: "Achieved arithmetic as a share of the hardware's rated peak, the standard measure of whether expensive silicon is earning its keep."
                 Achieved memory bandwidth:
+                  Type: KPI
                   Description: "How much of rated bandwidth a workload actually reaches, the decode-side counterpart to MFU."
             Procurement:
               Description: "How compute capacity is acquired."
               children:
                 Sourcing model (Cloud vs on-prem vs hybrid):
+                  Type: Concept
                   Description: "The basic decision of renting, owning, or mixing infrastructure."
                 Neoclouds and GPU specialists:
+                  Type: Concept
                   Description: "Providers built specifically around accelerator rental, often priced and contracted differently from general-purpose clouds."
                 Commitment (Reserved vs on-demand vs spot):
+                  Type: Concept
                   Description: "The pricing commitment chosen, trading flexibility against unit cost."
                 Capacity blocks:
+                  Type: Concept
                   Description: "Fixed windows of guaranteed accelerator capacity bought in advance, a middle ground between on-demand and long reservations."
                 GPU quotas / allocation:
+                  Type: KPI
                   Description: "Limits vendors place on how many accelerators a customer can access."
                 Lead times:
+                  Type: KPI
                   Description: "The wait between ordering and receiving scarce accelerators."
                 Capex vs Opex:
+                  Type: Concept
                   Description: "Whether compute is a capital purchase or an operating expense."
                 Vendor lock-in:
+                  Type: Concept
                   Description: "Dependence on one provider's hardware, software, or pricing."
             Lifecycle (Intersections with HAM):
               Description: "Managing hardware from acquisition through retirement, overlapping with hardware asset management."
               children:
                 Depreciation schedules:
+                  Type: Concept
                   Description: "How accelerator value is written down over its useful life."
                 Refresh cycles:
+                  Type: Concept
                   Description: "The cadence of replacing hardware with newer generations."
                 Failure / RMA rates:
+                  Type: KPI
                   Description: "How often units fail and must be returned, reducing effective capacity."
                 Secondary market resale:
+                  Type: Concept
                   Description: "Recovering value by selling used accelerators."
                 Utilization tracking:
+                  Type: KPI
                   Description: "Measuring how fully hardware is used, the key to cost efficiency."
             Software stack:
               Description: "The vendor libraries and toolchains between a model and the silicon, which decide portability as much as performance."
               children:
                 CUDA:
+                  Type: Concept
                   Description: "NVIDIA's parallel computing platform, the default target for nearly all inference software."
                 ROCm:
+                  Type: Concept
                   Description: "AMD's equivalent stack, the main route to running the same workloads on non-NVIDIA accelerators."
                 Metal / MPS:
+                  Type: Concept
                   Description: "Apple's GPU stack, the Apple Silicon analog to CUDA and ROCm, and the layer MLX and llama.cpp target on Mac."
                 Triton (kernel language):
+                  Type: Concept
                   Description: "A Python-like language for writing GPU kernels, distinct from the inference server of the same name."
                 NCCL and collective libraries:
+                  Type: Concept
                   Description: "Libraries implementing multi-device communication, which dominate performance once a model is sharded."
                 Driver and toolkit compatibility:
+                  Type: Concept
                   Description: "Version alignment between driver, toolkit, and framework, a routine source of deployment failure that costs engineer time rather than compute."
         Training:
           Description: "The process of creating and refining a model."
@@ -352,27 +476,37 @@ Tokenomics:
               Description: "The large-scale initial training that gives a model its base capabilities."
               children:
                 Data curation:
+                  Type: Concept
                   Description: "Selecting and cleaning the training corpus, a major quality and cost lever."
                 Data licensing:
+                  Type: Concept
                   Description: "Securing legal rights to training data."
                 Synthetic data:
+                  Type: Concept
                   Description: "Model-generated data used to augment or replace scarce real data."
                 Scaling laws:
+                  Type: Concept
                   Description: "Empirical relationships predicting quality from model size, data, and compute."
                 Training token budget:
+                  Type: KPI
                   Description: "How many tokens the model sees during training, traded against parameter count under a fixed compute budget."
                 Compute budget:
+                  Type: KPI
                   Description: "Total accelerator time allocated to a run, fixed early and difficult to revise once underway."
                 Data mixing and curriculum:
+                  Type: Concept
                   Description: "The proportions and ordering of data sources, which shape capability without changing model size."
                 Optimizer:
                   Description: "Turns gradients into weight updates, with stored state that is a large share of training memory and a choice that sets convergence speed."
                   children:
                     AdamW:
+                      Type: Concept
                       Description: "The default adaptive optimizer, whose two state tensors per parameter dominate optimizer memory."
                     Muon:
+                      Type: Concept
                       Description: "Momentum-orthogonalizing optimizer for 2D hidden weights, reaching target loss in fewer steps and cutting compute at scale."
                     Second-order / Shampoo:
+                      Type: Concept
                       Description: "Uses curvature for faster convergence per step, at higher per-step compute and memory."
             Post-Training:
               Description: "Steps after pretraining that adapt and align a model."
@@ -381,47 +515,64 @@ Tokenomics:
                   Description: "Adapting a pretrained model to a specific task or domain."
                   children:
                     Supervised fine-tuning (SFT):
+                      Type: Concept
                       Description: "Trains a base model on curated prompt-response pairs, the supervised step before preference alignment that yields the instruction-tuned model."
                     Full fine-tune:
+                      Type: Concept
                       Description: "Updating all weights, the most capable but most expensive adaptation."
                     PEFT / Adapters:
                       Description: "Parameter-efficient methods that train small add-on weights instead of the full model."
                       children:
                         LoRA (Low-Rank Adaptation):
+                          Type: Concept
                           Description: "Trains small low-rank matrices, cutting fine-tuning cost dramatically."
                         QLoRA (Quantized Low-Rank Adaptation):
+                          Type: Concept
                           Description: "Combines LoRA with a quantized base model to fine-tune on modest hardware."
                         DoRA:
+                          Type: Concept
                           Description: "A LoRA refinement that decomposes weights into magnitude and direction for better accuracy."
                     Prompt / Prefix tuning:
+                      Type: Concept
                       Description: "Learns soft prompt vectors while freezing the model, the lightest adaptation."
                     Continued pretraining:
+                      Type: Concept
                       Description: "Further general training on domain data before any task-specific step."
                 Alignment:
                   Description: "Shaping model behavior to human preferences and safety norms."
                   children:
                     RLHF:
+                      Type: Concept
                       Description: "Reinforcement learning from human feedback, the standard preference-alignment method."
                     RLAIF:
+                      Type: Concept
                       Description: "Uses AI-generated feedback in place of human labels to cut alignment cost."
                     Constitutional AI:
+                      Type: Concept
                       Description: "Aligns to a written set of principles via model-generated critiques and revisions, cutting human labeling and underlying much RLAIF."
                     DPO:
+                      Type: Concept
                       Description: "Direct preference optimization, aligning models without a separate reward model."
                     PPO:
+                      Type: Concept
                       Description: "The policy optimization algorithm long used to run the reinforcement learning step in RLHF."
                     GRPO:
+                      Type: Concept
                       Description: "A group-relative policy optimization variant that drops the separate value model, widely used for reasoning training."
                     Reward models:
                       Description: "Models trained to score outputs, used as the objective that policy optimization maximizes."
                       children:
                         Outcome reward model (ORM):
+                          Type: Concept
                           Description: "Scores only the final answer, cheap to label but blind to where a reasoning trace failed."
                         Process reward model (PRM):
+                          Type: Concept
                           Description: "Scores each reasoning step, a denser signal at much higher labeling and inference cost."
                     Reinforcement learning with verifiable rewards:
+                      Type: Concept
                       Description: "Training against automatically checkable outcomes such as passing tests, which removes the human labelling bottleneck."
                 Distillation:
+                  Type: Concept
                   Description: "Training a smaller model to mimic a larger one, lowering serving cost."
             Quantization:
               Description: "Reducing the numeric precision of weights and activations to shrink cost."
@@ -430,93 +581,127 @@ Tokenomics:
                   Description: "When quantization is applied relative to training."
                   children:
                     PTQ (Post-Training Quantization):
+                      Type: Concept
                       Description: "Quantizes an already-trained model, fast but sometimes lossy."
                     QAT (Quantization-Aware Training):
+                      Type: Concept
                       Description: "Trains with quantization simulated, preserving more accuracy."
                 Scheme:
                   Description: "How numeric ranges are mapped to lower precision."
                   children:
                     Affine quantization:
+                      Type: Concept
                       Description: "Uses a scale and zero-point offset to map values, handling asymmetric ranges."
                     Symmetric quantization:
+                      Type: Concept
                       Description: "Maps values around zero without an offset, simpler and faster."
                     Granularity:
+                      Type: Concept
                       Description: "Whether scales are shared per tensor, per channel, or per small block, trading accuracy against overhead."
                 Algorithms:
                   Description: "Specific quantization techniques."
                   children:
                     GPTQ:
+                      Type: Concept
                       Description: "A one-shot post-training method that quantizes weights layer by layer with low error."
                     AWQ:
+                      Type: Concept
                       Description: "Activation-aware quantization that protects the most important weights."
                     SmoothQuant:
+                      Type: Concept
                       Description: "Shifts difficulty from activations into weights so both can be quantized together."
                     GGUF:
+                      Type: Concept
                       Description: "A file format and quantization scheme popular for running models locally."
                     Calibration data:
+                      Type: Concept
                       Description: "The sample inputs used to fit quantization scales, which quietly determines how well the result holds up."
                     bitsandbytes:
+                      Type: Concept
                       Description: "A library providing 8-bit and 4-bit quantization, widely used as the base for memory-efficient fine-tuning."
                     K-quants:
+                      Type: Concept
                       Description: "Mixed-precision block quantization variants within the GGUF family, offering a spread of size and quality points."
                 Precision formats:
                   Description: "The numeric formats weights and activations use."
                   children:
                     BF16:
+                      Type: Concept
                       Description: "16-bit brain floating point, the common training precision."
                     FP8:
+                      Type: Concept
                       Description: "8-bit floating point, increasingly used to speed inference and training."
                     INT8:
+                      Type: Concept
                       Description: "8-bit integer precision, a widely supported inference quantization."
                     INT4:
+                      Type: Concept
                       Description: "4-bit integer precision, maximizing memory savings at some quality cost."
                     Microscaling formats (MXFP4, NVFP4):
+                      Type: Concept
                       Description: "Four-bit formats that attach a shared scale to small blocks of values, giving low precision more usable range."
                 What gets quantized:
                   Description: "Different parts of the model can be reduced independently."
                   children:
                     Weight-only:
+                      Type: Concept
                       Description: "Compresses stored weights while computing at higher precision, the most common inference setup."
                     Activation quantization:
+                      Type: Concept
                       Description: "Reduces precision of intermediate values too, needed to actually use low-precision arithmetic units."
                     KV cache quantization:
+                      Type: Concept
                       Description: "Stores cached keys and values at lower precision, which buys concurrency rather than speed."
                 Quality impact:
                   Description: "How to tell what a precision reduction actually cost."
                   children:
                     Perplexity:
+                      Type: KPI
                       Description: "How well a model predicts held-out text, the standard quick proxy for quantization damage and a weak predictor of task performance."
                     Task-level regression:
+                      Type: Concept
                       Description: "Measuring the quantized model on the actual workload, the only check that catches damage perplexity misses."
             Distributed Training:
               Description: "Splitting training across many devices to handle large models."
               children:
                 Data parallelism:
+                  Type: Concept
                   Description: "Replicates the model across devices, each processing different data."
                 Tensor parallelism:
+                  Type: Concept
                   Description: "Splits individual layers across devices to fit large models."
                 Pipeline parallelism:
+                  Type: Concept
                   Description: "Splits the model by layers into stages across devices."
                 Mixture of Experts:
+                  Type: Concept
                   Description: "Distributes expert subnetworks across devices, active only when routed to."
                 Sequence / context parallelism:
+                  Type: Concept
                   Description: "Splits a single long sequence across devices so context length is not bounded by one device's memory."
                 ZeRO and FSDP:
+                  Type: Concept
                   Description: "Shards optimizer state, gradients, and parameters across data-parallel ranks to cut memory per device."
                 Gradient checkpointing and accumulation:
+                  Type: Concept
                   Description: "Trades recomputation and extra steps for lower peak memory, letting bigger batches fit on the same hardware."
             Operations:
               Description: "The practical running of training jobs."
               children:
                 Checkpointing:
+                  Type: Concept
                   Description: "Periodically saving model state to survive failures and resume runs."
                 Hyperparameter tuning:
+                  Type: Concept
                   Description: "Searching over training settings to improve results."
                 Training compute cost:
+                  Type: KPI
                   Description: "The total accelerator spend to train a model."
                 Failed runs and restarts:
+                  Type: Concept
                   Description: "Work lost to divergence or hardware failure, a real line item that rarely appears in published training costs."
                 Cluster goodput:
+                  Type: KPI
                   Description: "The share of allocated cluster time that produced usable training progress."
             Evaluation:
               Description: "Measuring whether a trained model is actually good enough to deploy."
@@ -525,29 +710,40 @@ Tokenomics:
                   Description: "Standard test sets used to compare models, useful for triage and weak as a proxy for production behaviour."
                   children:
                     Knowledge and reasoning benchmarks:
+                      Type: Concept
                       Description: "Standard multiple-choice and problem-solving sets such as MMLU and GPQA, used for coarse capability comparison."
                     Code benchmarks:
+                      Type: Concept
                       Description: "Function-level sets such as HumanEval and repository-level sets such as SWE-bench, which measure very different things."
                     Arena and Elo ratings:
+                      Type: KPI
                       Description: "Rankings derived from pairwise human preference, which capture perceived quality that fixed test sets miss."
                     pass@k:
+                      Type: KPI
                       Description: "The share of problems solved within k attempts, which makes the cost of retries explicit in the metric itself."
                     Long-context probes:
+                      Type: Concept
                       Description: "Tests such as needle in a haystack retrieval and RULER that measure usable context rather than advertised context."
                 Contamination:
+                  Type: Concept
                   Description: "Benchmark data leaking into training, which inflates scores without improving capability."
                 Held-out and internal evals:
+                  Type: Concept
                   Description: "Task-specific test sets built from the actual workload, the only evidence that transfers to a deployment decision."
                 Cost of evaluation:
+                  Type: Concept
                   Description: "Evaluation is itself a token workload, and thorough evaluation of a frontier model is not cheap."
             Training economics:
               Description: "How training spend relates to what it eventually returns."
               children:
                 Amortization over inference:
+                  Type: Concept
                   Description: "Training cost spread across the tokens the model eventually serves, which only pays back at volume."
                 Build vs adapt vs prompt:
+                  Type: Concept
                   Description: "The choice between training a model, fine-tuning one, and getting the same result from context engineering."
                 Model obsolescence:
+                  Type: Concept
                   Description: "A trained model depreciates as better base models arrive, shortening the window to recover its cost."
         Serving:
           Description: "Running trained models to produce tokens for users. Also called inference, and the two words are used interchangeably: model building is training, everything after it that answers users is serving."
@@ -561,15 +757,19 @@ Tokenomics:
                   Description: "Strategies for storing, sharing, and evicting KV cache entries."
                   children:
                     Persistent Caching:
+                      Type: Concept
                       Description: "Keeping KV cache across requests so repeated prefixes are not recomputed."
                     Disaggregated Caching:
+                      Type: Concept
                       Description: "Storing the KV cache separately from compute nodes so it can be shared and scaled."
                     Cross-Engine Support:
                       Description: "Sharing cached state across different inference engines or nodes."
                       children:
                         Centralised Cache Server:
+                          Type: Concept
                           Description: "A shared server that holds KV cache for many workers to reuse."
                         Peer-to-Peer (P2P) Cache Transfer:
+                          Type: Concept
                           Description: "Moving cache directly between workers without a central store."
                     Hierarchical KV cache:
                       Description: "Placing KV cache across tiers, typically GPU memory, host memory, and shared storage, so cache survives beyond what fits on the accelerator. The trade is storage and network bandwidth against recomputed prefill, which makes the fetch-or-recompute decision the economic core of the branch. Distinct from weight offloading under Memory hierarchy and offloading, which moves model weights rather than cache."
@@ -577,25 +777,32 @@ Tokenomics:
                         - "https://arxiv.org/abs/2407.00079"
                       children:
                         Cache tiers:
+                          Type: Concept
                           Description: "GPU memory as the fast tier, host memory as the middle tier, and shared storage as the tier any node can reach. Only the shared tier is reusable across instances, and only when every instance points at the same namespace."
                         Write policy:
+                          Type: Concept
                           Description: "Whether cache entries are written down to slower tiers as they are created or only on eviction, which sets how much bandwidth is spent on entries that are never read back."
                         Prefetch policy:
+                          Type: Concept
                           Description: "Pulling cache up from a slower tier before it is needed, which hides transfer latency and wastes bandwidth when the prediction is wrong."
                         Tier-aware routing:
+                          Type: Concept
                           Description: "A router that knows which tier a prefix lives on, so a worker holding the prefix in host memory or shared storage is not scored as cold. Without it, a fetchable cache hit is treated as a full recomputation. Related: cache-aware routing under Routing."
                         Hierarchical cache managers:
                           Description: "The layer that decides which tier a block lives on and moves it between them. Distinct from the storage tier itself: a manager is chosen with the engine, a store is chosen with the infrastructure."
                           children:
                             HiCache:
+                              Type: Concept
                               Description: "SGLang's hierarchical cache, extending RadixAttention across GPU, host, and an optional external storage tier, with the external tier exposed through one pluggable interface."
                               Links:
                                 - "https://www.lmsys.org/blog/2025-09-10-sglang-hicache/"
                             LMCache:
+                              Type: Concept
                               Description: "An external KV cache layer that stores and reuses cache across engine instances and storage tiers."
                               Links:
                                 - "https://docs.lmcache.ai/"
                             Dynamo KV Block Manager (KVBM):
+                              Type: Concept
                               Description: "NVIDIA Dynamo's memory manager for KV cache, which separates block management from the inference runtime and tiers blocks across GPU memory, host memory, local SSD, and remote storage over NIXL."
                               Links:
                                 - "https://docs.nvidia.com/dynamo/latest/architecture/kvbm_architecture.html"
@@ -603,40 +810,51 @@ Tokenomics:
                           Description: "A shared, persistent storage layer that holds KV cache beyond device and host memory so any node can retrieve precomputed state instead of re-running prefill, turning cache from a per-node optimization into a fleet-wide stored asset with its own capacity, retention, and breakeven economics."
                           children:
                             Mooncake Store:
+                              Type: Concept
                               Description: "The distributed KV cache store inside Mooncake, the serving platform behind Kimi, which pools spare CPU, DRAM, and SSD capacity across prefill and decode clusters."
                               Links:
                                 - "https://github.com/kvcache-ai/Mooncake"
                                 - "https://arxiv.org/abs/2407.00079"
                             WEKA Augmented Memory Grid:
+                              Type: Concept
                               Description: "A storage vendor's persistent KV cache tier on NVMe, served at near-memory latency and marketed as a token warehouse."
                               Links:
                                 - "https://www.weka.io/article/wekas-augmented-memory-grid-pioneering-a-token-warehouse-for-the-future"
                             3FS (Fire-Flyer File System):
+                              Type: Concept
                               Description: "DeepSeek's open-source distributed file system for AI training and inference, built around SSDs and RDMA, used as a KV cache store as well as a training data store."
                               Links:
                                 - "https://github.com/deepseek-ai/3FS"
                             AIBrix KVCache:
+                              Type: Concept
                               Description: "A KV cache offloading framework providing memory tiering and cross-engine reuse, with pluggable eviction policies and backend stores."
                               Links:
                                 - "https://aibrix.readthedocs.io/latest/designs/aibrix-kvcache-offloading-framework.html"
                             NIXL:
+                              Type: Concept
                               Description: "A transfer library with a unified API over memory and storage tiers, covering plugins such as 3FS, GPUDirect Storage, and S3-compatible object storage. The access layer the stores are reached through rather than a store in its own right."
                 Prefix caching:
                   Description: "Reusing the cached computation of shared prompt prefixes across requests."
                   children:
                     RadixAttention:
+                      Type: Concept
                       Description: "Automatic reuse of shared prefixes via a radix tree over cached sequences, so prefix sharing needs no explicit cache management."
                 Eviction policies:
+                  Type: Concept
                   Description: "Rules for which cache entries to drop when memory fills."
                 PagedAttention:
+                  Type: Concept
                   Description: "Pages the KV cache into fixed-size blocks to cut fragmentation and raise GPU utilization."
                   Links:
                     - "https://blog.vllm.ai/2023/06/20/vllm.html"
                 Cache compression:
+                  Type: Concept
                   Description: "Shrinking stored KV data to fit more requests in memory."
                 Quantized KV cache:
+                  Type: Concept
                   Description: "Storing KV cache at lower precision to reduce its memory footprint."
                 Cache sizing:
+                  Type: Concept
                   Description: "How much device memory is left for cache after weights, which sets the ceiling on concurrent requests."
             Inference Optimization:
               Description: "Techniques that lower the cost and latency of generating tokens."
@@ -650,40 +868,54 @@ Tokenomics:
                       Description: "The draft then verify loop shared by every speculative method."
                       children:
                         Drafting:
+                          Type: Concept
                           Description: "A cheap proposer generates a candidate continuation of k tokens."
                         Verification:
+                          Type: Concept
                           Description: "The target model scores all candidate positions in one forward pass, so accepted tokens cost roughly one decode step."
                         Acceptance rule:
+                          Type: Concept
                           Description: "The test that decides how many drafted tokens survive; the standard rule is lossless, meaning accepted tokens match the target model's own distribution."
                         Tree drafting and tree attention:
+                          Type: Concept
                           Description: "Proposing a branching tree of candidates rather than one chain, raising the odds that some path is accepted."
                         Rollback:
+                          Type: Concept
                           Description: "Discarding drafted tokens after the first rejection and resuming from the last verified position."
                     Drafter designs:
                       Description: "Where proposed tokens come from, the main axis of difference between methods."
                       children:
                         Independent draft model:
+                          Type: Concept
                           Description: "A separate small model from the same family, simple to deploy but costs extra weights, extra memory, and its own autoregressive latency."
                         Self-drafting / early exit:
+                          Type: Concept
                           Description: "The target model drafts for itself by exiting at an intermediate layer or skipping layers, avoiding a second set of weights."
                         Multi-head drafting:
+                          Type: Concept
                           Description: "Extra prediction heads bolted onto the target model emit several future positions in parallel; Medusa and Hydra are the reference designs."
                         Feature-level drafting (EAGLE family):
                           Description: "Drafting autoregressively over the target model's hidden features rather than over tokens alone, which raises acceptance for a small drafter."
                           children:
                             EAGLE:
+                              Type: Concept
                               Description: "Runs draft autoregression at the feature level, reusing top layer features from the target model."
                             EAGLE-2:
+                              Type: Concept
                               Description: "Adds context aware dynamic draft trees, so tree shape adapts to how confident the drafter is."
                             EAGLE-3:
+                              Type: Concept
                               Description: "Drops the feature prediction constraint in favour of direct token prediction and fuses low, mid, and high layer features via training-time test, which lets draft quality keep improving as draft training data scales."
                               Links:
                                 - "https://arxiv.org/abs/2503.01840"
                             HASS:
+                              Type: Concept
                               Description: "Harmonized Speculative Sampling, an EAGLE-based drafter that aligns training with multi-step inference to raise acceptance length without changing output."
                             FR-Spec:
+                              Type: Concept
                               Description: "Frequency-ranked speculative sampling, limiting the drafting head to a high-frequency vocab subset to cut draft cost on large vocabularies without changing output."
                         Multi-Token Prediction (MTP):
+                          Type: Concept
                           Description: "Extra prediction modules trained into the model itself, originally as a training objective, then reused at serving time as the drafter; DeepSeek-V3 popularised the pattern."
                           Links:
                             - "https://arxiv.org/abs/2412.19437"
@@ -691,23 +923,30 @@ Tokenomics:
                           Description: "Model free drafting that copies candidate spans from text already in context, cheap to run and strong on repetitive or edit heavy work."
                           children:
                             Prompt lookup / n-gram:
+                              Type: Concept
                               Description: "Matches the recent suffix against the prompt and generation history, then proposes what followed last time."
                             Suffix decoding:
+                              Type: Concept
                               Description: "Builds a suffix tree over prior text and drafts from the best matching branch."
                             Retrieval from an external corpus:
+                              Type: Concept
                               Description: "Drafts from a datastore rather than only the current context, trading memory and lookup cost for higher acceptance on familiar material."
                         Lookahead / Jacobi decoding:
+                          Type: Concept
                           Description: "Generates and verifies n-grams from parallel Jacobi iterations, with no separate draft model and no extra training."
                     Execution topology:
                       Description: "How drafting and verification are placed and overlapped across hardware; the newer frontier, since drafter quality alone is hitting diminishing returns."
                       children:
                         Serial draft then verify:
+                          Type: Concept
                           Description: "The classic arrangement, where the drafter and target take turns on the same device; larger drafts raise acceptance but add latency on the critical path."
                         Mirror-SD:
+                          Type: Concept
                           Description: "Runs draft and target as two overlapping pipelines across heterogeneous accelerators, the draft proposing continuations while the target proposes correction paths, preserving the standard acceptance rule."
                           Links:
                             - "https://arxiv.org/abs/2510.13161"
                         Speculative Speculative Decoding (SSD):
+                          Type: Concept
                           Description: "The drafter predicts likely verification outcomes and prepares speculations for them while verification is still running, so drafting overhead disappears when the guess is right; Saguaro is the optimised algorithm."
                           Links:
                             - "https://arxiv.org/abs/2603.03251"
@@ -715,154 +954,213 @@ Tokenomics:
                       Description: "The settings that decide whether speculation pays off in a given deployment."
                       children:
                         Speculation length:
+                          Type: Concept
                           Description: "How many tokens to propose per step; too few wastes the parallel verify, too many wastes drafting on tokens that get rejected."
                         Dynamic speculation:
+                          Type: Concept
                           Description: "Varying speculation length at runtime with load or drafter confidence, so speculation backs off under peak traffic."
                         Draft tree width and depth:
+                          Type: Concept
                           Description: "The branching budget for tree based drafters, traded against verification batch width."
                         Drafter to target size ratio:
+                          Type: KPI
                           Description: "The cost of proposing relative to the cost of verifying, the first lever on net speedup."
                         Vocabulary and tokenizer alignment:
+                          Type: Concept
                           Description: "Drafter and target must share a tokenizer and vocabulary, or need explicit mapping, which constrains which pairs can be used."
                         Draft precision:
+                          Type: Concept
                           Description: "Quantizing the drafter, for example to FP8, to cut its latency and memory at some cost to acceptance."
                     Economics:
                       Description: "Why speculation matters to cost and not only to latency."
                       children:
                         Acceptance rate:
+                          Type: KPI
                           Description: "The share of drafted tokens accepted, and the mean accepted length per step; the single number that determines whether speculation pays."
                         Latency versus throughput:
+                          Type: Concept
                           Description: "Speculation spends extra compute to shorten time per output token, so it improves interactivity first and cost per token only when the hardware was underused."
                         Batch size sensitivity:
+                          Type: Concept
                           Description: "Gains are largest at low concurrency where decode leaves the accelerator idle, and shrink as batching already fills it."
                         Wasted draft compute:
+                          Type: Concept
                           Description: "Rejected tokens consume real compute and energy, so goodput rather than raw throughput is the honest measure."
                         Drafter overhead:
+                          Type: Concept
                           Description: "Draft weights, draft KV cache, and verification of extra positions all take memory that would otherwise serve more concurrent requests."
                         Drafter lifecycle cost:
+                          Type: Concept
                           Description: "Trained drafters such as EAGLE heads and MTP modules must be produced, evaluated, and retrained per target model and per quantization, an ongoing cost that sits outside serving."
                         Effect on billing:
+                          Type: Concept
                           Description: "Speculation does not change how many tokens a buyer is billed for; it changes what those tokens cost to produce, so the benefit lands with whoever owns the serving hardware."
                     Engine support:
                       Description: "Which serving stacks expose which methods, the practical constraint on what can be adopted."
                       children:
                         vLLM:
+                          Type: Concept
                           Description: "Exposes speculation as a configured method, covering draft models, EAGLE and EAGLE-3, MTP, MLP and parallel draft models, n-gram, and suffix decoding."
                           Links:
                             - "https://docs.vllm.ai/en/latest/features/speculative_decoding/"
                         TensorRT-LLM:
+                          Type: Concept
                           Description: "NVIDIA's engine, with native speculative decoding support across draft model, EAGLE, and MTP style paths."
                         SGLang:
+                          Type: Concept
                           Description: "Ships EAGLE family speculative decoding alongside its structured generation and prefix reuse features."
                 Prefill / Decode disaggregation:
+                  Type: Concept
                   Description: "Separates the compute-heavy prefill phase from the memory-bound decode phase for efficiency. The compute-side half of a KVCache-centric architecture; the cache-side half is Hierarchical KV cache under KV Cache."
                 Chunked prefill:
+                  Type: Concept
                   Description: "Breaks long prompt processing into chunks to smooth latency and batching."
                 Parallelism (tensor / pipeline / model sharding):
+                  Type: Concept
                   Description: "Splits a model across devices so it fits and serves faster."
                 Memory hierarchy and offloading:
                   Description: "Serving a model whose weights exceed accelerator memory by placing state across GPU, host memory, and storage."
                   children:
                     Weight offloading:
+                      Type: Concept
                       Description: "Holding part of the weights in host memory or on disk and moving them in as needed, trading interconnect bandwidth for capacity."
                     Expert residency and caching:
+                      Type: Concept
                       Description: "Which MoE experts stay resident on the accelerator, with the rest fetched or computed elsewhere as routing demands them."
                     CPU and GPU co-execution:
+                      Type: Concept
                       Description: "Running some experts or layers on the host processor rather than moving their weights, worthwhile when host compute is cheaper than the transfer."
                     Interconnect bandwidth as the constraint:
+                      Type: Concept
                       Description: "Host link throughput setting the ceiling once weights no longer fit, the binding limit in offloaded serving."
                     Bandwidth-adaptive scheduling:
+                      Type: Concept
                       Description: "Dividing work between transfer and host execution according to measured bandwidth rather than committing to one fixed strategy."
                     Elastic memory allocation:
+                      Type: Concept
                       Description: "Resizing the split between weight cache and KV cache while the engine runs, which avoids a restart when available memory changes."
                 Kernels and compilation:
                   Description: "The low-level code that actually executes the model, often worth more than any algorithmic change."
                   children:
                     Fused kernels:
+                      Type: Concept
                       Description: "Combining several operations into one to avoid repeated trips to memory."
                     CUDA graphs:
+                      Type: Concept
                       Description: "Replaying a captured sequence of GPU operations to remove per-step launch overhead, which matters most at small batch sizes."
                     Graph compilation:
+                      Type: Concept
                       Description: "Ahead-of-time compilation of the model graph, trading startup time for steady-state speed."
                     Attention backends:
                       Description: "Interchangeable attention implementations, where the chosen backend constrains which other features can be enabled."
                       children:
                         FlashInfer:
+                          Type: Concept
                           Description: "A kernel library providing attention implementations tuned for serving workloads."
                     Quantized matmul kernels:
+                      Type: Concept
                       Description: "Specialised kernels such as Marlin that make low-precision weights actually faster rather than merely smaller."
                 Quantized inference:
+                  Type: Concept
                   Description: "Serving a reduced-precision model to cut memory and raise throughput, the most widely used single optimization."
                 Structured output enforcement:
+                  Type: Concept
                   Description: "Constraining decoding to a grammar or schema, which improves reliability and can reduce wasted retries."
             Batching:
               Description: "Grouping requests to raise GPU utilization."
               children:
                 Static batching:
+                  Type: Concept
                   Description: "Fixed batches formed before processing, simple but less efficient."
                 Continuous batching:
+                  Type: Concept
                   Description: "Dynamically adds and removes requests mid-flight to maximize throughput."
                 Cold Starts:
+                  Type: Concept
                   Description: "The latency and cost of loading a model before it can serve, worst after idle periods."
                 Scheduling policy:
+                  Type: Concept
                   Description: "The rules deciding which waiting requests join the next step, which sets the fairness and tail latency profile."
                 Admission control and queueing:
+                  Type: Concept
                   Description: "Holding or rejecting work when the engine is saturated, the alternative to letting latency degrade for everyone."
                 Batch size and the latency tradeoff:
+                  Type: Concept
                   Description: "Larger batches raise tokens per second per accelerator while lengthening the wait for any individual request."
             Scaling:
               Description: "Adjusting serving capacity to match demand."
               children:
                 Autoscaling:
+                  Type: Concept
                   Description: "Automatically adding or removing serving capacity with load."
                 Load balancing:
                   Description: "Distributing requests across workers to avoid hotspots."
                   children:
                     Cache-aware routing:
+                      Type: Concept
                       Description: "Sending a request to the worker that already holds its prefix, which turns routing into a cost optimization."
                 Multi-tenancy:
+                  Type: Concept
                   Description: "Serving many users or models on shared hardware to raise utilization."
                 Scale to zero:
+                  Type: Concept
                   Description: "Releasing capacity entirely when idle, trading cold start latency for eliminated idle cost."
                 Replica sizing:
+                  Type: Concept
                   Description: "Choosing how many accelerators back one model instance, which sets both the granularity of scaling and the parallelism overhead."
                 Model multiplexing:
+                  Type: Concept
                   Description: "Hosting several models or adapters on one deployment, including LoRA swapping and sleeping idle models to reclaim memory."
             Performance:
               Description: "The latency and throughput metrics that define serving quality and cost."
               children:
                 TTFT (Time To First Token):
+                  Type: KPI
                   Description: "How long until the first output token appears, driving perceived responsiveness."
                 TPOT / ITL (inter-token latency):
+                  Type: KPI
                   Description: "The time between successive output tokens."
                 Throughput vs latency:
+                  Type: Concept
                   Description: "The core serving tradeoff between total tokens per second and per-request speed."
                 SLOs:
+                  Type: KPI
                   Description: "Service level objectives that set target latency and availability."
                 End-to-end latency:
+                  Type: KPI
                   Description: "Total time to complete a request, the sum of queueing, prefill, and all decode steps."
                 Goodput:
+                  Type: KPI
                   Description: "Throughput counting only work that met its latency target and was actually used, the honest version of the metric."
                 Concurrency:
+                  Type: KPI
                   Description: "How many requests are in flight at once, the knob that trades per-request latency against total throughput."
                 Tail latency:
+                  Type: KPI
                   Description: "Behaviour at the slow end of the distribution, which governs user experience far more than the average does."
                 Saturation point:
+                  Type: KPI
                   Description: "The load beyond which added traffic degrades latency without raising throughput."
                 Requests per second (QPS):
+                  Type: KPI
                   Description: "Completed requests per second, the capacity unit that translates most directly into replica sizing."
                 Latency percentiles:
+                  Type: KPI
                   Description: "Median and tail figures such as p50, p95, and p99, which describe the distribution that an average conceals."
             Reliability:
               Description: "Keeping a serving deployment healthy under real traffic."
               children:
                 Health checks and draining:
+                  Type: Concept
                   Description: "Detecting bad workers and removing them without dropping in-flight requests."
                 Out-of-memory failures:
+                  Type: Concept
                   Description: "The most common serving failure, usually caused by cache growth rather than by weights."
                 Preemption and eviction:
+                  Type: Concept
                   Description: "Pausing or dropping running requests under memory pressure, which wastes already-spent compute."
                 Version and weight rollout:
+                  Type: Concept
                   Description: "Changing model versions without downtime, and the cost of running two versions during a cutover."
             Inference Engines:
               Description: "Software that runs models to serve tokens."
@@ -871,66 +1169,91 @@ Tokenomics:
                   Description: "High-throughput engines for server-class GPUs."
                   children:
                     vLLM:
+                      Type: Concept
                       Description: "A high-throughput open-source engine known for PagedAttention."
                     TensorRT-LLM:
+                      Type: Concept
                       Description: "NVIDIA's optimized inference library for its GPUs."
                     SGLang:
+                      Type: Concept
                       Description: "An engine optimized for structured generation and fast prefix reuse."
                     TGI:
+                      Type: Concept
                       Description: "Hugging Face's Text Generation Inference server."
                     LMDeploy:
+                      Type: Concept
                       Description: "A toolkit for compressing and serving LLMs efficiently."
                     DeepSpeed-MII:
+                      Type: Concept
                       Description: "Microsoft's low-latency inference engine built on DeepSpeed."
                 Local / edge runtimes:
                   Description: "Engines for running models on personal or edge hardware."
                   children:
                     llama.cpp (Ollama, LM Studio):
+                      Type: Concept
                       Description: "A CPU and GPU runtime for running quantized models locally."
                     ExLlamaV2:
+                      Type: Concept
                       Description: "A fast runtime for quantized models on consumer GPUs."
                     CTranslate2:
+                      Type: Concept
                       Description: "An efficient inference engine for transformer models on CPU and GPU."
                     MLC-LLM:
+                      Type: Concept
                       Description: "A compiler-based runtime that deploys models across many devices."
                     MLX / mlx-lm:
+                      Type: Concept
                       Description: "Apple's array framework for Apple Silicon, supporting local inference and LoRA fine-tuning on Mac over unified memory with 4- and 8-bit quantization."
                     FreeToken:
+                      Type: Concept
                       Description: "An edge-native MoE engine treating GPU, CPU, host memory, and interconnect as one pool to serve models larger than accelerator memory."
                 Serving orchestration:
                   Description: "Infrastructure that manages models and traffic at scale."
                   children:
                     Triton Inference Server:
+                      Type: Concept
                       Description: "NVIDIA's server for deploying and managing many models."
                     Ray Serve:
+                      Type: Concept
                       Description: "A scalable model-serving framework built on Ray."
                     KServe:
+                      Type: Concept
                       Description: "A Kubernetes-native platform for serving models."
                     NVIDIA Dynamo:
+                      Type: Concept
                       Description: "A framework for distributed inference across nodes, including disaggregated prefill and decode."
                     llm-d:
+                      Type: Concept
                       Description: "A Kubernetes-native stack for distributed LLM serving, including cache-aware routing across replicas."
                 Packaged / managed:
                   Description: "Prebuilt or hosted serving offerings that trade cost for convenience."
                   children:
                     NVIDIA NIM:
+                      Type: Concept
                       Description: "NVIDIA's packaged inference microservices that wrap optimized engines."
                     Fireworks / Together / Baseten:
+                      Type: Concept
                       Description: "Managed inference providers that host open models behind an API."
                     Friendli:
+                      Type: Concept
                       Description: "A managed inference service focused on high efficiency."
         Sustainability:
           Description: "The energy and environmental accounting of token production, increasingly a reported figure rather than an internal one."
           children:
             Energy per token:
+              Type: KPI
               Description: "Electricity consumed to produce a unit of output, the bridge between infrastructure efficiency and environmental reporting."
             Carbon intensity:
+              Type: KPI
               Description: "Emissions per unit of energy, which varies by grid and therefore by region and time of day."
             Water use:
+              Type: KPI
               Description: "Consumption associated with cooling, a growing constraint on where capacity can be sited."
             Embodied impact:
+              Type: Concept
               Description: "The footprint of manufacturing and disposing of hardware, separate from the cost of running it."
             Disclosure and reporting:
+              Type: Concept
               Description: "Obligations to report environmental impact, which turn an operational number into a compliance one."
     Consumption:
       Description: "Owns delivering AI services: how much is consumed, where the waste lives, and how to serve efficiently without degrading outcomes."
@@ -942,54 +1265,73 @@ Tokenomics:
               Description: "Structuring prompts and examples to get good results with fewer tokens."
               children:
                 System prompt:
+                  Type: Concept
                   Description: "Standing instructions sent with every request, a fixed token cost paid on every call unless a provider cache serves it at the cached read rate."
                 Prompt ordering for cacheability:
+                  Type: Concept
                   Description: "Stable content first, growing content next, per-request content last, since cached reuse stops at the first token that differs from the previous request."
                 Few-shot examples:
+                  Type: Concept
                   Description: "Worked examples included in context, which raise quality and input token count together."
                 Zero-shot instruction:
+                  Type: Concept
                   Description: "Relying on instruction alone with no examples, the cheapest prompt shape."
                 Delimiters and formatting:
+                  Type: Concept
                   Description: "Markup that separates instructions from data, which reduces confusion and injection risk."
             Prompt compression:
+              Type: Concept
               Description: "Shortening prompts while preserving meaning to cut input cost."
             Context window management:
               Description: "Deciding what to include or drop to stay within budget and window limits."
               children:
                 Truncation and sliding windows:
+                  Type: Concept
                   Description: "Dropping the oldest turns once the window fills, the simplest and most lossy strategy."
                 Summarization and rolling memory:
+                  Type: Concept
                   Description: "Replacing old turns with a compact summary, trading a one-off generation cost for lower ongoing input cost."
                 Chunking:
+                  Type: Concept
                   Description: "Splitting long documents into pieces sized for retrieval and for the window."
                 Overflow handling:
+                  Type: Concept
                   Description: "What happens when assembled context exceeds the limit, which is a correctness issue as much as a cost one."
             Output length control (max tokens, stop sequences):
+              Type: Concept
               Description: "Capping generation length to control output cost."
             Structured outputs (JSON mode, grammars):
               Description: "Constraining output format to reduce retries and wasted tokens."
               children:
                 JSON mode:
+                  Type: Concept
                   Description: "Forcing syntactically valid JSON output, the most common structured mode."
                 Grammar-constrained decoding:
+                  Type: Concept
                   Description: "Restricting each next token to those a formal grammar allows, which makes malformed output impossible rather than unlikely."
                 Tool and function schemas:
+                  Type: Concept
                   Description: "Declared call signatures the model selects from, which occupy input tokens on every request that offers them."
             Token budgeting / counting:
               Description: "Tracking token use per call to forecast and cap spend."
               children:
                 Pre-flight counting:
+                  Type: Concept
                   Description: "Measuring a request before sending it, the only way to enforce a budget rather than discover it afterward."
                 Per-turn and per-session budgets:
+                  Type: KPI
                   Description: "Limits applied at the level a user or agent actually operates, rather than per request."
             Context failure modes:
               Description: "Ways that longer context stops helping and starts hurting."
               children:
                 Lost in the middle:
+                  Type: Concept
                   Description: "Information placed mid-context is used less reliably than material at the start or end, so more context is not automatically better."
                 Context rot:
+                  Type: Concept
                   Description: "Accumulated stale or contradictory context degrading answers over a long session."
                 Prompt injection:
+                  Type: Concept
                   Description: "Untrusted content in context being treated as instruction, a security problem with direct cost consequences when it triggers loops."
         Optimization:
           Description: "Levers that reduce the number or price of tokens consumed."
@@ -998,43 +1340,61 @@ Tokenomics:
               Description: "Choosing the right model for each task to balance quality and cost, the portfolio decision made at design time; Routing applies the same criteria per request at run time."
               children:
                 Benchmarking:
+                  Type: Concept
                   Description: "Testing models on representative tasks to compare quality."
                 Capability tiers:
+                  Type: Concept
                   Description: "Grouping models by strength so the cheapest adequate one can be picked."
                 Cost per task:
+                  Type: KPI
                   Description: "Measuring what completing a real task costs, not just per-token price."
                 Accuracy vs price tradeoff:
+                  Type: Concept
                   Description: "Weighing quality gains against the higher cost of stronger models."
                 Open vs proprietary:
+                  Type: Concept
                   Description: "Whether to self-host open weights or buy an API, a decision about control and fixed versus variable cost."
                 Migration cost:
+                  Type: Concept
                   Description: "Prompts, evals, and guardrails are tuned per model, so switching is rarely as cheap as the price difference suggests."
             Routing:
               Description: "Directing each request to the model or serving path that meets the task's quality bar at the lowest cost, the decision layer over a mixed portfolio of hosted and open-weight models. A router answers the cost question against a quality bar set elsewhere; it does not define the bar."
               children:
                 Proxy:
+                  Type: Concept
                   Description: "A transparent pass-through on the request path: it forwards every call unchanged, collects metadata, and enforces network-level concerns such as rate limits and retries. It makes no model decision; the caller's chosen model is the model that answers."
                 Router:
+                  Type: Concept
                   Description: "The decision layer: picks which model or serving path handles each request from request properties or rules, such as query complexity, cache continuity, or right-sizing to capability tiers. It puts traffic on the rails rather than holding it."
                 Gateway:
+                  Type: Concept
                   Description: "The superset that houses proxy and router functions and adds organization-level policy (which teams may use which models), full observability, and resiliency such as multi-provider failover. You add routing to a gateway, not a gateway to a router."
                 Small vs large routing:
+                  Type: Concept
                   Description: "Sending easy requests to small models and hard ones to large models."
                 Cascades / fallback:
+                  Type: Concept
                   Description: "Trying a cheap model first and escalating only when a check on the first answer fails, the pattern; confidence-based escalation and output validation are the usual triggers."
                 Cost-based routing:
+                  Type: Concept
                   Description: "Choosing among eligible models by current price and expected quality, the comparison that cost per task is meant to settle rather than the per-token price sheet."
                 Semantic routing:
+                  Type: Concept
                   Description: "Routing by request meaning or category to the best-suited model."
                 Confidence-based escalation:
+                  Type: Concept
                   Description: "Using the first model's own uncertainty to decide whether a stronger model is needed, the signal most cascades run on."
                 Routing ownership:
+                  Type: Concept
                   Description: "Who owns the router matters when the routing layer comes from a company that also sells models, since the picker can favor its own inventory. A material share of buyers build the layer in-house, which makes build versus buy read as a trust decision, not only a tooling gap. The routing decision can also carry a governance role (access policy, budgets, monitoring) depending on the router; where that role lives, in the router, a gateway, or a separate governance platform in front of everything, is unsettled. Related: aggregators and gateways under Access and Delivery."
                 Routing and caching interaction:
+                  Type: Concept
                   Description: "Provider caches are machine-local, so which machine a request reaches decides whether a cached prefix exists there; affinity fields tie a session to a machine, and routing across models with different tokenizers or hardware invalidates cache continuity entirely. A router that ignores cache placement silently converts cache hits into writes. Related: prefix stability and model version binding under Caching."
                 Misroutes and routing quality:
+                  Type: Concept
                   Description: "Requests a classifier sends to a model that cannot handle them, answered confidently and incorrectly. Damage per misroute runs many multiples of the request cost, and uninstrumented misroutes surface months later through customer harm rather than the bill, so per-tier quality monitoring and a log of which model served every request are prerequisites to trusting a cost-based router."
                 Router overhead:
+                  Type: Concept
                   Description: "Classification adds its own latency and tokens, and spreading traffic across models splits one warm cache into several cold ones, which can erase the saving on short requests."
             Caching:
               Description: "Reusing prior results to avoid paying for repeated work, measured against a provider-specific break-even rather than a generic hit-rate feeling."
@@ -1045,33 +1405,46 @@ Tokenomics:
                   Description: "The ratios that decide whether a cache earns its keep, computed from token buckets in usage payloads and compared per workload, never blended."
                   children:
                     Reuse ratio:
+                      Type: KPI
                       Description: "Tokens read from cache divided by tokens written to cache over the same window: pulls off the shelf over pulls paid to put there, the payback measure for the cache."
                     Break-even ratio:
+                      Type: KPI
                       Description: "The static target set by one price sheet: (write price multiple minus 1) over (1 minus read price multiple). At a typical 1.25x write premium and 0.1x read rate it is about 0.28, and it is zero wherever writes are free; the reuse ratio must clear it."
                     Cache hit rate:
+                      Type: KPI
                       Description: "Cache-read tokens over all input tokens (reads, writes, and uncached): coverage, driven mostly by prompt ordering, which can look healthy while the payback stays under break-even."
                     Cache cost efficiency:
+                      Type: KPI
                       Description: "The fraction of prompt spend caching actually avoided: one minus actual prompt cost over the uncached-equivalent cost, the dollar-shaped readout of the ratios above."
                     Per-workload measurement:
+                      Type: Concept
                       Description: "One high-volume cached workload will mask a dozen broken ones in a blended number, so every cache ratio is tracked per workload and re-checked when model versions or price sheets change."
                 Provider-side prompt caching:
                   Description: "Vendor caching of repeated prompt prefixes at a discounted rate, billed through separate cache write and cache read token buckets on every response."
                   children:
                     Prefix stability:
+                      Type: Concept
                       Description: "Cached reuse requires an exact shared prefix starting at token zero, so anything that varies must sit at the end of the prompt and serialization must be frozen."
                     Cache lifetime:
+                      Type: Concept
                       Description: "Cached prefixes expire after an idle period, and some providers age the clock from the start of the request that touches the entry, which ties the benefit to traffic cadence rather than to prompt design alone."
                     Minimum cacheable prefix:
+                      Type: Concept
                       Description: "Each model sets a minimum prefix length, from hundreds to thousands of tokens, below which caching silently does nothing instead of returning an error."
                     Model version binding:
+                      Type: Concept
                       Description: "A cache entry belongs to one exact model version, so escalating to another model or a provider shipping an update invalidates prefixes fleet-wide with no change on the consumer side."
                     Hidden prompt content:
+                      Type: Concept
                       Description: "A hosted harness inserts its own system content ahead of the user prompt, occupying the head of the prefix and often excluded from the minimum cacheable length, while reasoning and tool-output tokens cache inside earlier turns and bill as input when read back."
                     Cache isolation:
+                      Type: Concept
                       Description: "Provider caches are partitioned per organization, workspace, and region, so there is no cross-customer reuse; within a tenant, a fleet of agents on one prefix shares a warm entry, but a parallel fan-out misses together and pays its own writes."
                     Cache write vs read pricing:
+                      Type: Concept
                       Description: "Writing to cache usually costs a premium over a normal input token while reading costs a small fraction of one, so caching only pays above a reuse threshold set by the price sheet."
                     Provider differences:
+                      Type: Concept
                       Description: "Published write charges, read discounts, minimum lengths, and lifetimes differ sharply between frontier providers, and the terms can change without notice (a major provider introduced cache write charges in mid-2026), which is why shared cache metrics must stay agnostic to any vendor implementation."
                       Links:
                         - "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
@@ -1080,18 +1453,25 @@ Tokenomics:
                   Description: "How much cache control and cache observability a consumer gets depends on the door they enter through, from fully hidden to fully exposed."
                   children:
                     Web UI and chat apps:
+                      Type: Concept
                       Description: "The provider's own chat surface assembles the prompt entirely and reports no token buckets at all; caching is folded into plan economics and stays invisible to the user by design."
                     First-party agent tools:
+                      Type: Concept
                       Description: "The provider's own coding or coworking harness manages breakpoints automatically and exposes session-level token dashboards, but its dollar figures are computed locally at list rates, so they show shape rather than the real bill."
                     Third-party tools:
+                      Type: Concept
                       Description: "Products that rehost frontier models behind a proxy assemble the prompt themselves and bill in credits or requests, netting cache savings into a pooled price so they never appear on the customer's side of the glass."
                     Direct API:
+                      Type: Concept
                       Description: "Full control of prompt structure and breakpoint placement, with every cache bucket returned on every response and billed line by line: full visibility and full responsibility."
                     Subscription feedback asymmetry:
+                      Type: Concept
                       Description: "On flat plans cache misses surface as rate limits rather than line items, so the feedback channel is throttling without explanation and cache economics must be inferred rather than observed."
                 Semantic caching:
+                  Type: Concept
                   Description: "Serving cached answers for semantically similar queries."
                 Embedding caching:
+                  Type: Concept
                   Description: "Storing computed embeddings so unchanged documents are not re-embedded on every index run."
             AI memory:
               Description: "Giving models access to prior context and external knowledge."
@@ -1100,6 +1480,7 @@ Tokenomics:
                   Description: "How knowledge reaches the model at query time, the architectural choice that sets both latency and the shape of the per-query bill."
                   children:
                     RAG (Retrieval-Augmented Generation):
+                      Type: Concept
                       Description: "Fetching relevant documents to ground responses and cut hallucination."
                     CAG (Cache-Augmented Generation):
                       Description: "Preloads the whole knowledge set into the context window once, caches the resulting model state, and answers every later query from that cache with no retrieval step at query time."
@@ -1107,30 +1488,43 @@ Tokenomics:
                         - "https://arxiv.org/abs/2412.15605"
                       children:
                         Corpus fit:
+                          Type: Concept
                           Description: "Viable only when the knowledge set fits inside the context window, which makes context length the gating constraint rather than index size."
                         Cache build cost:
+                          Type: Concept
                           Description: "A one-off prefill over the entire corpus, paid again on every rebuild, which is the fixed cost the per-query saving has to repay."
                         Staleness and invalidation:
+                          Type: Concept
                           Description: "The cache is precomputed, so any document change requires rebuilding it, making update frequency the deciding factor against retrieval."
                         Per-query cost shape:
+                          Type: Concept
                           Description: "Removes retrieval and reranking calls but presents the full corpus as input on every query, so the economics depend entirely on cached input being priced below normal input."
                     Hybrid CAG and RAG:
+                      Type: Concept
                       Description: "Caches a stable core of knowledge and retrieves only for queries falling outside it, keeping the latency benefit while bounding staleness."
                     Long-context stuffing:
+                      Type: Concept
                       Description: "Placing source material directly in the prompt with no caching or retrieval layer, the simplest pattern and the most expensive per query at volume."
                     Precomputed document caches:
+                      Type: Concept
                       Description: "Building and storing reusable cached state per document chunk so retrieved passages skip prefill, a middle path that keeps retrieval but removes most of its compute cost."
                     Knowledge in weights:
+                      Type: Concept
                       Description: "Training knowledge into the model through fine-tuning or continued pretraining, which removes per-query context cost entirely and replaces it with retraining cost on every update."
                     GraphRAG:
+                      Type: Concept
                       Description: "Builds a knowledge graph and community summaries over the corpus so questions spanning many documents can be answered, at a much higher one-off indexing cost."
                     Agentic RAG:
+                      Type: Concept
                       Description: "An agent plans and refines its own retrieval over several rounds, which raises answer quality and multiplies both retrieval calls and generation cost."
                     Self-correcting retrieval:
+                      Type: Concept
                       Description: "The model judges whether retrieved passages are adequate and retrieves again or falls back to another source, trading extra calls for fewer wrong answers."
                 Short vs long-term memory:
+                  Type: Concept
                   Description: "Distinguishing per-session context from persistent recall."
                 Context compression / summarization:
+                  Type: Concept
                   Description: "Condensing history to keep context small and cheap."
                 Retrieval mechanics:
                   Description: "The retrieval pipeline beneath any knowledge injection pattern, ordered by stage: what is built at index time, how the query is prepared, how candidates are found, how lists are merged and reordered, and what it costs when the result is wrong."
@@ -1139,34 +1533,45 @@ Tokenomics:
                       Description: "Work done once over the corpus and repeated on every rebuild, paid in full before a single query arrives."
                       children:
                         Chunking and embedding cost:
+                          Type: Concept
                           Description: "Indexing is its own token workload, paid up front and again on every re-index."
                         Contextual retrieval:
+                          Type: Concept
                           Description: "Prepending a short generated summary of surrounding context to each chunk before indexing, which improves recall and adds a one-off generation cost per chunk."
                         Late chunking:
+                          Type: Concept
                           Description: "Embedding the full document first and pooling per chunk afterwards, so chunk vectors retain document context."
                         Hierarchical summarization indexes (RAPTOR):
+                          Type: Concept
                           Description: "Recursively clustering and summarizing the corpus into a tree, so queries can be answered at the right level of abstraction."
                     Query preparation:
                       Description: "Work done on the question before any search runs, cheap per query and often more effective than tuning the index."
                       children:
                         Query rewriting and expansion:
+                          Type: Concept
                           Description: "Reformulating the user question before search, which costs a small generation and often beats tuning the index. Generating several reformulations instead of one turns this into multi-query fan-out, covered under Result fusion."
                         HyDE:
+                          Type: Concept
                           Description: "Generating a hypothetical answer and retrieving against its embedding, so the search vector matches document style rather than question style."
                     Sparse retrieval:
                       Description: "Scoring on term overlap, also called keyword or lexical search, which handles names, codes, identifiers, and rare terms that embeddings blur. It runs on an inverted index with no model call at query time, so marginal cost per query is near zero once the index is built."
                       children:
                         TF-IDF:
+                          Type: Concept
                           Description: "Weights a term by how often it appears in a document against how rare it is across the corpus. The original lexical weighting scheme, superseded in practice by BM25 but still the mental model most people carry for keyword search."
                         BM25:
+                          Type: Concept
                           Description: "A probabilistic refinement of TF-IDF that saturates term frequency and normalizes for document length, so a term appearing twenty times does not score ten times higher than one appearing twice. The default lexical scorer across search engines and hybrid stacks, and a baseline dense retrievers do not uniformly beat out of domain."
                           Links:
                             - "https://arxiv.org/abs/2104.08663"
                         BM25 parameters (k1 and b):
+                          Type: Concept
                           Description: "Two constants controlling term frequency saturation and document length normalization. They are corpus-specific and almost always left at their defaults, which makes them a quiet and recoverable source of retrieval quality loss."
                         Inverted index:
+                          Type: Concept
                           Description: "The term-to-document map sparse retrieval runs on. Cheap to build and update relative to a vector index, and it stores no floating-point vectors, so its footprint over the same corpus is a fraction of a dense index."
                         Learned sparse retrieval (SPLADE):
+                          Type: Concept
                           Description: "Uses a language model to predict term weights across the whole vocabulary, expanding documents with terms they do not literally contain while still indexing and searching as sparse vectors. It buys semantic matching without abandoning the inverted index, and pays for it with a model pass over every document at index time."
                           Links:
                             - "https://arxiv.org/abs/2107.05720"
@@ -1174,22 +1579,30 @@ Tokenomics:
                       Description: "Matching by embedding similarity, commonly called vector or semantic search, which captures meaning and misses exact identifiers. Every query costs an embedding call, and every document costs one at index time and again on every re-index."
                       children:
                         Bi-encoder architecture:
+                          Type: Concept
                           Description: "Query and document are embedded independently, so document vectors are precomputed and the query costs one short embedding call. This is what makes dense retrieval cheap at query time and what caps its accuracy below a cross-encoder that reads both together."
                         Similarity metric:
+                          Type: Concept
                           Description: "Cosine, dot product, or Euclidean distance. The correct choice is set by how the embedding model was trained rather than by preference, and using the wrong one degrades retrieval silently rather than failing."
                         Embedding dimensions:
+                          Type: Concept
                           Description: "Vector width, which sets storage and search cost across the whole corpus and is fixed at index time."
                         Matryoshka embeddings:
+                          Type: Concept
                           Description: "Embeddings trained so a truncated prefix stays usable, letting dimensions be cut later to reclaim storage and speed."
                         Multi-vector retrieval (ColBERT):
+                          Type: Concept
                           Description: "Storing per-token vectors and scoring by late interaction, which raises accuracy and sharply raises index size."
                         Out-of-domain degradation:
+                          Type: Concept
                           Description: "Embedding models trained on general web text lose accuracy on specialist corpora, the failure that hybrid search exists to cover. The BEIR benchmark is the standard evidence."
                           Links:
                             - "https://arxiv.org/abs/2104.08663"
                         Embedding model versioning:
+                          Type: Concept
                           Description: "Changing the embedding model invalidates every vector in the index, so an upgrade means re-embedding the whole corpus. That re-indexing bill is the switching cost of dense retrieval and it is rarely priced in at selection time."
                     Hybrid search:
+                      Type: Concept
                       Description: "Running dense and sparse retrieval over the same query and merging the two result lists, usually the strongest default because their failure modes differ. The merge itself is a separate choice, covered under Result fusion."
                     Result fusion:
                       Description: "How several ranked result lists become one ordering, the step that actually implements hybrid search and multi-query retrieval. Fusion only reorders the union of what the retrievers returned, so a document none of them found cannot appear at all, and the method chosen changes ranking quality without changing token cost."
@@ -1198,56 +1611,72 @@ Tokenomics:
                           Description: "Merges by position only, discarding the underlying scores. It needs no calibration between retrievers, so it works across scoring schemes that are not comparable, and it costs nothing beyond a sort."
                           children:
                             Reciprocal Rank Fusion (RRF):
+                              Type: Concept
                               Description: "Sums 1/(k + rank) across every list a document appears in. It combines positions rather than scores, needs no training and no model call, and ships in Elasticsearch, Qdrant, and Weaviate, where it is Qdrant's default. It is the baseline any reranker model, which bills per candidate, has to beat."
                               Links:
                                 - "https://cormack.uwaterloo.ca/cormacksigir09-rrf.pdf"
                                 - "https://dl.acm.org/doi/10.1145/1571941.1572114"
                             Rank constant k:
+                              Type: Concept
                               Description: "The constant added to the rank before inversion, fixed at 60 in the original pilot and reused as the conventional default since, exposed by Elasticsearch as rank_constant. A larger k flattens the gap between top and lower ranks, a smaller one sharpens it."
                             Weighted RRF:
+                              Type: Concept
                               Description: "Multiplying each list's reciprocal-rank contribution by a weight before summing, which lets one retriever count for more without reintroducing score comparison. Qdrant accepts a weight pair alongside k on its RRF query."
                             Condorcet Fuse:
+                              Type: Concept
                               Description: "An earlier rank-based method that orders documents by pairwise majority vote across the input rankings. RRF was introduced as a simpler alternative and beat it across the original evaluation, which leaves this mostly of historical interest."
                         Score-based fusion:
                           Description: "Keeps the magnitude of each retriever's scores and combines the numbers directly. It preserves the information that one result beat the next by a wide margin rather than a hair, at the cost of depending on score distributions that shift per query, per corpus, and per model version."
                           children:
                             Score normalization:
+                              Type: Concept
                               Description: "Rescaling each retriever's scores onto a shared range before they are combined, the prerequisite for any score-based method. Dense similarity is bounded while BM25 is not, so raw scores are not comparable and a fixed weight over them is dominated by whichever retriever has the larger magnitude on that query."
                             Relative Score Fusion:
+                              Type: Concept
                               Description: "Min-max normalizes each list so its top score becomes 1 and its bottom becomes 0, keeping the spacing in between, then adds the weighted results. Weaviate's default since v1.24, where alpha sets the split between the vector and keyword contributions."
                               Links:
                                 - "https://docs.weaviate.io/weaviate/concepts/search/hybrid-search"
                             Distribution-Based Score Fusion (DBSF):
+                              Type: Concept
                               Description: "Normalizes each list against its own mean and score spread rather than its endpoints, then sums the rescaled scores, so the size of a lead survives into the final ranking. Qdrant's alternative to RRF, with no tuning parameters of its own."
                               Links:
                                 - "https://qdrant.tech/documentation/search/hybrid-queries/"
                             Weighted score combination:
+                              Type: Concept
                               Description: "Multiplying each normalized list by a weight and summing, the general form that relative score fusion and Weaviate's alpha are instances of. Elasticsearch implements it as the linear retriever, with a per-retriever weight and normalizer. The weights are workload-specific, which makes this the branch carrying ongoing tuning cost."
                               Links:
                                 - "https://www.elastic.co/docs/reference/elasticsearch/rest-apis/retrievers/linear-retriever"
                             CombSUM and CombMNZ:
+                              Type: Concept
                               Description: "The original score-combination family from the early TREC evaluations, where CombSUM adds normalized scores and CombMNZ multiplies that sum by the number of lists a document appeared in, rewarding agreement across retrievers. Named here because today's fusion parameters are rediscoveries of these rather than new inventions."
                         Candidate depth:
+                          Type: Concept
                           Description: "How many results each retriever hands into the fusion step, set as rank_window_size in Elasticsearch and the prefetch limit in Qdrant. This is the real cost lever in the branch: retrieval work scales with depth times the number of retrievers, and the fused list sets how many candidates a downstream reranker bills for. Depth set too low caps quality regardless of which fusion method is chosen."
                         Fusion across query variants:
                           Description: "Applying the same merge machinery to lists from several rewritten versions of one question rather than from several retrievers. It raises recall on short or ambiguous queries and turns one user question into several searches plus a generation, which makes it a token amplifier rather than a saving."
                           children:
                             Multi-query fan-out:
+                              Type: Concept
                               Description: "Generating N reformulations of the query and retrieving for each. Cost scales linearly with N across search and embedding, and the generation producing the variants is paid on every query, so fan-out width is a direct multiplier on per-query cost."
                             RAG-Fusion:
+                              Type: Concept
                               Description: "The published name for multi-query fan-out merged with RRF. Reported to give more comprehensive answers because the variants approach the question from several angles, and to drift off topic when the generated variants stray from the original intent."
                               Links:
                                 - "https://arxiv.org/abs/2402.03367"
                         Fusion choice and evaluation:
+                          Type: Concept
                           Description: "Which method wins is a property of the corpus and the query mix rather than a general fact, so the choice can only be settled against a set of queries with known-good answers. Building and maintaining that labeled set is the actual cost here, paid once in human time rather than per query in tokens."
                     Reranking:
+                      Type: Concept
                       Description: "A second scoring pass over retrieved candidates using a model that reads query and document together, which raises precision and lets fewer documents be sent to the model. Distinct from result fusion, which reorders existing lists arithmetically with no model call and no per-candidate cost."
                     Vector store:
                       Description: "The database that holds embeddings and serves the index, distinct from the search algorithm running inside it. Cost is driven by whether the index stays resident in memory, how metadata filtering interacts with the search, and whether it is hosted or embedded."
                       children:
                         ANN indexes (HNSW, IVF):
+                          Type: Concept
                           Description: "Approximate nearest neighbour structures that make vector search fast, trading a little recall for large speed gains."
                     Retrieval quality and wasted context:
+                      Type: Concept
                       Description: "Irrelevant retrieved passages are billed as input tokens and can actively degrade the answer."
             Agentic:
               Description: "Multi-step, tool-using workflows that can multiply token consumption."
@@ -1256,261 +1685,361 @@ Tokenomics:
                   Description: "The way agent loops turn one task into many model calls and tokens."
                   children:
                     Context resend per step:
+                      Type: Concept
                       Description: "Each turn resends the accumulated history, so input cost grows with the square of conversation length unless cached."
                     Tool call round trips:
+                      Type: Concept
                       Description: "Every tool invocation costs a generation to call it and another pass to interpret the result."
                     Retries and self-correction:
+                      Type: Concept
                       Description: "Failed steps are re-attempted with the failure added to context, which compounds cost on exactly the hardest tasks."
                     Reflection loops:
+                      Type: Concept
                       Description: "Steps where the model critiques and revises its own work, doubling or more the tokens per unit of output."
                     Sub-agent fan-out:
+                      Type: Concept
                       Description: "Delegating to parallel sub-agents multiplies concurrent spend and is the fastest way to an unexpected bill."
                 Context accumulation:
+                  Type: Concept
                   Description: "Growing context as an agent gathers state, steadily raising cost."
                 Sub-agents / orchestration:
                   Description: "Coordinating multiple agents, each adding token overhead."
                   children:
                     Coordination overhead:
+                      Type: Concept
                       Description: "Tokens spent on briefing, handoffs, and duplicated context beyond the work performed by the agents themselves."
                     Model tiering:
+                      Type: Concept
                       Description: "Planning on a stronger model while delegating execution to cheaper ones, reserving the most expensive tokens for judgment."
                     Single vs multi-agent tradeoff:
+                      Type: Concept
                       Description: "Comparing one agent with many at the same total token budget separates gains from coordination from gains due simply to extra spend."
                 Tool-call overhead:
+                  Type: Concept
                   Description: "The extra tokens spent describing tools and parsing their results."
                 Step and turn budgets:
+                  Type: KPI
                   Description: "Hard caps on loop iterations, the main defence against an agent spending without bound."
                 Trajectory observability:
+                  Type: Concept
                   Description: "Tracing every model call inside a run, without which agent cost cannot be attributed to a cause."
                 Waste attribution:
                   Description: "Splitting an agent run's spend into what the task inherently required and what the loop added, so optimization targets the removable part."
                   children:
                     Capability limit vs harness waste:
+                      Type: Concept
                       Description: "Whether extra tokens buy capability the task needs or are overhead the scaffold could avoid, the line that decides what is fixable."
                     Harness overhead:
+                      Type: Concept
                       Description: "Tokens the scaffold consumes before task work begins, including system prompts, tool schemas, and coordination instructions."
                     Compaction economics:
+                      Type: Concept
                       Description: "Trimming or summarizing accumulated context cuts per-turn cost but can trigger re-read loops that spend more than they save."
                 Tool and protocol layer:
                   Description: "How an agent reaches the outside world, and the standards forming around it."
                   children:
                     Function calling / tool use:
+                      Type: Concept
                       Description: "The model emitting a structured call the application executes, the mechanism underneath every agent framework."
                     MCP (Model Context Protocol):
+                      Type: Concept
                       Description: "An open protocol for connecting models to tools and data through one interface, replacing bespoke integration per tool."
                     A2A (Agent to Agent):
+                      Type: Concept
                       Description: "A protocol for communication between separate agent systems, addressing coordination rather than tool access."
                     Computer and browser use:
+                      Type: Concept
                       Description: "Agents driving a screen or browser directly, which consumes vision tokens per step and is among the most expensive interaction modes."
                     ReAct pattern:
+                      Type: Concept
                       Description: "Interleaving reasoning and action steps, the loop shape most agent implementations follow."
                     Agent frameworks:
+                      Type: Concept
                       Description: "Libraries providing the loop, memory, and tool plumbing, which set defaults that quietly determine token spend."
             Sampling and decoding controls:
               Description: "Request-level settings that change both output character and cost."
               children:
                 Temperature and top-p:
+                  Type: Concept
                   Description: "Controls on randomness, which affect consistency and therefore retry rates."
                 Multiple samples (n, best-of):
+                  Type: Concept
                   Description: "Generating several candidates per request, a direct multiplier on output cost."
                 Self-consistency:
+                  Type: Concept
                   Description: "Sampling several reasoning paths and taking the majority answer, buying accuracy with a fixed cost multiple."
                 Seeds and determinism:
+                  Type: Concept
                   Description: "Reproducibility controls, which matter for evaluation and for caching."
                 Greedy decoding:
+                  Type: Concept
                   Description: "Always taking the highest probability token, deterministic and prone to repetition."
                 Top-k sampling:
+                  Type: Concept
                   Description: "Restricting choice to the k most likely tokens before sampling."
                 Min-p sampling:
+                  Type: Concept
                   Description: "Setting a floor relative to the top token's probability, which adapts the candidate pool to model confidence."
                 Repetition and frequency penalties:
+                  Type: Concept
                   Description: "Downweighting tokens already produced, which suppresses loops that would otherwise run to the token limit and bill for it."
                 Logit bias:
+                  Type: Concept
                   Description: "Directly raising or lowering the odds of specific tokens, a blunt way to force or forbid particular output."
                 Beam search:
+                  Type: Concept
                   Description: "Exploring several candidate sequences in parallel and keeping the best, which multiplies compute and is rarely used for chat."
         Workloads / Use Cases:
           Description: "The application types that consume AI capacity, each with a distinct cost profile."
           children:
             Chat / assistant:
+              Type: Concept
               Description: "Interactive conversation, typically bursty and latency-sensitive."
             Code generation:
+              Type: Concept
               Description: "Producing and editing code, often long-output and context-heavy."
             Coding agents:
               Description: "Autonomous multi-step code work, among the most token-intensive workloads in production."
               children:
                 Session cost variance:
+                  Type: Concept
                   Description: "The spread in spend across runs of the same task, wide enough to make per-task budgeting unreliable."
                 Harness sensitivity:
+                  Type: Concept
                   Description: "How the surrounding agent scaffold changes the same model's cost and success rate, making the harness a first-class cost variable."
                 Subscription vs metered access:
+                  Type: Concept
                   Description: "Whether agent usage is bought as a flat plan or paid per token, which decides who absorbs usage variance."
                 Native spend controls:
+                  Type: Concept
                   Description: "Usage dashboards, budgets, and limits exposed inside an agent product rather than only through the underlying billing layer."
             RAG / search:
+              Type: Concept
               Description: "Retrieval-grounded question answering over a corpus."
             Summarization:
+              Type: Concept
               Description: "Condensing long inputs, input-heavy and output-light."
             Extraction / classification:
+              Type: Concept
               Description: "Pulling structured data or labels from text, usually short outputs."
             Translation:
+              Type: Concept
               Description: "Converting between languages, where tokenizer efficiency varies sharply by language pair."
             Embeddings and indexing:
+              Type: Concept
               Description: "Producing vectors rather than text, priced differently and dominated by corpus size."
             Synthetic data and evaluation:
+              Type: Concept
               Description: "Using models to generate training data or to grade other models, an internal workload easily larger than production traffic."
             Vision workloads:
               Description: "Applications built on image input, billed as tiles plus output tokens."
               children:
                 OCR / document parsing:
+                  Type: Concept
                   Description: "Reads text and layout from images and PDFs, billed as input tiles plus transcribed output tokens."
                 Image captioning:
+                  Type: Concept
                   Description: "A text description of an image, short on output with cost dominated by input tiles."
                 Visual question answering (VQA):
+                  Type: Concept
                   Description: "Answers questions grounded in an image, combining tile input with reasoning-length output."
                 Chart and screen reading:
+                  Type: Concept
                   Description: "Extracts structure from charts, screenshots, and interfaces, the reading step behind computer and browser use."
                 Object detection / grounding:
+                  Type: Concept
                   Description: "Locates or points to image regions, returning coordinates rather than prose."
             Audio and speech workloads:
               Description: "Applications built on audio input or output, usually metered per second or minute rather than per token."
               children:
                 Transcription and diarization:
+                  Type: Concept
                   Description: "Turns recorded speech into labelled text with speakers identified, priced by length of audio rather than by prompt size."
                 Voice agents:
+                  Type: Concept
                   Description: "Interactive speech to speech assistants, where continuous audio and a strict latency budget make cost per conversation minute the unit that matters."
             Video workloads:
               Description: "Applications built on moving images, the heaviest input per minute of source content."
               children:
                 Video understanding:
+                  Type: Concept
                   Description: "Summarizes or answers questions over recorded video, where frame rate and clip length drive cost more than prompt length does."
                 Live and streaming video:
+                  Type: Concept
                   Description: "Continuous frame ingestion under a latency budget, where cost accrues per minute of stream rather than per request."
             Batch / offline jobs:
+              Type: Concept
               Description: "Non-interactive bulk processing that can use discounted throughput."
             Workload characteristics:
               Description: "The properties that determine which optimizations and commitments make sense."
               children:
                 Input to output ratio:
+                  Type: KPI
                   Description: "Whether a workload is dominated by reading or writing, which decides whether caching or output control is the lever."
                 Latency sensitivity:
+                  Type: Concept
                   Description: "How much a delay costs, which sets whether batch pricing is available at all."
                 Predictability:
+                  Type: Concept
                   Description: "How reliably future volume can be forecast, the precondition for any capacity commitment."
                 Burstiness:
+                  Type: Concept
                   Description: "Peak to average ratio, which decides how much headroom must be paid for."
                 Concurrency profile:
+                  Type: Concept
                   Description: "How many requests run at once, the main input to sizing a self-hosted deployment."
         Access & Delivery:
           Description: "How requests are sent and results returned, which affects price."
           children:
             Synchronous API:
+              Type: Concept
               Description: "Standard request-response calls at full price."
             Batch API (discounted):
+              Type: Concept
               Description: "Submitting jobs for asynchronous processing at a lower rate."
             Streaming vs non-streaming:
+              Type: Concept
               Description: "Whether tokens stream as generated or return all at once."
             Sync vs async:
+              Type: Concept
               Description: "Whether the caller waits or is notified when results are ready."
             Rate limits / quotas:
               Description: "Provider caps on request and token throughput."
               children:
                 Requests and tokens per minute:
+                  Type: KPI
                   Description: "The two limits that bind in practice, often before any budget does."
                 Concurrency caps:
+                  Type: KPI
                   Description: "Limits on simultaneous in-flight requests, which cap agent fan-out."
                 Tier progression:
+                  Type: Concept
                   Description: "Limits that rise with spend history, making early scaling a function of account age as well as need."
             Self-hosting:
+              Type: Concept
               Description: "Running open-weight models on owned or rented hardware, converting per-token cost into capacity cost."
             Edge and on-device:
+              Type: Concept
               Description: "Running small models locally, which removes per-token cost and network latency at the price of capability."
             Aggregators and gateways:
+              Type: Concept
               Description: "Intermediaries offering many models behind one interface, adding routing and failover at some margin. Where a product only passes traffic through and collects metadata it is a proxy; the Proxy, Router, and Gateway definitions live under Optimization and Routing."
             Reliability and continuity:
               Description: "Whether the capacity will be there when needed."
               children:
                 Provider SLAs:
+                  Type: KPI
                   Description: "Contractual availability and support commitments, usually weaker than the equivalent for traditional cloud services."
                 Multi-provider failover:
+                  Type: Concept
                   Description: "Keeping a second provider viable, which costs duplicated evaluation and prompt tuning."
                 Region and data residency:
+                  Type: Concept
                   Description: "Where inference physically runs, which constrains provider choice and often price."
                 Model deprecation:
+                  Type: Concept
                   Description: "Providers retire model versions on their own schedule, forcing migration work that was not planned or budgeted."
             Client-side resilience:
               Description: "How callers behave when limits and failures are hit, which decides whether pressure is absorbed or amplified."
               children:
                 Exponential backoff:
+                  Type: Concept
                   Description: "Increasing the wait between retries, the standard response to rate limiting and the one clients most often get wrong."
                 Token bucket limiting:
+                  Type: Concept
                   Description: "Client-side pacing against a refilling allowance, which smooths bursts before the provider rejects them."
                 Circuit breakers:
+                  Type: Concept
                   Description: "Stopping calls to a failing dependency for a period, which prevents paying repeatedly for requests that cannot succeed."
                 Idempotency keys:
+                  Type: Concept
                   Description: "Identifiers that let a retried request be recognised as the same call, avoiding duplicate work and duplicate billing."
                 Backpressure:
+                  Type: Concept
                   Description: "Signalling upstream to slow down rather than queueing without bound, the difference between degraded and collapsed."
         Guardrails:
           Description: "Controls that keep output safe and correct, some of which cost extra tokens. Consumption owns enforcement and the measurement machinery; what counts as acceptable is the Quality Floor, owned by Value."
           children:
             Output validation:
+              Type: Concept
               Description: "Checking responses against schemas or rules before use."
             Moderation / safety:
+              Type: Concept
               Description: "Screening inputs and outputs for harmful content."
             Watermarking / provenance:
+              Type: Concept
               Description: "Marks or certifies output for origin tracing under schemes such as SynthID and C2PA, an emerging compliance cost that adds per-request processing."
             Over-refusals and caveats:
+              Type: Concept
               Description: "Over-refusals and appended caveats burn output tokens and trigger retries, a safety and quality tradeoff with direct token cost."
             Hallucination control:
+              Type: Concept
               Description: "Techniques to reduce confident but wrong outputs."
             Groundedness and citation checking:
+              Type: Concept
               Description: "Verifying that claims trace to retrieved sources, which costs additional calls but converts an unmeasurable risk into a measurable one."
             Retries (token cost):
+              Type: Concept
               Description: "Re-running failed calls, a hidden and often overlooked cost."
             Production evals:
               Description: "Ongoing quality measurement of live traffic."
               children:
                 LLM as judge:
+                  Type: Concept
                   Description: "Using a model to grade output, which is itself a token workload that scales with traffic."
                 Offline vs online evaluation:
+                  Type: Concept
                   Description: "Testing against fixed sets before release versus sampling live traffic afterward."
                 Regression detection:
+                  Type: Concept
                   Description: "Catching quality drops after a prompt or model change, the control that makes cost optimization safe to attempt."
                 Golden datasets:
+                  Type: Concept
                   Description: "A curated set of cases with known good answers, the fixed reference any change is measured against."
                 A/B testing:
+                  Type: Concept
                   Description: "Comparing variants on live traffic, the only way to see effects that offline sets cannot reproduce."
                 Prompt versioning:
+                  Type: Concept
                   Description: "Tracking prompts as versioned artifacts, without which a quality or cost change cannot be traced to its cause."
             Human review:
+              Type: Concept
               Description: "People checking model output, usually the most expensive component per item and the benchmark others are measured against."
             Adversarial input:
               Description: "Deliberate attempts to break the intended behaviour of a deployed model."
               children:
                 Jailbreaking:
+                  Type: Concept
                   Description: "Prompts crafted to bypass a model's trained restrictions."
                 Red teaming:
+                  Type: Concept
                   Description: "Structured adversarial testing before and after release, which finds failure modes normal evaluation does not."
                 Abuse and cost attacks:
+                  Type: Concept
                   Description: "Traffic designed to consume expensive capacity, where the damage is the bill rather than the output."
             Data protection:
               Description: "Controls on what sensitive material reaches a model or a provider."
               children:
                 PII detection and redaction:
+                  Type: Concept
                   Description: "Finding and removing personal data before it is sent, usually an extra model or classifier call per request."
                 Data retention and training use:
+                  Type: Concept
                   Description: "Whether a provider stores prompts or trains on them, a contract term rather than a technical control."
         Demand:
           Description: "Understanding, measuring, and forecasting the drivers of AI consumption."
           children:
             Adoption and spend growth:
+              Type: KPI
               Description: "How quickly pilots turn into material token budgets, which sets the pressure on every cost control downstream."
             Spend predictability:
+              Type: Concept
               Description: "How reliably future token spend can be forecast from past usage, workload plans, and changes in agent behaviour."
             Bill shock:
+              Type: Concept
               Description: "A gap between expected and actual spend that surfaces late, often driven by rapid usage growth, agent loops, or delayed cost visibility."
             Demand elasticity:
+              Type: Concept
               Description: "How consumption changes as token prices change, determining whether lower unit prices reduce total spend or stimulate more usage."
         Purchase Options:
           Description: "How usage is bought from providers: the rate card, its modifiers, and the commercial structures around it. Purchasing mechanics rather than value measurement."
@@ -1519,68 +2048,94 @@ Tokenomics:
               Description: "What the meter actually counts, which differs by provider and by modality."
               children:
                 Input vs output token pricing:
+                  Type: Concept
                   Description: "Input and output tokens are billed at different rates, usually output higher."
                 Cached token pricing:
+                  Type: Concept
                   Description: "Discounted rates for reused, cached prompt tokens."
                 Per-request pricing:
+                  Type: Concept
                   Description: "Charging by call rather than by token, common for embeddings and small utility models."
                 Per-unit media pricing:
+                  Type: Concept
                   Description: "Images, audio, and video priced by tile, second, or frame rather than by token."
                 Capacity pricing:
+                  Type: Concept
                   Description: "Paying for dedicated throughput over time instead of for units consumed."
                 Outcome pricing:
+                  Type: Concept
                   Description: "Charging per completed task rather than per token, which shifts efficiency risk to the seller."
             Price modifiers:
               Description: "Adjustments applied on top of the base rate."
               children:
                 Price by model tier:
+                  Type: Concept
                   Description: "Different prices for models of different capability."
                 Context length tiers:
+                  Type: Concept
                   Description: "Higher rates once a request exceeds a length threshold, which can make one long call cost more than several short ones."
                 Batch API discounts:
+                  Type: Concept
                   Description: "Lower prices for non-urgent asynchronous jobs."
                 Tiered / volume pricing:
+                  Type: Concept
                   Description: "Unit prices that fall with committed volume."
                 Priority and latency tiers:
+                  Type: Concept
                   Description: "Paying more for faster or more reliable service, or less for best-effort."
                 Regional pricing:
+                  Type: Concept
                   Description: "Rates that vary by where inference runs, reflecting local capacity and power cost."
             Capacity and commitment:
               Description: "Buying throughput ahead of time rather than consumption after the fact."
               children:
                 Reserved capacity (PTUs / provisioned throughput):
+                  Type: Concept
                   Description: "Prepaid dedicated throughput for predictable cost and latency."
                 Capacity blocks:
+                  Type: Concept
                   Description: "Fixed future windows of guaranteed accelerator time, priced separately from on-demand."
                 Spot and preemptible:
+                  Type: Concept
                   Description: "Discounted capacity that can be reclaimed, viable only for interruption-tolerant work."
                 Commitment risk:
+                  Type: Concept
                   Description: "Reserved capacity converts a variable cost into a fixed one, which is a saving only if the forecast holds."
                 Utilization breakeven:
+                  Type: KPI
                   Description: "The usage level at which a commitment beats on-demand, the calculation that should precede any reservation."
             Price dynamics:
               Description: "How prices move over time and why."
               children:
                 Price per unit of capability:
+                  Type: KPI
                   Description: "Cost to reach a given quality level, which has fallen even where headline rates have not."
                 Hardware cost pass-through:
+                  Type: Concept
                   Description: "Changes in accelerator, power, and facility cost eventually reaching published rates."
                 Scarcity premiums:
+                  Type: Concept
                   Description: "Prices reflecting availability rather than production cost during periods of constrained supply."
                 Capability jumps versus price cuts:
+                  Type: Concept
                   Description: "Vendors may hold price and raise capability instead of cutting rates, which shows up as better value rather than lower spend."
                 Deprecation and repricing:
+                  Type: Concept
                   Description: "Existing models being retired or repriced, which can raise the cost of an unchanged workload."
             Commercial structures:
-              Description: "The contract forms buyers actually purchase under."
+              Description: "The contract forms buyers purchase under."
               children:
                 Public rate cards:
+                  Type: Concept
                   Description: "Published per-token pricing, the reference point for everything else."
                 Negotiated and private pricing:
+                  Type: Concept
                   Description: "Discounted terms at volume, which make public rates a poor basis for benchmarking."
                 Credits and prepayment:
+                  Type: Concept
                   Description: "Money committed up front, often with expiry, which creates use-it-or-lose-it pressure."
                 Overage terms:
+                  Type: Concept
                   Description: "What happens past a committed volume, frequently the least examined term in the contract."
         Observability:
           Description: "Visibility into the usage, cost, and quality of AI systems."
@@ -1589,47 +2144,64 @@ Tokenomics:
               Description: "Where the numbers come from, each with different coverage and trust."
               children:
                 Engine metrics:
+                  Type: Concept
                   Description: "Counters emitted by the inference server, the only source that knows about cache hits, queue depth, and acceptance rates."
                 Accelerator metrics:
+                  Type: Concept
                   Description: "Device-level utilization, memory, power, and temperature, which reveal whether hardware is earning its cost."
                 Traces:
+                  Type: Concept
                   Description: "Per-request spans across services, the only way to attribute cost inside a multi-step agent run."
                 Application and gateway logs:
+                  Type: Concept
                   Description: "Request-level records including model, tokens, and user, usually the practical basis for attribution."
                 Billing and usage records:
+                  Type: Concept
                   Description: "The provider's own account of what was consumed, authoritative for spend and slow to arrive."
             Signals:
               Description: "What is worth measuring once the data is available."
               children:
                 Usage & cost dashboards:
+                  Type: Concept
                   Description: "Live views of token consumption and spend."
                 Utilization tracking:
+                  Type: KPI
                   Description: "Measuring how fully hardware is used, the key to cost efficiency."
                 Quality / latency SLIs:
+                  Type: KPI
                   Description: "Indicators tracking response quality and speed."
                 Cost per outcome:
+                  Type: KPI
                   Description: "Cost tied to a completed business result rather than raw usage."
                 Efficiency signals:
+                  Type: KPI
                   Description: "Cache hit rate, acceptance rate, and batch occupancy, the numbers that explain why cost per token is what it is."
                 Error and retry rates:
+                  Type: KPI
                   Description: "Failed and repeated work, which shows up as cost long before it shows up as a quality complaint."
             Practices:
               Description: "Turning telemetry into something anyone acts on."
               children:
                 Reconciliation:
+                  Type: Concept
                   Description: "Checking engine and application counts against the invoice, which is where silent measurement errors surface."
                 Tag propagation:
+                  Type: Concept
                   Description: "Carrying identity from the caller through gateways to the billing record, without which attribution breaks at the first hop."
                 Alerting:
+                  Type: Concept
                   Description: "Notification on threshold breaches, useful only where a named owner can act."
                 Sampling and retention cost:
+                  Type: Concept
                   Description: "Observability is itself an expense, and full-fidelity tracing of a high-volume token workload is not free."
             Standards / Open Specifications:
               Description: "Shared schemas that make measurement portable between tools and vendors."
               children:
                 FOCUS:
+                  Type: Concept
                   Description: "The open specification for normalizing billing and usage data across providers, which makes cross-vendor comparison possible."
                 OpenTelemetry:
+                  Type: Concept
                   Description: "The vendor-neutral standard for traces and metrics, including conventions for generative AI calls."
     Value:
       Description: "Owns the last part of Tokenomics, measuring the business value AI produces so investment is judged on outcomes rather than cost alone. Cost and utilization arrive from Production and Consumption as supporting scaffolding, not as the claim itself."
@@ -1641,102 +2213,136 @@ Tokenomics:
               Description: "What the AI produces, framed for conversation rather than fixed. The fusion draft groups the ten categories by how the number is produced: direct dollar wins, labor categories estimated in hours or FTE, and reported outcomes. The groups differ in method, not worth, and no category outranks another."
               children:
                 Revenue Enablement:
+                  Type: KPI
                   Description: "Revenue that would not exist without the AI. The number already sits in a ledger, so the argument is attribution rather than measurement."
                 Cost Avoidance:
+                  Type: KPI
                   Description: "Spend that does not occur. Spend that went down is visible on an invoice, spend never incurred is a counterfactual. Spans most of the range by itself."
                 Capacity Gain:
+                  Type: KPI
                   Description: "Same people produce more. Individually nice-to-haves, in aggregate often the largest line. For a non-profit or mission-driven organization this is usually where the gain lands: the same staff deliver more of the mission, measured in the organization's own output unit, such as cases handled or grants processed. Whether freed capacity counts as realized benefit is decided at the Net part of the claim chain, not here."
                 Labor Augmentation:
+                  Type: KPI
                   Description: "AI does part of the task and the human stays in the loop. The gain shows up as throughput or hours per unit before it shows up as headcount, measured against the human alone."
                 Labor Automation:
+                  Type: KPI
                   Description: "AI does the task end to end. Trivial to compute and hardest to defend: needs the best-of-either baseline and a cleared quality gate, and raises who owns the decision once the human is out of the loop."
                 Product Quality:
+                  Type: KPI
                   Description: "Fewer defects, less rework, better product. Quality of the work the business ships, deliberately renamed from Output Quality to keep it from being confused with the Quality Floor signal. Measurable only once the workload has a defined floor and instrumentation."
                 Speed to Market:
+                  Type: KPI
                   Description: "Faster delivery of changes. Cycle time is usually available, what a week of earlier delivery is worth usually is not. Resolves into revenue pulled forward or spend avoided."
                 Risk Reduction:
+                  Type: KPI
                   Description: "Exposure, liability, or security posture materially improved. The value is a loss that did not occur, so the claim rests on an expected-loss estimate and should say so plainly."
                 New Capability:
+                  Type: KPI
                   Description: "Something not previously possible, with no prior state to measure against. The claim is about viability rather than delta: name the alternative you chose not to build."
                 Employee Engagement:
                   Description: "Candidate tenth category, renamed from Job Satisfaction to name the actual I-O psychology construct. An AI program changes engagement along three facets, of which the claim carries only the behavioral top line: retention rates, productivity, and counterproductive work behaviors such as withdrawal or sabotage, measured with engagement surveys and incident reports. No forced conversion: the defensible move is to report it, not book it."
                   children:
                     Cognitive facet:
+                      Type: Concept
                       Description: "Fit and skill match: whether the job is changing toward or away from what the person is good at. Part of the construct's full decomposition, documented for the WG record rather than carried on the claim."
                     Affective facet:
+                      Type: Concept
                       Description: "Feelings toward the organization: whether AI change management was done well or people are worried about layoffs. Part of the full decomposition, not carried on the claim."
                     Behavioral facet:
+                      Type: Concept
                       Description: "What shows up in the data: retention, productivity, and counterproductive work behaviors including withdrawal and sabotage. The facet the reported claim is built on."
             Intangible Outcomes:
+              Type: Concept
               Description: "Candidate eleventh category alongside the ten: real effects that resist any defensible number, such as learning, option value, and better decisions. The category exists so these can be named and reported rather than dropped or inflated. Same rule as Employee Engagement: report them, do not book them, and never let an uncounted line turn into an uncounted budget."
             Value Measurement:
               Description: "How a value claim is constructed and defended. The categories name what changed; these nodes are the how."
               children:
                 Baseline:
+                  Type: Concept
                   Description: "The comparison a value claim rests on, ideally the best available alternative rather than a stale before-AI state. Baselines go stale quickly and created processes may have none."
                 No-baseline problem:
+                  Type: Concept
                   Description: "Workloads where AI created the process so no counterfactual exists. The hardest measurement case, handled with bounded estimates rather than solved."
                 Claim chain:
                   Description: "The how-to workflow, in four parts rather than layers, since layer is reserved for the technical stack. Observe gathers the inputs, all in one unit. Net turns them into one number in that unit. Convert carries the net number into another unit and can repeat. Book names where a dollar-denominated result lands. Many claims stop after Net, and a claim that stops there is complete."
                   children:
                     Observe:
+                      Type: Concept
                       Description: "The inputs, each denominated in the baseline's unit: scope, baseline, observed state, Quality Floor, cost created, and provenance. Cost created is the review, triage, rework, supervision, and escalation the AI adds inside the workload, expressed in the baseline's unit."
                     Net:
                       Description: "Gross delta times volume, less outputs that missed the floor, less cost created, less harm from misses, equals net benefit. One number, in one unit, over one period, with one confidence mark that carries the weakest provenance among the inputs."
                       children:
                         Harm from misses:
+                          Type: Concept
                           Description: "The Quality Floor makes bad output not count; it does not make bad output cost nothing. An incorrect resolution or a compliance miss is net negative, not merely zero, and the damage is subtracted here in the baseline's unit. Most claims carry zero on this line; risk-bearing workloads do not."
                         Redeployment:
+                          Type: Concept
                           Description: "Freed capacity that was not redeployed nets to zero realized benefit. It is tracked as an FTE estimate, not claimed, until the capacity is spent on work that produces an outcome. This applies to every labor category, not only capacity gain."
                     Convert:
                       Description: "The optional, repeatable hop from a net observation into hours, headcount, or money. Conversion operates on the net and never on the gross; each hop carries its own confidence and confidence compounds downward; the claim names its hop count, and a claim beyond the hop threshold the organization sets is reported, not booked. Defensibility lives here, not at the destination."
                       children:
                         Stated stopping point:
+                          Type: Concept
                           Description: "The conversion is available, not mandatory: teams managing in time may stop at the delta and report hours or FTE equivalents. The chain requires the claim to name where it stopped, so a freed hour is never quietly counted as a booked dollar. Whether conversion to dollars is optional or mandatory is still open in the working group."
                     Book:
                       Description: "Only a dollar-denominated result can reach a destination; a claim that stops at Net or converts into a non-dollar unit is reported and has no destination. Evidence marks say what kind of argument a claim requires: a ledger line, a counterfactual, an expected loss, or attribution."
                       children:
                         Destinations:
+                          Type: Concept
                           Description: "The five places a booked number lands: new revenue won, revenue retained, spend removed, spend avoided, capital freed. The financial statements are a closed list, so the set is closed; one win is booked once, in one destination, by one team."
                     Role ladder:
+                      Type: Concept
                       Description: "Each scope from IC to C-Suite answers the value question at a different range and has its own natural unit, hours per task at the bottom, P and L lines and market position at the top. Estimates add up within a scope, not across scopes."
                 Unit of measure:
+                  Type: KPI
                   Description: "Dollars, hours, or FTE equivalents, chosen per audience. Dollars read to executives, hours and FTE equivalents read to operational leads, and some outcomes deliberately stay unconverted."
                 Maturity staging:
+                  Type: Concept
                   Description: "What a claim looks like at each stage of running the chain. Crawl: a net delta in native units with a stated baseline and floor, stopping at Net. Walk: adds the conversion chain and a named destination, running through Book. Run: composes the claim against TCA for a return, which needs cost at the same attribution grain."
                 Augmentation and automation:
+                  Type: Concept
                   Description: "The old single Labor Offset label let teams claim augmentation and defend it with automation math. The split into two categories is the resolution: they need different baselines, human alone versus best-of-either, and saying which one you mean is most of the defense. What freed people move to afterwards stays open."
                 Product versus internal posture:
                   Description: "Restored as the what of common AI task types: Product AI is customer-facing and judged on growth and margin, Internal AI is operational and judged on cost and efficiency. The posture picks the scoreboard but never changes the measurement math, and packaging never decides posture, consumption does."
                   children:
                     Internal product workload:
+                      Type: Concept
                       Description: "AI-enabled features built and packaged like a product for internal users. The goal is productivity, so it is measured as Internal AI no matter how well it is packaged."
                 Value claim components:
+                  Type: Concept
                   Description: "A full claim names the workload or task type, the outcome measured, the unit, the baseline, and the quality the result was judged at."
                 Cost boundary:
                   Description: "A value claim nets the costs the AI creates inside the workload: review, triage, rework, supervision, escalation. It does not net the costs the AI consumes, which are TCA under the Business Case and compose later. The test is the baseline's own unit: if the baseline was 45 minutes of human review, triage time is human review time and nets before conversion; the GPU bill is not, so it belongs to TCA."
                   children:
                     Attribution grain:
+                      Type: Concept
                       Description: "For a claim and a cost to compose into a return, TCA has to land on the same workload boundary as the outcome. The value side defines the grain; the requirement is stated here and the solution is being built separately."
                 Quality Floor:
                   Description: "The pass bar for acceptable output on a specific workload: quality is the gate, not a multiplier. Value only counts when output clears the floor, cheap output that misses it is waste, and full utilization of a model that misses it is waste rather than efficiency."
                   children:
                     Task-specific criteria:
+                      Type: Concept
                       Description: "Code generation and creative summarization have different correctness criteria, so the floor is defined per workload. Leaderboard scores are a starting point for model selection, not a substitute for measuring on your own workload."
                     Defined before optimization:
+                      Type: Concept
                       Description: "Routing to cheaper models is impossible until acceptable has a definition, so the floor must exist before cost work begins."
                     Re-baselining:
+                      Type: Concept
                       Description: "A floor calibrated for one model generation goes stale for the next, so it must be re-established as models evolve."
                     Floor versus work quality:
+                      Type: Concept
                       Description: "The floor is a binary pass signal for the AI output; the Product Quality category means the quality of the work the business ships. The rename from Output Quality exists to keep the two from talking past each other."
             Outcome KPIs:
               Description: "The outcome-facing readouts of unit economics, where cost per unit stops describing production efficiency and starts describing business results."
               children:
                 Cost per outcome:
+                  Type: KPI
                   Description: "Cost tied to a completed business result rather than raw usage, the natural bridge from unit economics into business outcomes."
                 Cost per user:
+                  Type: KPI
                   Description: "Spend per active user over a period, the denominator that most directly connects usage to business metrics."
                 Cost per session:
+                  Type: KPI
                   Description: "Spend across a full user interaction, the first denominator that reflects conversion rather than infrastructure."
         Unit Economics:
           Description: "The per-unit costs and efficiency ratios behind token spend."
@@ -1745,89 +2351,121 @@ Tokenomics:
               Description: "What the spend is divided by, which is the choice that determines what the metric can tell you."
               children:
                 Cost per token:
+                  Type: KPI
                   Description: "The rawest measure, useful for comparing infrastructure and nearly useless for comparing products."
                 Cost per request:
+                  Type: KPI
                   Description: "Spend per API call, which hides wide variation in request size."
                 Cost per agent run:
+                  Type: KPI
                   Description: "Spend for one complete autonomous task, the natural unit once workflows stop being single calls."
             Efficiency ratios:
               Description: "Production-side measures of how much output a resource yields."
               children:
                 Tokens per dollar:
+                  Type: KPI
                   Description: "A throughput-per-cost efficiency metric and core optimization target."
                 Tokens per watt:
+                  Type: KPI
                   Description: "Token output per unit of energy, an efficiency and sustainability measure."
                 Tokens per GPU-hour:
+                  Type: KPI
                   Description: "How many tokens a GPU produces per hour, a utilization measure."
                 Tokens per second per accelerator:
+                  Type: KPI
                   Description: "Instantaneous production rate, which combined with hourly cost yields cost per token directly."
             Margin:
               Description: "What is left after the cost of producing the tokens."
               children:
                 Gross & contribution margin:
+                  Type: KPI
                   Description: "The profit left after token and serving costs."
                 COGS composition:
+                  Type: KPI
                   Description: "How much of the cost is model calls, retrieval, storage, and human review, which shows where optimization would actually land."
                 Blended cost:
+                  Type: KPI
                   Description: "A weighted average across the model mix, which is what finance sees and what hides the outliers."
             Cost drivers:
               Description: "The operational variables that move the unit number."
               children:
                 Utilization:
+                  Type: KPI
                   Description: "The share of paid capacity doing useful work, the dominant driver for self-hosted serving."
                 Cache hit rate:
+                  Type: KPI
                   Description: "The share of input served from cache, the dominant driver for prompt-heavy API workloads."
                 Model mix:
+                  Type: KPI
                   Description: "The distribution of traffic across price tiers, usually more movable than any single price."
                 Retry and failure rate:
+                  Type: KPI
                   Description: "Work paid for twice, which links quality engineering directly to unit cost."
                 Input to output ratio:
+                  Type: KPI
                   Description: "Which side of the meter dominates, which determines whether prompt or generation is worth optimizing."
             Measurement pitfalls:
               Description: "Ways a unit economics figure can be technically correct and still mislead."
               children:
                 Idle and reserved cost:
+                  Type: Concept
                   Description: "Capacity paid for but unused has to land somewhere, and burying it inflates the apparent cost of active work."
                 Fixed cost amortization:
+                  Type: Concept
                   Description: "Training, evaluation, and platform cost spread over volume, which makes early unit costs look worse than the steady state."
                 Attribution boundary:
+                  Type: Concept
                   Description: "Whether retrieval, storage, guardrails, and human review count toward the unit cost, which is a choice that must be stated to be comparable."
                 Denominator drift:
+                  Type: Concept
                   Description: "A unit metric improving because the unit changed rather than because anything got cheaper."
         Monetization:
           Description: "How the value of tokens is captured as revenue."
           children:
             Usage-based / metered:
+              Type: Concept
               Description: "Charging customers in proportion to tokens or calls used."
             Seat-based:
+              Type: Concept
               Description: "Charging per user regardless of usage."
             Subscription / tiers:
+              Type: Concept
               Description: "Recurring plans with bundled usage limits."
             Credits / prepaid:
+              Type: Concept
               Description: "Selling usage credits customers draw down."
             Markup on token cost:
+              Type: Concept
               Description: "Reselling tokens above their raw cost as the margin."
             Hybrid pricing:
+              Type: Concept
               Description: "A base subscription plus metered overage, the common compromise between predictable revenue and cost coverage."
             Outcome-based pricing:
+              Type: Concept
               Description: "Charging for completed work, which requires confident unit economics because the efficiency risk sits with the seller."
             Metering design:
               Description: "Choosing what the customer sees on their bill."
               children:
                 Credit abstraction:
+                  Type: Concept
                   Description: "Exposing an internal unit rather than raw tokens, which preserves pricing freedom and obscures cost comparison."
                 Cost pass-through vs absorption:
+                  Type: Concept
                   Description: "Whether upstream price changes reach the customer, which decides who carries provider pricing risk."
                 Limits as product tiers:
+                  Type: Concept
                   Description: "Using rate and volume caps to differentiate plans, which turns a cost control into a packaging decision."
             Margin risk:
               Description: "Ways a pricing model stops covering its costs."
               children:
                 Unbounded usage:
+                  Type: Concept
                   Description: "Flat-price plans meeting agentic workloads, where a small number of users can consume far beyond the average."
                 Cost inflation exposure:
+                  Type: Concept
                   Description: "Committed customer pricing meeting rising provider or infrastructure cost."
                 Abuse and automation:
+                  Type: Concept
                   Description: "Programmatic consumption of a plan priced for human use."
         Business Case:
           Description: "The justification for AI spend against its returns."
@@ -1836,37 +2474,53 @@ Tokenomics:
               Description: "The unit at which value is attributed: a named workload with an owner, best framed as a workflow or business process rather than a single-shot, single-user task. The same unit anchors the cost side under Consumption; here it is the boundary the outcome is measured at, and a use case is its business-facing view."
               children:
                 Workflow grain:
+                  Type: Concept
                   Description: "Value compounds across a whole workflow: the model, the retrieved data, the infrastructure, the engineer who designed the workflow, and the employee who used it. No measurement isolates the share belonging to the AI alone, so claims scope to the workflow outcome, not to individual calls."
             Value case gate:
+              Type: Concept
               Description: "A measurable value case before a new workload goes live: what the process costs today in money or time, which specific financial outcome the AI improves, and how that outcome will be measured in dollars. A business case that cannot express its expected value in financial terms before launch is an experiment, and should be funded with explicit scope limits and a defined point at which it produces evidence or stops."
             ROI:
+              Type: KPI
               Description: "The return generated relative to AI investment."
             TCA:
+              Type: KPI
               Description: "The Total Cost of AI across tokens, hardware, power, licensing, and the labor to build and operate the AI platform. A value claim does not net these; see Cost boundary under Value Measurement for the boundary and the grain at which a claim and a cost compose into a return."
             Build vs buy:
+              Type: Concept
               Description: "Whether to self-host or use a managed provider."
             Payback period:
+              Type: KPI
               Description: "How long until savings or revenue cover the investment."
             Value per token (quality, task completion):
+              Type: KPI
               Description: "The business value a token delivers, not just its cost."
             Benchmark against existing cost:
+              Type: Concept
               Description: "Comparing against the human or software cost the workload replaces, which is usually the number that decides funding."
             Opportunity cost:
+              Type: Concept
               Description: "What the same capacity, capital, or team could have produced elsewhere."
             Risk adjustment:
+              Type: Concept
               Description: "Discounting expected return for model, vendor, and regulatory uncertainty."
         Market Structure:
           Description: "The supply landscape that sets what any buyer can actually get and at what price."
           children:
             Supply chain:
+              Type: Concept
               Description: "Silicon, memory, power, and facilities, each with its own lead time and constraint."
             Provider landscape:
+              Type: Concept
               Description: "Model developers, hyperscalers, specialist accelerator clouds, and aggregators, each with a different cost basis."
             Capacity as a traded good:
+              Type: Concept
               Description: "Accelerator time increasingly bought, resold, and brokered rather than only rented from a provider."
             Arbitrage:
+              Type: Concept
               Description: "Exploiting price differences between providers, regions, or commitment types for the same effective capability."
             Concentration risk:
+              Type: Concept
               Description: "Dependence on a small number of suppliers at several layers of the stack at once."
             Infrastructure price inflation:
+              Type: Concept
               Description: "Rising cost of the underlying compute and facilities, which does not always appear in per-token rates but eventually constrains them."
