@@ -7,6 +7,15 @@ Tokenomics:
         Tokenization:
           Description: "How raw text and media are converted into the tokens that get billed and processed."
           children:
+            Pipeline Stages:
+              Description: "The steps applied to raw text before the core tokenization algorithm runs."
+              children:
+                Normalization:
+                  Type: Concept
+                  Description: "Standardizing text, such as Unicode normalization or lowercasing, which impacts token efficiency and cost."
+                Pre-tokenization rules:
+                  Type: Concept
+                  Description: "The regex or splitting pass applied before merging, which decides how whitespace, digits, and punctuation group together."
             Algorithm:
               Description: "The method used to split text into tokens."
               children:
@@ -16,18 +25,24 @@ Tokenomics:
                 WordPiece:
                   Type: Concept
                   Description: "A subword scheme used by BERT-family models that picks merges by likelihood rather than raw frequency."
-                SentencePiece / Unigram:
+                Unigram:
                   Type: Concept
                   Description: "A language-agnostic tokenizer that trains directly on raw text, common in multilingual models."
                 Byte-level tokenization:
                   Type: Concept
                   Description: "Operates on raw bytes so any input is representable without unknown tokens."
-                Pre-tokenization rules:
+            Tokenizer-free approaches:
+              Description: "Research directions that learn dynamic byte groupings instead of a fixed vocabulary, removing the tokenizer as a cost variable."
+              children:
+                Raw byte processing:
                   Type: Concept
-                  Description: "The regex or splitting pass applied before merging, which decides how whitespace, digits, and punctuation group together."
-                Tokenizer-free approaches:
+                  Description: "Treating each of the 256 possible byte values as an individual input. This completely eliminates the concept of 'out-of-vocabulary' and removes the cost penalty for non-English languages."
+                Patch-level modeling (Megabyte):
                   Type: Concept
-                  Description: "Research directions that learn dynamic byte groupings instead of a fixed vocabulary, removing the tokenizer as a cost variable."
+                  Description: "Dynamically grouping bytes into larger patches instead of processing them one by one. This prevents the sequence length from exploding, which would otherwise crush the model with compute costs."
+                The Compute vs. Embedding Tradeoff:
+                  Type: Concept
+                  Description: "The core economic shift of tokenizer-free models: you save massive amounts of memory by deleting the 100,000+ token embedding table, but you pay for it with the extra compute required to process sequences that are 3-4x longer."
             Implementations:
               Description: "Concrete libraries that perform tokenization."
               children:
@@ -58,6 +73,9 @@ Tokenomics:
                 Reserved and unused slots:
                   Type: Concept
                   Description: "Vocabulary entries held back for later use, often repurposed for control tokens or tool syntax."
+                Byte-fallback / UNK handling:
+                  Type: Concept
+                  Description: "Encoding unknown characters as raw bytes rather than emitting UNK tokens, impacting token counts for rare languages or special formatting."
             Efficiency:
               Description: "How compactly a tokenizer encodes text, which directly sets token counts and cost."
               children:
@@ -70,6 +88,9 @@ Tokenomics:
                 Code / structured text density:
                   Type: Concept
                   Description: "Code and markup tokenize inefficiently, inflating token counts for technical workloads."
+                Whitespace and Indentation Penalty:
+                  Type: Concept
+                  Description: "How a tokenizer handles consecutive spaces vs. tabs, a massive driver of code-generation costs."
                 Compression rate:
                   Type: KPI
                   Description: "The overall ratio of characters to tokens a tokenizer achieves."
@@ -99,7 +120,7 @@ Tokenomics:
                   Description: "A single character can span several tokens, so streamed output must buffer until a boundary is safe to emit."
                 Stop sequence matching:
                   Type: Concept
-                  Description: "Stop strings are matched on text rather than tokens, so generation can overshoot slightly before halting."
+                  Description: "Stop strings are matched on text rather than tokens, so generation can overshoot slightly before halting."        
         Model / Architecture:
           Description: "The model's design, which sets the cost floor before any training or serving."
           children:
