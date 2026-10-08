@@ -1449,6 +1449,16 @@ Tokenomics:
                       Links:
                         - "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
                         - "https://developers.openai.com/api/docs/guides/prompt-caching"
+                    Cache Warmup:
+                      Type: Concept
+                      Description: "Also known as cache warming or cache pre-warming. A minimal request that writes a shared prompt prefix (tool definitions, system prompt, and shared context) to a provider's prompt cache before the requests that will reuse it are sent. Use warmup before a predictable burst of traffic or before fanning out parallel work such as subagents. A cache entry becomes readable only after its writing request begins responding, so parallel requests sent sooner each pay for their own write. Warmup pays off only if every follow-up request matches the warmed prefix exactly, including model, tools, and reasoning settings."
+                      Links:
+                        - "https://medium.com/tr-labs-ml-engineering-blog/prompt-caching-the-secret-to-60-cost-reduction-in-llm-applications-6c792a0ac29b"
+                    Cache Keep-Alive:
+                      Type: Concept
+                      Description: "Also known as cache warming, keepalive pings, or heartbeat. A periodic minimal request that reads an existing cache entry during an idle period, resetting its time to live (TTL) before it expires. Keep-alive trades a small recurring cache-read cost for avoiding a much larger cache-write cost when work resumes. It pays off only when work is likely to resume before the accumulated pings cost more than the rewrite they prevent, and it saves nothing where usage is not billed per token. Longer retention tiers (for example, 1-hour or 24-hour TTLs) are the main alternative."
+                      Links:
+                        - "https://pi.dev/docs/latest/settings#model-and-thinking"
                 Cache access modes:
                   Description: "How much cache control and cache observability a consumer gets depends on the door they enter through, from fully hidden to fully exposed."
                   children:
