@@ -326,6 +326,9 @@
 
     #tip .badge.kpi { background: var(--kpi-color); color: #fff; }
     #tip .badge.concept { background: var(--concept-color); color: #fff; }
+    #tip .badge.rc { background: #f0a03c; color: #17171b; }
+    #tip .badge.stable { background: #56c39a; color: #17171b; }
+    #tip .meta { color: var(--muted); font-size: 11px; margin-bottom: 5px; }
     #tip .desc { color: var(--ink) }
     
     #tip .links {
@@ -548,6 +551,21 @@
         </select>
       </div>
       <div class="field">
+        <label for="edStatus">Status</label>
+        <select id="edStatus">
+          <option value="draft">Draft</option>
+          <option value="RC">RC</option>
+          <option value="stable">Stable</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="edTraining">Training</label>
+        <select id="edTraining">
+          <option value="">(Not covered)</option>
+          <option value="fundamentals">Fundamentals</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="edDesc">Description</label>
         <textarea id="edDesc" placeholder="Optional — shown on hover in the map"></textarea>
       </div>
@@ -592,9 +610,13 @@
         const desc = pick(val, "Description", "description");
         const links = pick(val, "Links", "links");
         const type = pick(val, "Type", "type");
+        const status = pick(val, "Status", "status");
+        const training = pick(val, "Training", "training");
         if (desc != null) node.description = String(desc);
         if (links != null) node.links = Array.isArray(links) ? links.map(String) : [String(links)];
         if (type != null) node.type = String(type);
+        if (status != null) node.status = String(status);
+        if (training != null) node.training = String(training);
         const ch = pick(val, "children", "Children");
         if (ch && typeof ch === "object" && !Array.isArray(ch)) {
           node.children = Object.entries(ch).map(([k, v]) => toNode(k, v));
@@ -633,7 +655,7 @@
     function hasRealChildren(d) { return !!(d.data.children && d.data.children.length); }
     function branchName(d) { let n = d; while (n.depth > 1) n = n.parent; return n.depth === 1 ? n.data.name : null; }
     function colorOf(d) { return BRANCH_COLORS[branchName(d)] || "#9aa1ad"; }
-    function hasInfo(d) { return !d.data.__add && !!(d.data.description || d.data.type || (d.data.links && d.data.links.length)); }
+    function hasInfo(d) { return !d.data.__add && !!(d.data.description || d.data.type || d.data.status || d.data.training || (d.data.links && d.data.links.length)); }
     function textLeft(d) { return !d.data.__add && hasRealChildren(d) && !d.data.collapsed; }
 
     function initSvg() {
@@ -804,6 +826,8 @@
     const modal = document.getElementById("modal");
     const edName = document.getElementById("edName");
     const edType = document.getElementById("edType");
+    const edStatus = document.getElementById("edStatus");
+    const edTraining = document.getElementById("edTraining");
     const edDesc = document.getElementById("edDesc");
     const edLinks = document.getElementById("edLinks");
     let editorState = null;
@@ -826,6 +850,8 @@
       const src = cfg.mode === "edit" ? cfg.node : {};
       edName.value = src.name || "";
       edType.value = src.type || "";
+      edStatus.value = src.status || "draft";
+      edTraining.value = src.training || "";
       edDesc.value = src.description || "";
       setLinks(src.links || []);
       modal.classList.add("show");
@@ -836,6 +862,8 @@
       if (!editorState) return;
       const name = edName.value.trim();
       const type = edType.value.trim();
+      let status = edStatus.value.trim() || "draft";
+      const training = edTraining.value.trim();
       const desc = edDesc.value.trim();
       const links = getLinks();
       if (!name) { edName.focus(); return; }
@@ -844,6 +872,8 @@
         parent.children = parent.children || [];
         const node = { name, children: [], collapsed: false, __id: uid() };
         if (type) node.type = type;
+        node.status = status;
+        if (training) node.training = training;
         if (desc) node.description = desc;
         if (links.length) node.links = links;
         parent.children.push(node);
@@ -852,6 +882,8 @@
         const node = editorState.node;
         node.name = name;
         if (type) node.type = type; else delete node.type;
+        node.status = status;
+        if (training) node.training = training; else delete node.training;
         if (desc) node.description = desc; else delete node.description;
         if (links.length) node.links = links; else delete node.links;
       }
@@ -869,6 +901,10 @@
         const badgeClass = d.data.type.toUpperCase() === "KPI" ? "kpi" : "concept";
         html += `<div class="badge ${badgeClass}">${escapeHtml(d.data.type)}</div>`;
       }
+      if (d.data.status && d.data.status !== "draft") {
+        html += `<div class="badge ${escapeHtml(d.data.status.toLowerCase())}">${escapeHtml(d.data.status.toUpperCase())}</div>`;
+      }
+      if (d.data.training) html += `<div class="meta">Training: ${escapeHtml(d.data.training)}</div>`;
       if (statusNote) html += `<div style="color:${ST[d.data.__removed ? "removed" : d.data.__status] || ST.unchanged};font-weight:600;margin-bottom:5px">${statusNote}</div>`;      if (d.data.description) html += `<div class="desc">${escapeHtml(d.data.description)}</div>`;
       if (diffMode && d.data.__status === "revised" && d.data.__oldDescription) {
         html += `<div class="desc" style="color:var(--muted);margin-top:5px"><i>was: ${escapeHtml(d.data.__oldDescription)}</i></div>`;
@@ -915,7 +951,7 @@
     }
 
     function nodeContent(n) {
-      return JSON.stringify([n.type || "", n.description || "", (n.links || []).slice().sort()]);
+      return JSON.stringify([n.type || "", n.status || "", n.training || "", n.description || "", (n.links || []).slice().sort()]);
     }
     function indexTree(tree) {
       const byPath = new Map(), byName = new Map();
@@ -1134,6 +1170,8 @@
       const pad = "  ".repeat(indent);
       out.push(pad + keyStr(node.name) + ":");
       if (node.type) out.push(pad + "  Type: " + valStr(node.type));
+      if (node.status) out.push(pad + "  Status: " + valStr(node.status));
+      if (node.training) out.push(pad + "  Training: " + valStr(node.training));
       if (node.description) out.push(pad + "  Description: " + valStr(node.description));
       if (node.links && node.links.length) {
         out.push(pad + "  Links:");
