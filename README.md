@@ -63,22 +63,31 @@ Three top-level branches, color-coded in the viewer:
 
 ## YAML format
 
-Every node is a mapping key. `Description` and `Links` are optional; `children` nests the next level.
+Every node is a mapping key. `Description` and `Links` are optional; `children` nests the next level. Each node also carries review metadata: a mandatory `Status` and, where applicable, an optional `Training` tag.
 
 ```yaml
 Tokenomics:
   Description: "The full economics of producing and consuming LLM tokens."
+  Status: draft
+  Training: fundamentals
   children:
     Production:
       Description: "The supply side of tokens."
+      Status: draft
+      Training: fundamentals
       children:
         PagedAttention:
+          Type: Concept
+          Status: draft
           Description: "Pages the KV cache into fixed-size blocks."
           Links:
             - "https://blog.vllm.ai/2023/06/20/vllm.html"
 ```
 
-`Description`, `Links`, and `children` are each accepted in either capitalization. A YAML file with a single root key renders that key as the root node; multiple top-level keys get wrapped in a generic "Mind Map" root.
+- **`Status`** (mandatory, one new node is never committed without it): `draft` is the default for any node not yet through working-group review; `RC` is applied after discussion and consensus in a WG; `stable` is applied once the term and its definition are broadly accepted. The viewer badges only `RC` and `stable` (`draft` is the assumed baseline).
+- **`Training`** (optional): names the training course that covers the node. The only value today is `fundamentals` (AI Tokenomics Fundamentals, the Tokenomics 101 material); when new courses exist, new values appear here. Absent means not covered by any course.
+
+`Description`, `Links`, `Type`, `Status`, `Training`, and `children` are each accepted in either capitalization. A YAML file with a single root key renders that key as the root node; multiple top-level keys get wrapped in a generic "Mind Map" root.
 
 ## Dependencies
 
