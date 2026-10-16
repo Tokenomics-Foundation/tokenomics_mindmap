@@ -3372,6 +3372,8 @@ Tokenomics:
               Type: Concept
               Status: draft
               Description: "Discounting expected return for model, vendor, and regulatory uncertainty."
+            AI Economics Architect (proposed persona):
+              Description: "Designs the enterprise AI economic model connecting strategy, technology, total cost, governed action, measurable outcomes, and learning across Production, Consumption, and Value."
         Market Structure:
           Status: draft
           Training: fundamentals
