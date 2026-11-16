@@ -13,6 +13,12 @@ Tokenomics:
           Training: fundamentals
           Description: "How raw text and media are converted into the tokens that get billed and processed."
           children:
+            Token:
+              Type: Concept
+              Status: draft
+              Description: "The atomic unit of AI: the chunk of text a model reads and writes, and the basis for most AI billing."
+              Links:
+                "https://www.tokeneconomics.com/what-is-ai-tokenomics/"
             Algorithm:
               Status: draft
               Description: "The method used to split text into tokens."
@@ -587,6 +593,10 @@ Tokenomics:
                   Type: Concept
                   Status: draft
                   Description: "How accelerator value is written down over its useful life."
+                Useful life:
+                  Type: Concept
+                  Status: draft
+                  Description: "The service period assumed behind a write-down, the largest single swing in a self-hosted cost. Book life in the ledger, economic life before newer hardware wins per unit of output, and model life can each differ, so a self-hosted figure declares which one it uses."
                 Refresh cycles:
                   Type: Concept
                   Status: draft
@@ -1362,6 +1372,10 @@ Tokenomics:
                       Type: Concept
                       Status: draft
                       Description: "Holding part of the weights in host memory or on disk and moving them in as needed, trading interconnect bandwidth for capacity."
+                    Weight streaming:
+                      Type: Concept
+                      Status: draft
+                      Description: "Keeping model weights in host memory and streaming them to the accelerator on demand during inference, so a model larger than accelerator memory runs without quantization. It makes accelerator memory held by weights a variable rather than a fixed floor."
                     Expert residency and caching:
                       Type: Concept
                       Status: draft
@@ -1526,6 +1540,12 @@ Tokenomics:
                   Type: KPI
                   Status: draft
                   Description: "Median and tail figures such as p50, p95, and p99, which describe the distribution that an average conceals."
+                Interactivity:
+                  Type: KPI
+                  Status: draft
+                  Description: "The speed at which tokens arrive, measured as tokens per second per user. One of the two axes of token value, alongside intelligence."
+                  Links:
+                    "https://www.tokeneconomics.com/what-is-ai-tokenomics/"
             Reliability:
               Status: draft
               Description: "Keeping a serving deployment healthy under real traffic."
@@ -1810,6 +1830,12 @@ Tokenomics:
                   Type: Concept
                   Status: draft
                   Description: "Prompts, evals, and guardrails are tuned per model, so switching is rarely as cheap as the price difference suggests."
+                Tokenmaxing:
+                  Type: Concept
+                  Status: draft
+                  Description: "The habit of running everything through the most powerful model because tokens felt free."
+                  Links:
+                    "https://www.tokeneconomics.com/what-is-ai-tokenomics/"
             Routing:
               Status: RC
               Description: "Directing each request to the model or serving path that meets the task's quality bar at the lowest cost, the decision layer over a mixed portfolio of hosted and open-weight models. A router answers the cost question against a quality bar set elsewhere; it does not define the bar."
@@ -1846,6 +1872,12 @@ Tokenomics:
                   Type: Concept
                   Status: RC
                   Description: "Using the first model's own uncertainty to decide whether a stronger model is needed, the signal most cascades run on."
+                Mixture of Agents:
+                  Type: Concept
+                  Status: draft
+                  Description: "Sending one request to several models in parallel and having an aggregator model synthesize their answers into a single response, optionally over more than one round. It is routing aligned to outcome rather than efficiency: every proposer call is billed, so token cost scales with the number of models and rounds, and it pays off only when the combined answer clears a quality floor that no single model reaches at the same total cost. Not to be confused with Mixture of Experts, which routes between sub-networks inside one model."
+                  Links:
+                    - "https://arxiv.org/abs/2406.04692"
                 Routing ownership:
                   Type: Concept
                   Status: draft
@@ -1858,6 +1890,18 @@ Tokenomics:
                   Type: Concept
                   Status: draft
                   Description: "Requests a classifier sends to a model that cannot handle them, answered confidently and incorrectly. Damage per misroute runs many multiples of the request cost, and uninstrumented misroutes surface months later through customer harm rather than the bill, so per-tier quality monitoring and a log of which model served every request are prerequisites to trusting a cost-based router."
+                Misroute rate:
+                  Type: KPI
+                  Status: draft
+                  Description: "The share of graded requests sent to the wrong tier. A request is under-routed when it failed and a replay one tier up passes, and over-routed when it passed and a replay one tier down also passes."
+                Counterfactual evaluation:
+                  Type: Concept
+                  Status: draft
+                  Description: "Replaying sampled production requests on other eligible models to learn whether a cheaper or stronger route would have met the same quality bar. Production traffic shows only the model that was chosen, so the alternatives have to be run to be known."
+                Oracle router:
+                  Type: Concept
+                  Status: draft
+                  Description: "A hypothetical router that sends every request to the cheapest model that would have answered it acceptably, computed after the fact from a sample replayed on every model. No real router reaches it, so the gap to the oracle bounds what better routing could still save."
                 Router overhead:
                   Type: Concept
                   Status: RC
@@ -2346,6 +2390,10 @@ Tokenomics:
                       Type: Concept
                       Status: draft
                       Description: "Libraries providing the loop, memory, and tool plumbing, which set defaults that quietly determine token spend."
+                    Elicitation:
+                      Type: Concept
+                      Status: draft
+                      Description: "A protocol-defined pause in which an agent or tool server asks a person for a confirmation, a missing input, or a sign-in or payment step mid-task. Each one adds a human round trip to the run."
             Sampling and decoding controls:
               Status: draft
               Description: "Request-level settings that change both output character and cost."
@@ -2730,6 +2778,12 @@ Tokenomics:
               Type: Concept
               Status: draft
               Description: "How consumption changes as token prices change, determining whether lower unit prices reduce total spend or stimulate more usage."
+            Jevons paradox:
+              Type: Concept
+              Status: draft
+              Description: "Efficiency that lowers unit cost can raise total consumption and total spend. It shows clearly in AI, where falling token prices accompany rising total spend."
+              Links:
+                "https://www.tokeneconomics.com/what-is-ai-tokenomics/"
         Purchase Options:
           Status: draft
           Training: fundamentals
@@ -2920,6 +2974,10 @@ Tokenomics:
                   Type: Concept
                   Status: draft
                   Description: "Checking engine and application counts against the invoice, which is where silent measurement errors surface."
+                Usage-share allocation:
+                  Type: Concept
+                  Status: draft
+                  Description: "Splitting a provider's billed amount across consumers by each one's share of measured activity. It is the join available when gateway records and the bill meet only at the grain of period, provider, model, and token type, with no per-request identifier."
                 Tag propagation:
                   Type: Concept
                   Status: draft
@@ -3089,6 +3147,14 @@ Tokenomics:
                       Type: Concept
                       Status: draft
                       Description: "Each scope from IC to C-Suite answers the value question at a different range and has its own natural unit, hours per task at the bottom, P and L lines and market position at the top. Estimates add up within a scope, not across scopes."
+                Task and outcome hierarchy:
+                  Type: Concept
+                  Status: draft
+                  Description: "Tasks roll up to outcomes, and an outcome can itself be a task toward a higher outcome: a commit contributes to a merged change, which contributes to a released feature. The grain of any cost or value figure names a level in this hierarchy."
+                Value trace:
+                  Type: Concept
+                  Status: draft
+                  Description: "Following one job end to end: estimate the value it should produce, trace costs and attributions along the way including human escalations, and record the outcome, averaged over repeated runs. Value is attributed at the outcome, not per request."
                 Unit of measure:
                   Type: KPI
                   Status: draft
@@ -3149,6 +3215,10 @@ Tokenomics:
                   Type: KPI
                   Status: RC
                   Description: "Total cost divided by completed business results that succeeded, not by every attempt. The natural bridge from unit economics into business outcomes; attempts that failed belong in cost per task."
+                Cost per value:
+                  Type: KPI
+                  Status: draft
+                  Description: "Cost divided by the realized value of the work, the step after cost per outcome on the path that starts at cost per token."
                 Cost per user:
                   Type: KPI
                   Status: draft
@@ -3178,6 +3248,10 @@ Tokenomics:
                   Type: KPI
                   Status: draft
                   Description: "Spend for one complete autonomous task, the natural unit once workflows stop being single calls."
+            Internal rate card:
+              Type: Concept
+              Status: draft
+              Description: "An organization's own cost to produce and serve AI per delivery path, such as a provider API or self-hosted capacity, expressed as a rate. Product and use case costs are then built by consuming the rate card."
             Efficiency ratios:
               Status: draft
               Description: "Production-side measures of how much output a resource yields."
