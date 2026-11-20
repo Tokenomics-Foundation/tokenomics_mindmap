@@ -208,9 +208,9 @@ Tokenomics:
                   Type: Concept
                   Status: draft
                   Description: "Layer count, hidden size, and head count, which together set memory footprint and how the model shards across devices."
-            Context:
+            Context window:
               Status: draft
-              Description: "How much input a model can attend to at once."
+              Description: "The span of input a model can attend to at once, the hard bound on how much context a single request can carry."
               children:
                 Context window length:
                   Type: KPI
@@ -1548,7 +1548,7 @@ Tokenomics:
                     "https://www.tokeneconomics.com/what-is-ai-tokenomics/"
             Reliability:
               Status: draft
-              Description: "Keeping a serving deployment healthy under real traffic."
+              Description: "Keeping a serving deployment available and healthy under real traffic, the service sense of reliability rather than the consistency of results across repeated runs."
               children:
                 Health checks and draining:
                   Type: Concept
@@ -1731,7 +1731,7 @@ Tokenomics:
               Description: "Shortening prompts while preserving meaning to cut input cost."
             Context window management:
               Status: draft
-              Description: "Deciding what to include or drop to stay within budget and window limits."
+              Description: "Deciding what is selected, compacted, dropped, or placed into the context to stay within budget and window limits, also called context assembly."
               children:
                 Truncation and sliding windows:
                   Type: Concept
@@ -1995,11 +1995,11 @@ Tokenomics:
                       Type: Concept
                       Status: draft
                       Description: "The provider's own chat surface assembles the prompt entirely and reports no token buckets at all; caching is folded into plan economics and stays invisible to the user by design."
-                    First-party agent tools:
+                    First-party agent harnesses:
                       Type: Concept
                       Status: draft
                       Description: "The provider's own coding or coworking harness manages breakpoints automatically and exposes session-level token dashboards, but its dollar figures are computed locally at list rates, so they show shape rather than the real bill."
-                    Third-party tools:
+                    Third-party products:
                       Type: Concept
                       Status: draft
                       Description: "Products that rehost frontier models behind a proxy assemble the prompt themselves and bill in credits or requests, netting cache savings into a pooled price so they never appear on the customer's side of the glass."
@@ -2021,7 +2021,7 @@ Tokenomics:
                   Description: "Storing computed embeddings so unchanged documents are not re-embedded on every index run."
             AI memory:
               Status: draft
-              Description: "Giving models access to prior context and external knowledge."
+              Description: "Giving an agent or application information beyond the current request, through memory it reads and writes across steps and sessions and through retrieval from external knowledge sources."
               children:
                 Knowledge injection patterns:
                   Status: draft
@@ -2297,7 +2297,7 @@ Tokenomics:
                     Context resend per step:
                       Type: Concept
                       Status: draft
-                      Description: "Each turn resends the accumulated history, so input cost grows with the square of conversation length unless cached."
+                      Description: "Each step resends the accumulated history, so input cost grows with the square of the number of steps unless cached."
                     Tool call round trips:
                       Type: Concept
                       Status: draft
@@ -2309,16 +2309,16 @@ Tokenomics:
                     Reflection loops:
                       Type: Concept
                       Status: draft
-                      Description: "Steps where the model critiques and revises its own work, doubling or more the tokens per unit of output."
-                    Sub-agent fan-out:
+                      Description: "Steps where an agent reassesses and revises its own work, doubling or more the tokens per unit of output."
+                    Subagent fan-out:
                       Type: Concept
                       Status: draft
-                      Description: "Delegating to parallel sub-agents multiplies concurrent spend and is the fastest way to an unexpected bill."
+                      Description: "Delegating to parallel subagents multiplies concurrent spend and is the fastest way to an unexpected bill."
                 Context accumulation:
                   Type: Concept
                   Status: draft
                   Description: "Growing context as an agent gathers state, steadily raising cost."
-                Sub-agents / orchestration:
+                Subagents / orchestration:
                   Status: draft
                   Description: "Coordinating multiple agents, each adding token overhead."
                   children:
@@ -2329,7 +2329,7 @@ Tokenomics:
                     Model tiering:
                       Type: Concept
                       Status: draft
-                      Description: "Planning on a stronger model while delegating execution to cheaper ones, reserving the most expensive tokens for judgment."
+                      Description: "Planning on a stronger model while handing execution to cheaper ones, reserving the most expensive tokens for judgment."
                     Single vs multi-agent tradeoff:
                       Type: Concept
                       Status: draft
@@ -2341,11 +2341,11 @@ Tokenomics:
                 Step and turn budgets:
                   Type: KPI
                   Status: draft
-                  Description: "Hard caps on loop iterations, the main defence against an agent spending without bound."
+                  Description: "Hard caps on how many steps an agent may take within a turn and how many turns a run may span, the main defence against an agent spending without bound. A step is one cycle of the agent loop, a single model call and the tool calls it requests; a turn runs from one input to its response and includes every step taken."
                 Trajectory observability:
                   Type: Concept
                   Status: draft
-                  Description: "Tracing every model call inside a run, without which agent cost cannot be attributed to a cause."
+                  Description: "Tracing the path an agent takes through a run, every model call, tool call, and handoff, without which agent cost cannot be attributed to a cause."
                 Waste attribution:
                   Status: draft
                   Description: "Splitting an agent run's spend into what the task inherently required and what the loop added, so optimization targets the removable part."
@@ -2361,7 +2361,7 @@ Tokenomics:
                     Compaction economics:
                       Type: Concept
                       Status: draft
-                      Description: "Trimming or summarizing accumulated context cuts per-turn cost but can trigger re-read loops that spend more than they save."
+                      Description: "Trimming or summarizing accumulated context cuts per-step cost but can trigger re-read loops that spend more than they save."
                 Tool and protocol layer:
                   Status: draft
                   Description: "How an agent reaches the outside world, and the standards forming around it."
@@ -2374,10 +2374,10 @@ Tokenomics:
                       Type: Concept
                       Status: draft
                       Description: "An open protocol for connecting models to tools and data through one interface, replacing bespoke integration per tool."
-                    A2A (Agent to Agent):
+                    A2A (Agent2Agent Protocol):
                       Type: Concept
                       Status: draft
-                      Description: "A protocol for communication between separate agent systems, addressing coordination rather than tool access."
+                      Description: "An open protocol for agent-to-agent interaction, in which one agent communicates, coordinates, or exchanges information with another across separate agent systems, addressing coordination rather than tool access."
                     Computer and browser use:
                       Type: Concept
                       Status: draft
@@ -2453,12 +2453,12 @@ Tokenomics:
               Description: "Producing and editing code, often long-output and context-heavy."
             Coding agents:
               Status: draft
-              Description: "Autonomous multi-step code work, among the most token-intensive workloads in production."
+              Description: "Multi-step code work carried out by an agent, among the most token-intensive workloads in production."
               children:
                 Session cost variance:
                   Type: Concept
                   Status: draft
-                  Description: "The spread in spend across runs of the same task, wide enough to make per-task budgeting unreliable."
+                  Description: "The spread in spend across sessions that attempt the same task, wide enough to make per-task budgeting unreliable."
                 Harness sensitivity:
                   Type: Concept
                   Status: draft
@@ -2622,7 +2622,7 @@ Tokenomics:
               Description: "Intermediaries offering many models behind one interface, adding routing and failover at some margin. Where a product only passes traffic through and collects metadata it is a proxy; the Proxy, Router, and Gateway definitions live under Optimization and Routing."
             Reliability and continuity:
               Status: draft
-              Description: "Whether the capacity will be there when needed."
+              Description: "Whether the capacity will be there when needed, the availability of supply rather than the consistency of results across repeated runs."
               children:
                 Provider SLAs:
                   Type: KPI
@@ -2688,7 +2688,7 @@ Tokenomics:
             Hallucination control:
               Type: Concept
               Status: draft
-              Description: "Techniques to reduce confident but wrong outputs."
+              Description: "Techniques to reduce outputs that sound plausible but are not supported by the available evidence or sources."
             Groundedness and citation checking:
               Type: Concept
               Status: draft
@@ -2699,7 +2699,7 @@ Tokenomics:
               Description: "Re-running failed calls, a hidden and often overlooked cost."
             Production evals:
               Status: draft
-              Description: "Ongoing quality measurement of live traffic."
+              Description: "Ongoing quality measurement of live traffic, assessing during or after execution whether outputs meet predefined quality criteria."
               children:
                 LLM as judge:
                   Type: Concept
@@ -2916,7 +2916,7 @@ Tokenomics:
         Observability:
           Status: draft
           Training: fundamentals
-          Description: "Visibility into the usage, cost, and quality of AI systems."
+          Description: "Visibility into the usage, cost, and quality of AI systems, inferred from the signals they emit: traces, metrics, logs, and billing records."
           children:
             Telemetry sources:
               Status: draft
@@ -2981,7 +2981,7 @@ Tokenomics:
                 Tag propagation:
                   Type: Concept
                   Status: draft
-                  Description: "Carrying identity from the caller through gateways to the billing record, without which attribution breaks at the first hop."
+                  Description: "Carrying attribution tags such as caller, team, and workload from the caller through gateways to the billing record, alongside trace context, without which attribution breaks at the first hop."
                 Alerting:
                   Type: Concept
                   Status: draft
@@ -3222,11 +3222,11 @@ Tokenomics:
                 Cost per user:
                   Type: KPI
                   Status: draft
-                  Description: "Spend per active user over a period, the denominator that most directly connects usage to business metrics."
+                  Description: "Spend per active user over a period, the denominator that most directly connects usage to business metrics. A user can be a person or an agent, so the count states which are included."
                 Cost per session:
                   Type: KPI
                   Status: draft
-                  Description: "Spend across a full user interaction, the first denominator that reflects conversion rather than infrastructure."
+                  Description: "Spend across one session, a continuous engagement with a user that can span many turns, the first denominator that reflects conversion rather than infrastructure."
         Unit Economics:
           Status: draft
           Training: fundamentals
@@ -3247,7 +3247,7 @@ Tokenomics:
                 Cost per agent run:
                   Type: KPI
                   Status: draft
-                  Description: "Spend for one complete autonomous task, the natural unit once workflows stop being single calls."
+                  Description: "Spend for one complete agent run of a task, the natural unit once workflows stop being single calls."
             Internal rate card:
               Type: Concept
               Status: draft
