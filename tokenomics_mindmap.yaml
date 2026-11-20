@@ -1797,6 +1797,12 @@ Tokenomics:
                   Type: Concept
                   Status: draft
                   Description: "Untrusted content in context being treated as instruction, a security problem with direct cost consequences when it triggers loops."
+                Context exhaustion:
+                  Type: Concept
+                  Status: draft
+                  Description: "The tendency for models to lose accuracy on tasks as context approaches its maximum length, commonly handled by compacting context before the limit. The limit is never reached, which separates it from overflow."
+                  Links:
+                    - "https://github.com/aaif/ws-taxonomy-landscape/blob/main/taxonomy/taxonomy.json"
         Optimization:
           Status: draft
           Training: fundamentals
@@ -2338,10 +2344,30 @@ Tokenomics:
                   Type: Concept
                   Status: draft
                   Description: "The extra tokens spent describing tools and parsing their results."
+                Harness:
+                  Type: Concept
+                  Status: draft
+                  Description: "The software control layer that sits between an AI model and the external world, enabling it to execute a breadth of complex tasks. It runs the loop, connects tools, holds state, and shapes the prompt, so the harness sets how many tokens the same model spends on the same task."
+                  Links:
+                    - "https://github.com/aaif/ws-taxonomy-landscape/blob/main/taxonomy/taxonomy.json"
+                Agent step:
+                  Type: Concept
+                  Status: draft
+                  Description: "One cycle of an agent loop: a single model call and the tool calls it requests. The smallest unit at which agent spend can be counted and capped."
+                Turn:
+                  Type: Concept
+                  Status: draft
+                  Description: "One exchange in which an agentic system receives one input from its caller and works until it produces its response, including every agent step it takes. Cost per turn therefore varies with the number of steps."
                 Step and turn budgets:
                   Type: KPI
                   Status: draft
                   Description: "Hard caps on how many steps an agent may take within a turn and how many turns a run may span, the main defence against an agent spending without bound. A step is one cycle of the agent loop, a single model call and the tool calls it requests; a turn runs from one input to its response and includes every step taken."
+                Kill switch:
+                  Type: Concept
+                  Status: draft
+                  Description: "An out-of-band stop that halts an agent by cutting its access, regardless of the agent's own logic. The last resort against runaway spend when budgets inside the loop fail."
+                  Links:
+                    - "https://github.com/aaif/ws-taxonomy-landscape/blob/main/taxonomy/taxonomy.json"
                 Trajectory observability:
                   Type: Concept
                   Status: draft
@@ -2689,6 +2715,11 @@ Tokenomics:
               Type: Concept
               Status: draft
               Description: "Techniques to reduce outputs that sound plausible but are not supported by the available evidence or sources."
+              children:
+                Hallucination rate:
+                  Type: KPI
+                  Status: draft
+                  Description: "The proportion of evaluation scenarios in which any hallucination symptom was observed: an ungrounded claim, an entity mismatch, a stale source error, or a fabricated tool result."
             Groundedness and citation checking:
               Type: Concept
               Status: draft
@@ -2729,6 +2760,16 @@ Tokenomics:
               Type: Concept
               Status: draft
               Description: "People checking model output, usually the most expensive component per item and the benchmark others are measured against."
+            Human in the loop:
+              Type: Concept
+              Status: draft
+              Description: "An agentic workflow that includes a human-required step: a human must review, approve, or intervene at defined checkpoints before the agent may proceed. Each checkpoint adds labor cost and waiting time to the workload it protects."
+              Links:
+                - "https://github.com/aaif/ws-taxonomy-landscape/blob/main/taxonomy/taxonomy.json"
+            Policy gate:
+              Type: Concept
+              Status: draft
+              Description: "A non-bypassable step that enforces allow-lists, budgets, or human approval before sensitive actions execute. It is where a spend limit becomes enforced rather than advisory."
             Adversarial input:
               Status: draft
               Description: "Deliberate attempts to break the intended behaviour of a deployed model."
