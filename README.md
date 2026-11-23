@@ -96,3 +96,12 @@ Tokenomics:
 ## Contributing
 
 Edits are YAML edits. Add or refine nodes in `tokenomics_mindmap.yaml`, keep descriptions to one plain sentence, and add a `Links` entry when a concept has a canonical paper or writeup. Open a PR with the diff.
+
+## License
+
+- **Mind map content** (`tokenomics_mindmap.yaml`, including every term, definition, and KPI, plus this README): [Creative Commons Attribution 4.0 International](LICENSE) (CC BY 4.0), as the Tokenomics Foundation charter requires for documentation. You may copy, adapt, and redistribute it, including in commercial products, as long as you give credit.
+- **Viewer code** (`mindmap.html`, `index.html`): [MIT](LICENSE-CODE).
+
+Suggested attribution: "Tokenomics Mind Map, Tokenomics Foundation, licensed under CC BY 4.0", with a link to this repository and a note if you changed the content. Pinning to a release tag keeps the attribution reproducible.
+
+Contributions are accepted under the same terms, with a Developer Certificate of Origin sign-off (`git commit -s`).
